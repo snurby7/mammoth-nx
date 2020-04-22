@@ -1,0 +1,103 @@
+import * as uuid from 'uuid/v4'
+import { IBudgetQuery, IBudgetRequest, IBudgetUpdate } from '../../common'
+import { ExecuteStatement } from '../../neo4j'
+import { BudgetLabel } from '../constants'
+
+/**
+ * Returns back a formatted query and it's statement properties to easily reuse queries
+ *
+ * @param {string} key This is where the result is keyed into
+ * @param {IBudgetRequest} request The budget request to place into the props to pass to the statement
+ * @returns {ExecuteStatement}
+ */
+export const getCreateBudgetStatement = (key: string, request: IBudgetRequest): ExecuteStatement => ({
+  statement: `
+    CREATE (${key}:${BudgetLabel} $nodeProps)
+    RETURN ${key}
+  `,
+  props: {
+    nodeProps: {
+      ...request,
+      // * override any passed in budget so I control it.
+      createdDate: new Date().toISOString(),
+      id: uuid(),
+    },
+  },
+})
+
+/**
+ * Returns back the query needed to retrieve all budgets that match the given query
+ * @param resultKey Key where the results will be stored.
+ * @param request The request to retrieve/fill slots in the query with.
+ * @returns {ExecuteStatement}
+ */
+export const getBudgetsByQuery = (resultKey: string, request: IBudgetQuery): ExecuteStatement => ({
+  statement: `
+    MATCH (${resultKey}:${BudgetLabel})
+    RETURN ${resultKey}
+    ${request.limit ? `LIMIT ${request.limit}` : ''}
+  `,
+})
+
+/**
+ * Returns a query that targets only the id property on a given budget node
+ *
+ * @param {string} resultKey The result key
+ * @param {string} id Budget Id to match
+ * @returns {ExecuteStatement}
+ */
+export const getBudgetById = (resultKey: string, id: string): ExecuteStatement => ({
+  statement: `
+    MATCH (${resultKey}:${BudgetLabel})
+    WHERE ${resultKey}.id = $id
+    RETURN ${resultKey}
+  `,
+  props: {
+    id,
+  },
+})
+
+/**
+ * Deletes a given budget by it's Id and should also delete all associated nodes with it.
+ *
+ * Keep an eye on this as it's not ideal for deleting massive amounts of data, very inefficient.
+ *
+ * Doc: https://neo4j.com/docs/cypher-manual/current/clauses/delete/#delete-delete-all-nodes-and-relationships
+ *
+ * Improvement Opportunities
+ * * Tie a budget to a user who created it and only allow that person with the ID to delete their budget
+ *  * https://3.basecamp.com/4326074/buckets/14452756/todos/2447985166
+ * @param {string} id A specific budgetId.
+ * @returns {ExecuteStatement}
+ */
+export const deleteBudgetById = (id: string): ExecuteStatement => ({
+  statement: `
+    MATCH (budget:${BudgetLabel} { id: $id })
+    DETACH DELETE budget
+  `,
+  props: {
+    id,
+  },
+})
+
+/**
+ * Updates a budget based on the query sent to it and returns the updated record
+ *
+ * Currently only updates the following
+ * * name
+ *
+ * @param {string} resultKey Key where the result is stored
+ * @param {IBudgetUpdate} request The new budget data
+ * @returns {ExecuteStatement}
+ */
+export const updateBudgetRequest = (resultKey: string, request: IBudgetUpdate): ExecuteStatement => ({
+  statement: `
+    MATCH (${resultKey}:${BudgetLabel} { id: $id })
+    SET ${resultKey}.name = $name
+    RETURN ${resultKey}
+  `,
+  props: {
+    name: request.name,
+    id: request.id,
+  },
+})

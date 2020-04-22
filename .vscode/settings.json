@@ -1,0 +1,53 @@
+{
+    "vsicons.presets.angular": true,
+    "cSpell.words": [
+        "commitlint",
+        "nestjs",
+        "prebuild",
+        "vetur"
+    ],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        ".vscode/": false,
+        ".idea": true,
+        "**/coverage": true,
+        "**/dist": true,
+        "**/.webpack": true,
+        "**/.cache-loader": true,
+        "**/*.js.map": true,
+        "**/*.js": {
+            "when": "$(basename).ts"
+        },
+        "**/*.d.ts": {
+            "when": "$(basename).ts"
+        },
+        "**/node_modules": true,
+        "**/documentation": true,
+    },
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/*/**": true
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/coverage": true,
+        "**/build": true,
+        "/public/node_modules": true,
+        "dist": true,
+        "node_modules": true,
+        "**/.webpack": true,
+        "**/.cache-loader": true,
+        "**/documentation": true,
+    },
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "editor.formatOnSave": true,
+    "editor.rulers": [
+        80,
+        120
+    ],
+    "typescript.tsdk": "node_modules\\typescript\\lib",
+}

@@ -1,8 +1,16 @@
 {
   "recommendations": [
-    "nrwl.angular-console",
+    "aaron-bond.better-comments",
     "angular.ng-template",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "ghmcadams.lintlens",
+    "gruntfuggly.todo-tree",
+    "HookyQR.beautify",
+    "knisterpeter.vscode-commitizen",
     "ms-vscode.vscode-typescript-tslint-plugin",
-    "esbenp.prettier-vscode"
+    "nrwl.angular-console",
+    "pflannery.vscode-versionlens",
+    "streetsidesoftware.code-spell-checker"
   ]
 }
