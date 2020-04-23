@@ -1,5 +1,5 @@
-export { ICategory } from './ICategory';
-export { ICategoryQuery } from './ICategoryQuery';
-export { ICategorySearchResponse } from './ICategorySearchResponse';
-export { ICategoryUpdate } from './ICategoryUpdate';
-export { ICreateCategory } from './ICreateCategory';
+export * from './category.interface';
+export * from './category-query.interface';
+export * from './category-search-response.interface';
+export * from './update-category.interface';
+export * from './create-category.interface';

@@ -1,2 +1,1 @@
-export { IBaseSearchQuery } from './IBaseSearchQuery'
-export { IDeleteResponse } from './IDeleteResponse'
+export { IDeleteResponse } from './IDeleteResponse';

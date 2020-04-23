@@ -1,18 +1,25 @@
-import * as uuid from 'uuid/v4'
-import { IBudgetQuery, IBudgetRequest, IBudgetUpdate } from '../../common'
-import { ExecuteStatement } from '../../neo4j'
-import { BudgetLabel } from '../constants'
+import {
+  IBudgetQuery,
+  ICreateBudget,
+  IUpdateBudget,
+} from '@mammoth/api-interfaces';
+import * as uuid from 'uuid/v4';
+import { SupportedLabel } from '../../constants';
+import { ExecuteStatement } from '../../neo4j';
 
 /**
  * Returns back a formatted query and it's statement properties to easily reuse queries
  *
  * @param {string} key This is where the result is keyed into
- * @param {IBudgetRequest} request The budget request to place into the props to pass to the statement
+ * @param {ICreateBudget} request The budget request to place into the props to pass to the statement
  * @returns {ExecuteStatement}
  */
-export const getCreateBudgetStatement = (key: string, request: IBudgetRequest): ExecuteStatement => ({
+export const getCreateBudgetStatement = (
+  key: string,
+  request: ICreateBudget
+): ExecuteStatement => ({
   statement: `
-    CREATE (${key}:${BudgetLabel} $nodeProps)
+    CREATE (${key}:${SupportedLabel.Budget} $nodeProps)
     RETURN ${key}
   `,
   props: {
@@ -23,7 +30,7 @@ export const getCreateBudgetStatement = (key: string, request: IBudgetRequest): 
       id: uuid(),
     },
   },
-})
+});
 
 /**
  * Returns back the query needed to retrieve all budgets that match the given query
@@ -31,13 +38,16 @@ export const getCreateBudgetStatement = (key: string, request: IBudgetRequest): 
  * @param request The request to retrieve/fill slots in the query with.
  * @returns {ExecuteStatement}
  */
-export const getBudgetsByQuery = (resultKey: string, request: IBudgetQuery): ExecuteStatement => ({
+export const getBudgetsByQuery = (
+  resultKey: string,
+  request: IBudgetQuery
+): ExecuteStatement => ({
   statement: `
-    MATCH (${resultKey}:${BudgetLabel})
+    MATCH (${resultKey}:${SupportedLabel.Budget})
     RETURN ${resultKey}
     ${request.limit ? `LIMIT ${request.limit}` : ''}
   `,
-})
+});
 
 /**
  * Returns a query that targets only the id property on a given budget node
@@ -46,16 +56,19 @@ export const getBudgetsByQuery = (resultKey: string, request: IBudgetQuery): Exe
  * @param {string} id Budget Id to match
  * @returns {ExecuteStatement}
  */
-export const getBudgetById = (resultKey: string, id: string): ExecuteStatement => ({
+export const getBudgetById = (
+  resultKey: string,
+  id: string
+): ExecuteStatement => ({
   statement: `
-    MATCH (${resultKey}:${BudgetLabel})
+    MATCH (${resultKey}:${SupportedLabel.Budget})
     WHERE ${resultKey}.id = $id
     RETURN ${resultKey}
   `,
   props: {
     id,
   },
-})
+});
 
 /**
  * Deletes a given budget by it's Id and should also delete all associated nodes with it.
@@ -72,13 +85,13 @@ export const getBudgetById = (resultKey: string, id: string): ExecuteStatement =
  */
 export const deleteBudgetById = (id: string): ExecuteStatement => ({
   statement: `
-    MATCH (budget:${BudgetLabel} { id: $id })
+    MATCH (budget:${SupportedLabel.Budget} { id: $id })
     DETACH DELETE budget
   `,
   props: {
     id,
   },
-})
+});
 
 /**
  * Updates a budget based on the query sent to it and returns the updated record
@@ -87,12 +100,15 @@ export const deleteBudgetById = (id: string): ExecuteStatement => ({
  * * name
  *
  * @param {string} resultKey Key where the result is stored
- * @param {IBudgetUpdate} request The new budget data
+ * @param {IUpdateBudget} request The new budget data
  * @returns {ExecuteStatement}
  */
-export const updateBudgetRequest = (resultKey: string, request: IBudgetUpdate): ExecuteStatement => ({
+export const updateBudgetRequest = (
+  resultKey: string,
+  request: IUpdateBudget
+): ExecuteStatement => ({
   statement: `
-    MATCH (${resultKey}:${BudgetLabel} { id: $id })
+    MATCH (${resultKey}:${SupportedLabel.Budget} { id: $id })
     SET ${resultKey}.name = $name
     RETURN ${resultKey}
   `,
@@ -100,4 +116,4 @@ export const updateBudgetRequest = (resultKey: string, request: IBudgetUpdate): 
     name: request.name,
     id: request.id,
   },
-})
+});

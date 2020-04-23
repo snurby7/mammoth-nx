@@ -1,10 +1,19 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Logger, Param, Post, Put } from '@nestjs/common';
+import { IAccount } from '@mammoth/api-interfaces';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpException,
+  HttpStatus,
+  Logger,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { IAccount } from '../common';
 import { AccountService } from './account.service';
-import { AccountQueryDto } from './dto/AccountQueryDto';
-import { CreateAccountDto } from './dto/CreateAccountDto';
-import { UpdateAccountDto } from './dto/UpdateAccountDto';
+import { AccountQuery, CreateAccount, UpdateAccount } from './dto';
 
 @Controller('account')
 @ApiTags('account')
@@ -15,16 +24,20 @@ export class AccountController {
   @Post()
   @ApiOperation({
     summary: 'Create Account',
-    description: 'Creates an account, a account is a top level node for the system.',
+    description:
+      'Creates an account, a account is a top level node for the system.',
   })
   @ApiResponse({
     status: 201,
     description: 'The newly created account is returned',
   })
-  async create(@Body() accountRequest: CreateAccountDto): Promise<IAccount> {
+  async create(@Body() accountRequest: CreateAccount): Promise<IAccount> {
     if (!accountRequest.budgetId) {
       this.logger.error('No budgetId found on request');
-      throw new HttpException('No budgetId found on request', HttpStatus.CONFLICT);
+      throw new HttpException(
+        'No budgetId found on request',
+        HttpStatus.CONFLICT
+      );
     }
     return await this.accountService.createAccount(accountRequest);
   }
@@ -38,7 +51,7 @@ export class AccountController {
     status: 200,
     description: 'A list of all accounts and their properties and labels.',
   })
-  async findAll(@Body() query?: AccountQueryDto): Promise<IAccount[]> {
+  async findAll(@Body() query?: AccountQuery): Promise<IAccount[]> {
     return await this.accountService.findAccounts(query);
   }
 
@@ -61,9 +74,15 @@ export class AccountController {
     description:
       'Update a single account, currently only updates the name property and everything else remains the same',
   })
-  async update(@Param('id') id: string, @Body() updateAccount: UpdateAccountDto): Promise<IAccount> {
+  async update(
+    @Param('id') id: string,
+    @Body() updateAccount: UpdateAccount
+  ): Promise<IAccount> {
     if (id !== updateAccount.id) {
-      throw new HttpException('The parameter id and the body id do not match.', HttpStatus.CONFLICT);
+      throw new HttpException(
+        'The parameter id and the body id do not match.',
+        HttpStatus.CONFLICT
+      );
     }
     return await this.accountService.saveAccount(updateAccount);
   }

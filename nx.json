@@ -1,5 +1,5 @@
 {
-  "npmScope": "mammoth-nx",
+  "npmScope": "mammoth",
   "implicitDependencies": {
     "angular.json": "*",
     "package.json": {
@@ -30,6 +30,9 @@
       "tags": []
     },
     "api-interfaces": {
+      "tags": []
+    },
+    "neo4j": {
       "tags": []
     }
   }

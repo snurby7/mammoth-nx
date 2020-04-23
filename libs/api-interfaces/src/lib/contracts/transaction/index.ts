@@ -1,5 +1,5 @@
-export { ITransaction } from './ITransaction';
-export { ITransactionCreate } from './ITransactionCreate';
-export { ITransactionDeleteRequest } from './ITransactionDeleteRequest';
-export { ITransactionQuery } from './ITransactionQuery';
-export { ITransactionSearchResponse } from './ITransactionSearchResponse';
+export * from './transaction.interface';
+export * from './create-transaction.interface';
+export * from './transaction-delete-request.interface';
+export * from './transaction-query.interface';
+export * from './transaction-search-response.interface';

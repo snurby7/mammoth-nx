@@ -1,3 +1,3 @@
-export { IAccount } from './IAccount';
-export { IAccountCreate } from './IAccountCreate';
-export { IAccountQuery } from './IAccountQuery';
+export * from './account.interface';
+export * from './create-account.interface';
+export * from './account-query.interface';

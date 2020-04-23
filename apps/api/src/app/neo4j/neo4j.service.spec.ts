@@ -14,7 +14,6 @@ describe('Neo4jService', () => {
   //   });
 
   it('should be defined', () => {
-    expect(true).toBeTruthy();
     // expect(service).toBeDefined();
   });
 });

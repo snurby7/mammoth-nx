@@ -1,12 +1,11 @@
-import { INeo4jCoreNode } from '../../common'
-import { ExecuteStatement } from '../interface'
+import { ExecuteStatement, IMammothCoreNode } from '../interface'
 
 export const Neo4jCommonQueries = {
   createRelationship: (
     resultKey: string,
-    fromNodeProps: INeo4jCoreNode,
+    fromNodeProps: IMammothCoreNode,
     relationship: string,
-    toNodeProps: INeo4jCoreNode,
+    toNodeProps: IMammothCoreNode,
   ): ExecuteStatement => {
     if (fromNodeProps.budgetId !== toNodeProps.budgetId) throw Error('Budget Ids do not match')
     return {

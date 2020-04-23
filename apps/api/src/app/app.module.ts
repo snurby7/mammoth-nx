@@ -11,7 +11,7 @@ import { TransactionModule } from './transaction/transaction.module';
 
 const routes: Routes = [
   {
-    path: 'api/v1',
+    path: 'v1',
     children: [
       BudgetModule,
       CategoryModule,
@@ -21,7 +21,7 @@ const routes: Routes = [
     ],
   },
   {
-    path: 'api/v2',
+    path: 'v2',
     children: [],
   },
 ];

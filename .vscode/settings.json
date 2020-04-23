@@ -1,5 +1,4 @@
 {
-    "vsicons.presets.angular": true,
     "cSpell.words": [
         "commitlint",
         "nestjs",
@@ -50,4 +49,5 @@
         120
     ],
     "typescript.tsdk": "node_modules\\typescript\\lib",
+    "vsicons.presets.angular": true,
 }

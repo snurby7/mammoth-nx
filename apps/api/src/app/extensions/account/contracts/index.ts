@@ -1,4 +1,4 @@
-export { IAccountBalanceRequest } from './IAccountBalanceRequest'
-export { IAccountLinkBreak } from './IAccountLinkBreak'
-export { IAccountLinkedNodeMeta, IAccountLinkRequest, IReferenceNodeMeta } from './IAccountLinkRequest'
-export { IAccountLinkResponse } from './IAccountLinkResponse'
+export * from './account-balance-request.interface';
+export * from './account-link-break.interface';
+export * from './account-link-request.interface';
+export * from './account-link-response.interface';

@@ -1,10 +1,18 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put } from '@nestjs/common';
+import { ICategory, ICategorySearchResponse } from '@mammoth/api-interfaces';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ICategory, ICategorySearchResponse } from '../common';
 import { CategoryService } from './category.service';
-import { CategoryQueryDto } from './dto/CategoryQueryDto';
-import { CreateCategoryDto } from './dto/CreateCategoryDto';
-import { UpdateCategoryDto } from './dto/UpdateCategoryDto';
+import { CategoryQuery, CreateCategory, UpdateCategory } from './dto';
 
 @Controller('category')
 @ApiTags('category')
@@ -17,27 +25,33 @@ export class CategoryController {
     status: 201,
     description: 'The newly created category is returned',
   })
-  public async create(@Body() categoryRequest: CreateCategoryDto): Promise<ICategory> {
+  public async create(
+    @Body() categoryRequest: CreateCategory
+  ): Promise<ICategory> {
     return await this.categoryService.createCategory(categoryRequest);
   }
 
   @Get()
   @ApiOperation({
     summary: 'Find all categories',
-    description: 'Get all the categories that have either Category or Child_Category as its label',
+    description:
+      'Get all the categories that have either Category or Child_Category as its label',
   })
   @ApiResponse({
     status: 200,
     description: 'A list of all categories and their properties and labels.',
   })
-  public async findAll(@Body() query?: CategoryQueryDto): Promise<ICategorySearchResponse[]> {
+  public async findAll(
+    @Body() query?: CategoryQuery
+  ): Promise<ICategorySearchResponse[]> {
     return await this.categoryService.findCategories(query);
   }
 
   @Get(':id/budget/:budgetId')
   @ApiOperation({
     summary: 'Find a single category',
-    description: 'Get a category that has either Category or Child_Category as its label',
+    description:
+      'Get a category that has either Category or Child_Category as its label',
   })
   @ApiResponse({
     status: 200,
@@ -45,7 +59,7 @@ export class CategoryController {
   })
   public async findOne(
     @Param('id') id: string,
-    @Param('budgetId') budgetId: string,
+    @Param('budgetId') budgetId: string
   ): Promise<ICategorySearchResponse[]> {
     return await this.categoryService.findCategory(id, budgetId);
   }
@@ -61,11 +75,18 @@ export class CategoryController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Returns back the updated category with its properties and labels after being updated',
+    description:
+      'Returns back the updated category with its properties and labels after being updated',
   })
-  public async update(@Param('id') id: string, @Body() updateCategory: UpdateCategoryDto): Promise<ICategory> {
+  public async update(
+    @Param('id') id: string,
+    @Body() updateCategory: UpdateCategory
+  ): Promise<ICategory> {
     if (id !== updateCategory.id) {
-      throw new HttpException('The parameter id and the body id do not match.', HttpStatus.CONFLICT);
+      throw new HttpException(
+        'The parameter id and the body id do not match.',
+        HttpStatus.CONFLICT
+      );
     }
     return await this.categoryService.updateCategory(updateCategory);
   }

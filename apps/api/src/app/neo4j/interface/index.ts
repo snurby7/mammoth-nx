@@ -1,1 +1,2 @@
-export { ExecuteStatement } from './ExecuteStatement'
+export * from './ExecuteStatement';
+export * from './IMammothCoreNode';

@@ -1,3 +1,3 @@
-export { IPayee } from './IPayee';
-export { IPayeeCreate } from './IPayeeCreate';
-export { IPayeeQuery } from './IPayeeQuery';
+export * from './payee.interface';
+export * from './create-payee.interface';
+export * from './payee-query.interface';

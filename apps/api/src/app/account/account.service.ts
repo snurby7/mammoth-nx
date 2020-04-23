@@ -1,26 +1,26 @@
-import { Injectable, Logger } from '@nestjs/common'
-import * as uuid from 'uuid/v4'
-import { IAccount, ITransaction, SupportedLabel } from '../common'
+import { IAccount, ITransaction } from '@mammoth/api-interfaces';
+import { Injectable, Logger } from '@nestjs/common';
+import * as uuid from 'uuid/v4';
+import { SupportedLabel } from '../constants';
 import {
   CommonAccountService,
   IAccountBalanceRequest,
   IAccountLinkedNodeMeta,
   IAccountLinkRequest,
   ICommonAccountConverter,
-} from '../extensions'
-import { Neo4jService } from '../neo4j'
-import { AccountQueryDto } from './dto/AccountQueryDto'
-import { CreateAccountDto } from './dto/CreateAccountDto'
-import { UpdateAccountDto } from './dto/UpdateAccountDto'
+} from '../extensions';
+import { Neo4jService } from '../neo4j';
+import { AccountQuery, CreateAccount, UpdateAccount } from './dto';
 
 @Injectable()
-export class AccountService extends CommonAccountService implements ICommonAccountConverter {
-  protected readonly logger = new Logger(AccountService.name)
-  private readonly AccountRelationship = 'ACCOUNT_OF'
-  public readonly AccountLabel = 'Account'
+export class AccountService extends CommonAccountService
+  implements ICommonAccountConverter {
+  protected readonly logger = new Logger(AccountService.name);
+  private readonly AccountRelationship = 'ACCOUNT_OF';
+  public readonly AccountLabel = 'Account';
 
   constructor(protected neo4jService: Neo4jService) {
-    super(neo4jService)
+    super(neo4jService);
   }
 
   /**
@@ -30,9 +30,9 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @returns {Promise<IAccount>}
    * @memberof AccountService
    */
-  public async createAccount(accountRequest: CreateAccountDto): Promise<IAccount> {
-    this.logger.log('Creating an account')
-    const account = 'node'
+  public async createAccount(accountRequest: CreateAccount): Promise<IAccount> {
+    this.logger.log('Creating an account');
+    const account = 'node';
     const statementResult = await this.neo4jService.executeStatement({
       statement: `
         MATCH (budget:Budget {id: $budgetId})
@@ -48,8 +48,11 @@ export class AccountService extends CommonAccountService implements ICommonAccou
           id: uuid(),
         },
       },
-    })
-    return this.neo4jService.flattenStatementResult<IAccount>(statementResult, account)[0]
+    });
+    return this.neo4jService.flattenStatementResult<IAccount>(
+      statementResult,
+      account
+    )[0];
   }
 
   /**
@@ -59,9 +62,9 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @returns {Promise<IAccount[]>}
    * @memberof AccountService
    */
-  public async findAccounts(query: AccountQueryDto): Promise<IAccount[]> {
-    this.logger.log(`Finding accounts with budgetId - ${query.budgetId}`)
-    const nodes = 'accounts'
+  public async findAccounts(query: AccountQuery): Promise<IAccount[]> {
+    this.logger.log(`Finding accounts with budgetId - ${query.budgetId}`);
+    const nodes = 'accounts';
     const statementResult = await this.neo4jService.executeStatement({
       statement: `
         MATCH (${nodes}:${this.AccountLabel} {budgetId: $budgetId})
@@ -71,8 +74,11 @@ export class AccountService extends CommonAccountService implements ICommonAccou
       props: {
         budgetId: query.budgetId,
       },
-    })
-    return this.neo4jService.flattenStatementResult<IAccount>(statementResult, nodes)
+    });
+    return this.neo4jService.flattenStatementResult<IAccount>(
+      statementResult,
+      nodes
+    );
   }
 
   /**
@@ -84,8 +90,8 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @memberof AccountService
    */
   public async findAccount(id: string): Promise<IAccount> {
-    this.logger.log(`Finding account with ${id}`)
-    const node = 'account'
+    this.logger.log(`Finding account with ${id}`);
+    const node = 'account';
     const statementResult = await this.neo4jService.executeStatement({
       statement: `
         MATCH (${node}:${this.AccountLabel} {id: $accountId})
@@ -94,8 +100,11 @@ export class AccountService extends CommonAccountService implements ICommonAccou
       props: {
         accountId: id,
       },
-    })
-    return this.neo4jService.flattenStatementResult<IAccount>(statementResult, node)[0]
+    });
+    return this.neo4jService.flattenStatementResult<IAccount>(
+      statementResult,
+      node
+    )[0];
   }
 
   /**
@@ -110,10 +119,10 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @returns {Promise<IAccount>}
    * @memberof AccountService
    */
-  public async saveAccount(request: UpdateAccountDto): Promise<IAccount> {
-    const { id, budgetId, name, balance } = request
-    this.logger.log(`Updating an account with ${id}`)
-    const node = 'account'
+  public async saveAccount(request: UpdateAccount): Promise<IAccount> {
+    const { id, budgetId, name, balance } = request;
+    this.logger.log(`Updating an account with ${id}`);
+    const node = 'account';
     const statementResult = await this.neo4jService.executeStatement({
       statement: `
         MATCH (${node}:${this.AccountLabel} {id: $accountId, budgetId: $budgetId})
@@ -126,8 +135,11 @@ export class AccountService extends CommonAccountService implements ICommonAccou
         updatedName: name,
         updatedBalance: balance,
       },
-    })
-    return this.neo4jService.flattenStatementResult<IAccount>(statementResult, node)[0]
+    });
+    return this.neo4jService.flattenStatementResult<IAccount>(
+      statementResult,
+      node
+    )[0];
   }
 
   /**
@@ -138,18 +150,24 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @memberof AccountService
    */
   public async deleteAccount(id: string): Promise<{ message: string }> {
-    this.logger.debug(`Deleting account - ${id}`)
+    this.logger.debug(`Deleting account - ${id}`);
     const result = await this.neo4jService.executeStatement({
       statement: `
         MATCH (node:${this.AccountLabel} { id: '${id}' })
         DETACH DELETE node
       `,
-    })
-    this.logger.debug(`Deleted category - ${id}`)
-    this.logger.verbose(`Deleted ${result.summary.counters.updates().relationshipsDeleted} relationship(s)`)
+    });
+    this.logger.debug(`Deleted category - ${id}`);
+    this.logger.verbose(
+      `Deleted ${
+        result.summary.counters.updates().relationshipsDeleted
+      } relationship(s)`
+    );
     return {
-      message: `Deleted ${result.summary.counters.updates().relationshipsDeleted || 0} record(s)`,
-    }
+      message: `Deleted ${
+        result.summary.counters.updates().relationshipsDeleted || 0
+      } record(s)`,
+    };
   }
 
   /**
@@ -160,13 +178,16 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @returns {IAccountLinkedNodeMeta}
    * @memberof AccountService
    */
-  public convertTransactionToAccountLink(transaction: ITransaction, transactionAmount: number): IAccountLinkedNodeMeta {
+  public convertTransactionToAccountLink(
+    transaction: ITransaction,
+    transactionAmount: number
+  ): IAccountLinkedNodeMeta {
     return {
       id: transaction.accountId,
       label: SupportedLabel.Account,
       budgetId: transaction.budgetId,
       amount: transactionAmount,
-    }
+    };
   }
 
   /**
@@ -185,7 +206,7 @@ export class AccountService extends CommonAccountService implements ICommonAccou
     transactionUpdateRequest: ITransaction,
     linkingRelationship: string,
     currentTransactionAmount: number,
-    updatedTransactionRequestAmount: number,
+    updatedTransactionRequestAmount: number
   ): IAccountLinkRequest {
     const currentNodeRelationship: IAccountBalanceRequest = {
       id: currentTransaction.accountId,
@@ -196,7 +217,7 @@ export class AccountService extends CommonAccountService implements ICommonAccou
       chargeAmount: updatedTransactionRequestAmount,
       refundAmount: -currentTransactionAmount,
       budgetId: currentTransaction.budgetId,
-    }
+    };
 
     return {
       storedTransactionDetails: {
@@ -218,6 +239,6 @@ export class AccountService extends CommonAccountService implements ICommonAccou
         label: SupportedLabel.Account,
         budgetId: transactionUpdateRequest.budgetId,
       },
-    }
+    };
   }
 }

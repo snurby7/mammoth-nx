@@ -1,8 +1,7 @@
+import { IPayee } from '@mammoth/api-interfaces';
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { IPayee } from '../common';
-import { CreatePayeeDto } from './dto/CreatePayeeDto';
-import { PayeeQueryDto } from './dto/PayeeQueryDto';
+import { CreatePayee, PayeeQuery } from './dto';
 import { PayeeService } from './payee.service';
 
 @Controller('payee')
@@ -16,7 +15,9 @@ export class PayeeController {
     status: 201,
     description: 'Returns the newly created payee',
   })
-  public async createPayee(@Body() createRequest: CreatePayeeDto): Promise<IPayee> {
+  public async createPayee(
+    @Body() createRequest: CreatePayee
+  ): Promise<IPayee> {
     return await this.payeeService.createPayee(createRequest);
   }
 
@@ -26,7 +27,7 @@ export class PayeeController {
     status: 201,
     description: 'All payees that match the given request',
   })
-  public async getAllPayees(@Body() request: PayeeQueryDto): Promise<IPayee[]> {
+  public async getAllPayees(@Body() request: PayeeQuery): Promise<IPayee[]> {
     return await this.payeeService.getAllPayees(request);
   }
 }

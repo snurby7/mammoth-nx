@@ -1,11 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { Observable } from 'rxjs'
-import { IBudget } from '../common'
-import { BudgetService } from './budget.service'
-import { BudgetDto } from './dto/BudgetDto'
-import { BudgetQueryDto } from './dto/BudgetQueryDto'
-import { UpdateBudgetDto } from './dto/UpdateBudgetDto'
+import { IBudget } from '@mammoth/api-interfaces';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Observable } from 'rxjs';
+import { BudgetService } from './budget.service';
+import { Budget, BudgetQuery, UpdateBudget } from './dto';
 
 @Controller('budget')
 @ApiTags('budget')
@@ -24,8 +30,8 @@ export class BudgetController {
     status: 201,
     description: 'The newly created budget is returned',
   })
-  public createNewBudget(@Body() budgetRequest: BudgetDto): Observable<IBudget> {
-    return this.budgetService.createBudget(budgetRequest)
+  public createNewBudget(@Body() budgetRequest: Budget): Observable<IBudget> {
+    return this.budgetService.createBudget(budgetRequest);
   }
 
   @Get()
@@ -37,8 +43,8 @@ export class BudgetController {
     status: 200,
     description: 'A list of all budgets and their properties and labels.',
   })
-  public queryBudgets(@Body() query?: BudgetQueryDto): Observable<IBudget[]> {
-    return this.budgetService.queryBudgets(query)
+  public queryBudgets(@Body() query?: BudgetQuery): Observable<IBudget[]> {
+    return this.budgetService.queryBudgets(query);
   }
 
   @Get(':id')
@@ -51,7 +57,7 @@ export class BudgetController {
     description: 'A single budget and its properties and labels',
   })
   public getBudget(@Param('id') id: string): Observable<IBudget> {
-    return this.budgetService.getBudget(id)
+    return this.budgetService.getBudget(id);
   }
 
   @Put()
@@ -59,8 +65,10 @@ export class BudgetController {
     description:
       'Update a single budget, currently only updates the name property and everything else remains the same',
   })
-  public updateExistingBudget(@Body() updateRequest: UpdateBudgetDto): Observable<IBudget> {
-    return this.budgetService.saveBudget(updateRequest)
+  public updateExistingBudget(
+    @Body() updateRequest: UpdateBudget
+  ): Observable<IBudget> {
+    return this.budgetService.saveBudget(updateRequest);
   }
 
   @ApiOperation({
@@ -75,7 +83,9 @@ export class BudgetController {
       'Returns back a message saying how many nodes have been deleted. Data will need to refresh itself after making this request.',
   })
   @Delete(':id')
-  public removeBudgetById(@Param('id') id: string): Observable<{ message: string }> {
-    return this.budgetService.deleteBudget(id)
+  public removeBudgetById(
+    @Param('id') id: string
+  ): Observable<{ message: string }> {
+    return this.budgetService.deleteBudget(id);
   }
 }
