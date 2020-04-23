@@ -1,9 +1,9 @@
 module.exports = {
-  name: 'neo4j',
+  name: 'api-core',
   preset: '../../jest.config.js',
   transform: {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'html'],
-  coverageDirectory: '../../coverage/libs/neo4j',
+  coverageDirectory: '../../coverage/libs/api-core',
 };

@@ -25,7 +25,9 @@
               "apps/mammoth/src/favicon.ico",
               "apps/mammoth/src/assets"
             ],
-            "styles": ["apps/mammoth/src/styles.scss"],
+            "styles": [
+              "apps/mammoth/src/styles.scss"
+            ],
             "scripts": []
           },
           "configurations": {
@@ -84,7 +86,10 @@
               "apps/mammoth/tsconfig.app.json",
               "apps/mammoth/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**", "!apps/mammoth/**"]
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/mammoth/**"
+            ]
           }
         },
         "test": {
@@ -119,8 +124,13 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": ["apps/mammoth-e2e/tsconfig.e2e.json"],
-            "exclude": ["**/node_modules/**", "!apps/mammoth-e2e/**"]
+            "tsConfig": [
+              "apps/mammoth-e2e/tsconfig.e2e.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/mammoth-e2e/**"
+            ]
           }
         }
       }
@@ -138,7 +148,9 @@
             "outputPath": "dist/apps/api",
             "main": "apps/api/src/main.ts",
             "tsConfig": "apps/api/tsconfig.app.json",
-            "assets": ["apps/api/src/assets"]
+            "assets": [
+              "apps/api/src/assets"
+            ]
           },
           "configurations": {
             "production": {
@@ -167,7 +179,10 @@
               "apps/api/tsconfig.app.json",
               "apps/api/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**", "!apps/api/**"]
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/api/**"
+            ]
           }
         },
         "test": {
@@ -193,7 +208,10 @@
               "libs/api-interfaces/tsconfig.lib.json",
               "libs/api-interfaces/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**", "!libs/api-interfaces/**"]
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/api-interfaces/**"
+            ]
           }
         },
         "test": {
@@ -206,9 +224,9 @@
         }
       }
     },
-    "neo4j": {
-      "root": "libs/neo4j",
-      "sourceRoot": "libs/neo4j/src",
+    "api-core": {
+      "root": "libs/api-core",
+      "sourceRoot": "libs/api-core/src",
       "projectType": "library",
       "schematics": {},
       "architect": {
@@ -216,17 +234,20 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "libs/neo4j/tsconfig.lib.json",
-              "libs/neo4j/tsconfig.spec.json"
+              "libs/api-core/tsconfig.lib.json",
+              "libs/api-core/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**", "!libs/neo4j/**"]
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/api-core/**"
+            ]
           }
         },
         "test": {
           "builder": "@nrwl/jest:jest",
           "options": {
-            "jestConfig": "libs/neo4j/jest.config.js",
-            "tsConfig": "libs/neo4j/tsconfig.spec.json",
+            "jestConfig": "libs/api-core/jest.config.js",
+            "tsConfig": "libs/api-core/tsconfig.spec.json",
             "passWithNoTests": true
           }
         }

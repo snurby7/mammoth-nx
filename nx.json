@@ -14,7 +14,12 @@
     "default": {
       "runner": "@nrwl/workspace/tasks-runners/default",
       "options": {
-        "cacheableOperations": ["build", "lint", "test", "e2e"]
+        "cacheableOperations": [
+          "build",
+          "lint",
+          "test",
+          "e2e"
+        ]
       }
     }
   },
@@ -24,7 +29,9 @@
     },
     "mammoth-e2e": {
       "tags": [],
-      "implicitDependencies": ["mammoth"]
+      "implicitDependencies": [
+        "mammoth"
+      ]
     },
     "api": {
       "tags": []
@@ -32,7 +39,7 @@
     "api-interfaces": {
       "tags": []
     },
-    "neo4j": {
+    "api-core": {
       "tags": []
     }
   }
