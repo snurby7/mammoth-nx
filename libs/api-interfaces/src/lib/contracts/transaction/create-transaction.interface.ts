@@ -5,7 +5,7 @@ import { ITransaction } from './transaction.interface';
  * create a transaction only.
  *
  * @export
- * @interface ITransactionCreate
+ * @interface ICreateTransaction
  * @extends {Omit<ITransaction, 'id'>}
  */
-export interface ITransactionCreate extends Omit<ITransaction, 'id'> {}
+export interface ICreateTransaction extends Omit<ITransaction, 'id'> {}

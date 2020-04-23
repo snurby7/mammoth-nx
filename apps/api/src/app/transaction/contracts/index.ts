@@ -1,1 +1,1 @@
-export * from './ITransactionLinkRequest';
+export * from './transaction-link-request.interface';

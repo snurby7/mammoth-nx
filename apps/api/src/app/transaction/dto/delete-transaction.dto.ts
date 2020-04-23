@@ -1,6 +1,6 @@
+import { ITransactionDeleteRequest } from '@mammoth/api-interfaces';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsUUID } from 'class-validator';
-import { ITransactionDeleteRequest } from '../../common';
 
 export class TransactionDeleteDto implements ITransactionDeleteRequest {
   @ApiProperty({

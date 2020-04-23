@@ -1,6 +1,6 @@
+import { ITransactionQuery } from '@mammoth/api-interfaces';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsOptional, IsUUID } from 'class-validator';
-import { ITransactionQuery } from '../../common';
 
 /**
  * Transaction query object. Currently supported query objects.
@@ -25,7 +25,8 @@ export class TransactionQueryDto implements ITransactionQuery {
   budgetId: string;
 
   @ApiProperty({
-    description: 'If you know the specific transaction id you can pass that here',
+    description:
+      'If you know the specific transaction id you can pass that here',
     required: false,
     example: '53b37aa8-2297-4dc8-a9c4-6f40fd5dbdd8',
   })
@@ -61,7 +62,8 @@ export class TransactionQueryDto implements ITransactionQuery {
   categoryId?: string;
 
   @ApiProperty({
-    description: 'If you have a set number of transactions you want back it can go here',
+    description:
+      'If you have a set number of transactions you want back it can go here',
     required: false,
   })
   @IsOptional()

@@ -1,3 +1,4 @@
+import { ICreateTransaction } from '@mammoth/api-interfaces';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDateString,
@@ -10,11 +11,11 @@ import {
   Min,
   ValidateIf,
 } from 'class-validator';
-import { ITransactionCreate } from '../../common';
 
-export class TransactionCreateDto implements ITransactionCreate {
+export class TransactionCreateDto implements ICreateTransaction {
   @ApiProperty({
-    description: 'The date of the transaction, this can be updated, must be an ISO String',
+    description:
+      'The date of the transaction, this can be updated, must be an ISO String',
     example: '2020-01-25T14:16:18.362Z',
     required: true,
   })
@@ -62,7 +63,7 @@ export class TransactionCreateDto implements ITransactionCreate {
     description: 'Total inflow from the transaction',
     example: 16.39,
   })
-  @ValidateIf(prop => !prop.outflow && prop.outflow !== 0)
+  @ValidateIf((prop) => !prop.outflow && prop.outflow !== 0)
   @IsNumber()
   @Min(0)
   inflow?: number;
@@ -71,7 +72,7 @@ export class TransactionCreateDto implements ITransactionCreate {
     description: 'Total outflow from the transaction',
     example: -16.39,
   })
-  @ValidateIf(prop => !prop.inflow && prop.inflow !== 0)
+  @ValidateIf((prop) => !prop.inflow && prop.inflow !== 0)
   @IsNumber()
   @Max(0)
   outflow?: number;

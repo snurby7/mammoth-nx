@@ -1,8 +1,12 @@
-import * as uuid from 'uuid/v4'
-import { ITransaction, ITransactionCreate, ITransactionQuery, Relationship, SupportedLabel } from '../../common'
-import { CommonQueries } from '../../common-queries'
-import { ExecuteStatement } from '../../neo4j'
-import { TransactionLabel } from '../constants'
+import {
+  ICreateTransaction,
+  ITransaction,
+  ITransactionQuery,
+} from '@mammoth/api-interfaces';
+import * as uuid from 'uuid/v4';
+import { CommonQueries } from '../../common-queries';
+import { NodeRelationship, SupportedLabel } from '../../constants';
+import { ExecuteStatement } from '../../neo4j';
 
 /**
  * This exports out all the possible TransactionQueries.
@@ -13,18 +17,21 @@ export const TransactionQueries = {
    * account, payee, and category
    *
    * @param {string} requestKey
-   * @param {ITransactionCreate} request
+   * @param {ICreateTransaction} request
    * @returns {ExecuteStatement}
    */
-  createNewTransaction: (requestKey: string, request: ITransactionCreate): ExecuteStatement => ({
+  createNewTransaction: (
+    requestKey: string,
+    request: ICreateTransaction
+  ): ExecuteStatement => ({
     statement: `
       MATCH (category:Category {id: $categoryId, budgetId: $budgetId})
       MATCH (account:Account {id: $accountId, budgetId: $budgetId})
       MATCH (payee:Payee {id: $payeeId, budgetId: $budgetId})
       CREATE (${requestKey}:${SupportedLabel.Transaction} $nodeProps)
-      MERGE (${requestKey})-[relatesToAccount:${Relationship.UsedAccount}]->(account)
-      MERGE (${requestKey})-[relatesToCategory:${Relationship.UsedCategory}]->(category)
-      MERGE (${requestKey})-[relatesToPayee:${Relationship.UsedPayee}]->(payee)
+      MERGE (${requestKey})-[relatesToAccount:${NodeRelationship.UsedAccount}]->(account)
+      MERGE (${requestKey})-[relatesToCategory:${NodeRelationship.UsedCategory}]->(category)
+      MERGE (${requestKey})-[relatesToPayee:${NodeRelationship.UsedPayee}]->(payee)
       RETURN ${requestKey}
     `,
     props: {
@@ -49,7 +56,10 @@ export const TransactionQueries = {
    * @param {string} budgetId Budget Id to remove the node from
    * @returns {ExecuteStatement}
    */
-  deleteTransactionStatement: (transactionId: string, budgetId: string): ExecuteStatement =>
+  deleteTransactionStatement: (
+    transactionId: string,
+    budgetId: string
+  ): ExecuteStatement =>
     CommonQueries.deleteNodeStatement('deletedNode', {
       id: transactionId,
       budgetId,
@@ -63,11 +73,14 @@ export const TransactionQueries = {
    * @param {ITransactionQuery} query Query properties to find a transaction
    * @returns {ExecuteStatement}
    */
-  searchTransactions: (resultKey: string, query: ITransactionQuery): ExecuteStatement => {
-    const { budgetId, categoryId, payeeId, accountId, id } = query
+  searchTransactions: (
+    resultKey: string,
+    query: ITransactionQuery
+  ): ExecuteStatement => {
+    const { budgetId, categoryId, payeeId, accountId, id } = query;
     return {
       statement: `
-      MATCH (${resultKey}:${TransactionLabel} {budgetId: $budgetId})
+      MATCH (${resultKey}:${SupportedLabel.Transaction} {budgetId: $budgetId})
       WHERE ${resultKey}.categoryId = $categoryId
         OR ${resultKey}.id = $id
         OR ${resultKey}.payeeId = $payeeId
@@ -82,7 +95,7 @@ export const TransactionQueries = {
         payeeId: payeeId || '',
         accountId: accountId || '',
       },
-    }
+    };
   },
 
   /**
@@ -92,9 +105,12 @@ export const TransactionQueries = {
    * @param {ITransaction} request
    * @returns {ExecuteStatement}
    */
-  updateTransaction: (resultKey: string, request: ITransaction): ExecuteStatement => ({
+  updateTransaction: (
+    resultKey: string,
+    request: ITransaction
+  ): ExecuteStatement => ({
     statement: `
-    MATCH (${resultKey}:${TransactionLabel} { id: $id})
+    MATCH (${resultKey}:${SupportedLabel.Transaction} { id: $id})
     SET ${resultKey} += {inflow: $inflow, outflow: $outflow, memo: $memo, date: $date, accountId: $accountId, payeeId: $payeeId, categoryId: $categoryId}
     RETURN ${resultKey}
   `,
@@ -118,6 +134,14 @@ export const TransactionQueries = {
    * @param {string} budgetId BudgetId the transaction is under
    * @returns {ExecuteStatement}
    */
-  getTransaction: (resultKey: string, transactionId: string, budgetId: string): ExecuteStatement =>
-    CommonQueries.getNodeStatement(resultKey, { id: transactionId, budgetId, label: SupportedLabel.Transaction }),
-}
+  getTransaction: (
+    resultKey: string,
+    transactionId: string,
+    budgetId: string
+  ): ExecuteStatement =>
+    CommonQueries.getNodeStatement(resultKey, {
+      id: transactionId,
+      budgetId,
+      label: SupportedLabel.Transaction,
+    }),
+};

@@ -1,12 +1,15 @@
-import { Body, Controller, Delete, Get, Post, Put } from '@nestjs/common'
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { Observable } from 'rxjs'
-import { IDeleteResponse, ITransaction } from '../common'
-import { TransactionCreateDto } from './dto/TransactionCreateDto'
-import { TransactionDeleteDto } from './dto/TransactionDeleteDto'
-import { TransactionDto } from './dto/TransactionDto'
-import { TransactionQueryDto } from './dto/TransactionQueryDto'
-import { TransactionService } from './transaction.service'
+import { ITransaction } from '@mammoth/api-interfaces';
+import { Body, Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Observable } from 'rxjs';
+import { IDeleteResponse } from '../common';
+import {
+  TransactionCreateDto,
+  TransactionDeleteDto,
+  TransactionDto,
+  TransactionQueryDto,
+} from './dto';
+import { TransactionService } from './transaction.service';
 
 @Controller('transaction')
 @ApiTags('transaction')
@@ -25,8 +28,10 @@ export class TransactionController {
     status: 201,
     description: 'Returns back a single, newly created transaction',
   })
-  public createTransaction(@Body() request: TransactionCreateDto): Observable<ITransaction> {
-    return this.transactionService.createTransaction(request)
+  public createTransaction(
+    @Body() request: TransactionCreateDto
+  ): Observable<ITransaction> {
+    return this.transactionService.createTransaction(request);
   }
 
   @Get()
@@ -38,8 +43,10 @@ export class TransactionController {
     status: 201,
     description: 'Transactions that match some property on the ',
   })
-  public getTransactionsByQuery(@Body() query: TransactionQueryDto): Observable<ITransaction[]> {
-    return this.transactionService.getTransactionsByQuery(query)
+  public getTransactionsByQuery(
+    @Body() query: TransactionQueryDto
+  ): Observable<ITransaction[]> {
+    return this.transactionService.getTransactionsByQuery(query);
   }
 
   @Put()
@@ -51,10 +58,13 @@ export class TransactionController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Returns back the updated transactions with its properties and labels after being updated',
+    description:
+      'Returns back the updated transactions with its properties and labels after being updated',
   })
-  public updateTransaction(@Body() transactionData: TransactionDto): Observable<ITransaction> {
-    return this.transactionService.updateTransaction$(transactionData)
+  public updateTransaction(
+    @Body() transactionData: TransactionDto
+  ): Observable<ITransaction> {
+    return this.transactionService.updateTransaction$(transactionData);
   }
 
   @ApiOperation({
@@ -70,7 +80,9 @@ export class TransactionController {
       'Returns back a message saying how many nodes have been deleted. Data will need to refresh itself after making this request.',
   })
   @Delete()
-  public deleteTransaction(@Body() request: TransactionDeleteDto): Observable<IDeleteResponse> {
-    return this.transactionService.deleteTransaction$(request)
+  public deleteTransaction(
+    @Body() request: TransactionDeleteDto
+  ): Observable<IDeleteResponse> {
+    return this.transactionService.deleteTransaction$(request);
   }
 }

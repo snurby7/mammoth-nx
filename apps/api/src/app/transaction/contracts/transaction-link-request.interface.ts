@@ -1,4 +1,4 @@
-import { ITransaction } from '../../common';
+import { ITransaction } from '@mammoth/api-interfaces';
 
 export interface ITransactionLinkRequest {
   currentTransaction: ITransaction;

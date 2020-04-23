@@ -1,57 +1,85 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common'
-import { forkJoin, Observable, throwError } from 'rxjs'
-import { catchError, flatMap, map, materialize, switchMap, tap, toArray } from 'rxjs/operators'
-import { AccountService } from '../account'
-import { CategoryService } from '../category'
 import {
-  IDeleteResponse,
+  ICreateTransaction,
   ITransaction,
-  ITransactionCreate,
   ITransactionDeleteRequest,
   ITransactionQuery,
-  SupportedLabel,
-} from '../common'
-import { IAccountLinkBreak, IAccountLinkResponse } from '../extensions'
-import { getRecordsByKey, getRecordsByKeyNotification, Neo4jService } from '../neo4j'
-import { PayeeService } from '../payee'
-import { Transaction_UsedAccount, Transaction_UsedCategory, Transaction_UsedPayee } from './constants'
-import { TransactionQueries } from './queries'
+} from '@mammoth/api-interfaces';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { forkJoin, Observable, throwError } from 'rxjs';
+import {
+  catchError,
+  flatMap,
+  map,
+  materialize,
+  switchMap,
+  tap,
+  toArray,
+} from 'rxjs/operators';
+import { AccountService } from '../account';
+import { CategoryService } from '../category';
+import { IDeleteResponse } from '../common';
+import { SupportedLabel } from '../constants';
+import { IAccountLinkBreak, IAccountLinkResponse } from '../extensions';
+import {
+  getRecordsByKey,
+  getRecordsByKeyNotification,
+  Neo4jService,
+} from '../neo4j';
+import { PayeeService } from '../payee';
+import {
+  Transaction_UsedAccount,
+  Transaction_UsedCategory,
+  Transaction_UsedPayee,
+} from './constants';
+import { TransactionQueries } from './queries';
 
 @Injectable()
 export class TransactionService {
-  private readonly logger = new Logger(TransactionService.name)
+  private readonly logger = new Logger(TransactionService.name);
 
   constructor(
     private neo4jService: Neo4jService,
     private accountService: AccountService,
     private categoryService: CategoryService,
-    private payeeService: PayeeService,
+    private payeeService: PayeeService
   ) {}
 
   /**
    * Creates a transaction and links it to a given category, payee, and account. Once the links are made, and their is a flattened result.
    * Checking for the flattenedResults makes sure that neo4j made the links. It will then go charge those accounts the amount.
    *
-   * @param {ITransactionCreate} request
+   * @param {ICreateTransaction} request
    * @returns {Promise<ITransaction>}
    * @memberof TransactionService
    */
-  public createTransaction(request: ITransactionCreate): Observable<ITransaction> {
-    this.logger.log('Creating a transaction')
-    const resultKey = 'transactionResult'
-    const { statement, props } = TransactionQueries.createNewTransaction(resultKey, request)
-    const createTransaction$ = this.neo4jService.rxSession.writeTransaction(txc =>
-      txc
-        .run(statement, props)
-        .records()
-        .pipe(
-          getRecordsByKey<ITransaction>(resultKey),
-          tap(result => {
-            this.logger.log(`Transaction ---- ${result ? 'Transaction created' : 'No transaction created'}`)
-          }),
-        ),
-    )
-    return createTransaction$.pipe(switchMap(result => this.updateLinkedNodeBalanceByService$(result)))
+  public createTransaction(
+    request: ICreateTransaction
+  ): Observable<ITransaction> {
+    this.logger.log('Creating a transaction');
+    const resultKey = 'transactionResult';
+    const { statement, props } = TransactionQueries.createNewTransaction(
+      resultKey,
+      request
+    );
+    const createTransaction$ = this.neo4jService.rxSession.writeTransaction(
+      (txc) =>
+        txc
+          .run(statement, props)
+          .records()
+          .pipe(
+            getRecordsByKey<ITransaction>(resultKey),
+            tap((result) => {
+              this.logger.log(
+                `Transaction ---- ${
+                  result ? 'Transaction created' : 'No transaction created'
+                }`
+              );
+            })
+          )
+    );
+    return createTransaction$.pipe(
+      switchMap((result) => this.updateLinkedNodeBalanceByService$(result))
+    );
   }
 
   /**
@@ -62,14 +90,22 @@ export class TransactionService {
    * @returns {Observable<ITransaction>}
    * @memberof TransactionService
    */
-  private updateLinkedNodeBalanceByService$(transaction: ITransaction): Observable<ITransaction> {
-    const amount = this.getTransactionAmount(transaction)
-    const services = [this.accountService, this.payeeService, this.categoryService]
+  private updateLinkedNodeBalanceByService$(
+    transaction: ITransaction
+  ): Observable<ITransaction> {
+    const amount = this.getTransactionAmount(transaction);
+    const services = [
+      this.accountService,
+      this.payeeService,
+      this.categoryService,
+    ];
     return forkJoin(
-      services.map(service =>
-        service.updateLinkedNodeBalance$({ ...service.convertTransactionToAccountLink(transaction, amount) }),
-      ),
-    ).pipe(map(() => transaction))
+      services.map((service) =>
+        service.updateLinkedNodeBalance$({
+          ...service.convertTransactionToAccountLink(transaction, amount),
+        })
+      )
+    ).pipe(map(() => transaction));
   }
 
   /**
@@ -79,20 +115,27 @@ export class TransactionService {
    * @returns {Observable<ITransaction[]>}
    * @memberof TransactionService
    */
-  public getTransactionsByQuery(query: ITransactionQuery): Observable<ITransaction[]> {
-    const resultKey = 'nodes'
-    const { statement, props } = TransactionQueries.searchTransactions(resultKey, query)
-    return this.neo4jService.rxSession.readTransaction(trx =>
+  public getTransactionsByQuery(
+    query: ITransactionQuery
+  ): Observable<ITransaction[]> {
+    const resultKey = 'nodes';
+    const { statement, props } = TransactionQueries.searchTransactions(
+      resultKey,
+      query
+    );
+    return this.neo4jService.rxSession.readTransaction((trx) =>
       trx
         .run(statement, props)
         .records()
         .pipe(
-          tap(() => this.logger.log('Getting transactions that match the given query')),
+          tap(() =>
+            this.logger.log('Getting transactions that match the given query')
+          ),
           materialize(),
           toArray(),
-          getRecordsByKeyNotification<ITransaction>(resultKey),
-        ),
-    )
+          getRecordsByKeyNotification<ITransaction>(resultKey)
+        )
+    );
   }
 
   /**
@@ -104,18 +147,27 @@ export class TransactionService {
    * @memberof TransactionService
    */
   public updateTransaction$(request: ITransaction): Observable<ITransaction> {
-    this.logger.log('Attempting to update the transaction')
+    this.logger.log('Attempting to update the transaction');
 
-    const findMatchingTransaction$ = this.getTransaction(request.id, request.budgetId).pipe(
-      map(transaction => {
-        return transaction ? transaction : throwError(new NotFoundException('No current transaction found to match!'))
-      }),
-    )
+    const findMatchingTransaction$ = this.getTransaction(
+      request.id,
+      request.budgetId
+    ).pipe(
+      map((transaction) => {
+        return transaction
+          ? transaction
+          : throwError(
+              new NotFoundException('No current transaction found to match!')
+            );
+      })
+    );
 
     return findMatchingTransaction$.pipe(
-      switchMap((transaction: ITransaction) => forkJoin([...this.updateLinkedNodeBalance$(transaction, request)])),
-      flatMap(() => this.updateTransactionProperties$(request)),
-    )
+      switchMap((transaction: ITransaction) =>
+        forkJoin([...this.updateLinkedNodeBalance$(transaction, request)])
+      ),
+      flatMap(() => this.updateTransactionProperties$(request))
+    );
   }
 
   /**
@@ -125,21 +177,23 @@ export class TransactionService {
    * @returns {Observable<IDeleteResponse>}
    * @memberof TransactionService
    */
-  public deleteTransaction$(request: ITransactionDeleteRequest): Observable<IDeleteResponse> {
+  public deleteTransaction$(
+    request: ITransactionDeleteRequest
+  ): Observable<IDeleteResponse> {
     return this.getTransactionsByQuery({
       budgetId: request.budgetId,
       id: request.id,
     }).pipe(
-      map(results => results[0]),
-      map(transaction => {
+      map((results) => results[0]),
+      map((transaction) => {
         if (!transaction) {
-          throw new NotFoundException('No current transaction found to match!')
+          throw new NotFoundException('No current transaction found to match!');
         }
-        return transaction
+        return transaction;
       }),
-      flatMap(transaction => this.removeLinkWithRefund$(transaction)),
-      flatMap(_ => this.deleteTransactionById$(request.id, request.budgetId)),
-    )
+      flatMap((transaction) => this.removeLinkWithRefund$(transaction)),
+      flatMap((_) => this.deleteTransactionById$(request.id, request.budgetId))
+    );
   }
 
   /**
@@ -150,18 +204,25 @@ export class TransactionService {
    * @returns {Observable<ITransaction>}
    * @memberof TransactionService
    */
-  public getTransaction(transactionId: string, budgetId: string): Observable<ITransaction> {
-    const resultKey = 'transaction'
-    const { statement, props } = TransactionQueries.getTransaction(resultKey, transactionId, budgetId)
-    return this.neo4jService.rxSession.readTransaction(trx =>
+  public getTransaction(
+    transactionId: string,
+    budgetId: string
+  ): Observable<ITransaction> {
+    const resultKey = 'transaction';
+    const { statement, props } = TransactionQueries.getTransaction(
+      resultKey,
+      transactionId,
+      budgetId
+    );
+    return this.neo4jService.rxSession.readTransaction((trx) =>
       trx
         .run(statement, props)
         .records()
         .pipe(
-          catchError(err => throwError(err)),
-          getRecordsByKey<ITransaction>(resultKey),
-        ),
-    )
+          catchError((err) => throwError(err)),
+          getRecordsByKey<ITransaction>(resultKey)
+        )
+    );
   }
 
   /**
@@ -173,18 +234,23 @@ export class TransactionService {
    * @returns {Observable<ITransaction>}
    * @memberof TransactionService
    */
-  private updateTransactionProperties$(request: ITransaction): Observable<ITransaction> {
-    const resultKey = 'transactionNode'
-    const { statement, props } = TransactionQueries.updateTransaction(resultKey, request)
-    return this.neo4jService.rxSession.writeTransaction(trx =>
+  private updateTransactionProperties$(
+    request: ITransaction
+  ): Observable<ITransaction> {
+    const resultKey = 'transactionNode';
+    const { statement, props } = TransactionQueries.updateTransaction(
+      resultKey,
+      request
+    );
+    return this.neo4jService.rxSession.writeTransaction((trx) =>
       trx
         .run(statement, props)
         .records()
         .pipe(
           getRecordsByKey<ITransaction>(resultKey),
-          catchError(err => throwError(err)),
-        ),
-    )
+          catchError((err) => throwError(err))
+        )
+    );
   }
 
   /**
@@ -197,7 +263,7 @@ export class TransactionService {
    * @memberof TransactionService
    */
   private getTransactionAmount(transaction: ITransaction): number {
-    return transaction.inflow ? transaction.inflow : transaction.outflow || 0
+    return transaction.inflow ? transaction.inflow : transaction.outflow || 0;
   }
 
   /**
@@ -212,9 +278,12 @@ export class TransactionService {
    */
   private updateLinkedNodeBalance$(
     transaction: ITransaction,
-    request: ITransaction,
+    request: ITransaction
   ): Observable<IAccountLinkResponse>[] {
-    type ServiceRelationshipLink = { service: PayeeService | AccountService | CategoryService; relationship: string }
+    interface ServiceRelationshipLink {
+      service: PayeeService | AccountService | CategoryService;
+      relationship: string;
+    }
     const serviceLinks: ServiceRelationshipLink[] = [
       {
         service: this.accountService,
@@ -228,9 +297,9 @@ export class TransactionService {
         service: this.payeeService,
         relationship: Transaction_UsedPayee,
       },
-    ]
-    const currentTransactionAmount = this.getTransactionAmount(transaction)
-    const updateTransactionRequestAmount = this.getTransactionAmount(request)
+    ];
+    const currentTransactionAmount = this.getTransactionAmount(transaction);
+    const updateTransactionRequestAmount = this.getTransactionAmount(request);
 
     return serviceLinks.map(({ service, relationship }) =>
       service.updateLink$(
@@ -239,10 +308,10 @@ export class TransactionService {
           request,
           relationship,
           currentTransactionAmount,
-          updateTransactionRequestAmount,
-        ),
-      ),
-    )
+          updateTransactionRequestAmount
+        )
+      )
+    );
   }
   /**
    * Function to remove the link between an account and a Payee/Category/Account and refund that node however much
@@ -253,16 +322,19 @@ export class TransactionService {
    * @returns {Observable<any>}
    * @memberof TransactionService
    */
-  private removeLinkWithRefund$(currentTransaction: ITransaction): Observable<any> {
+  private removeLinkWithRefund$(
+    currentTransaction: ITransaction
+  ): Observable<any> {
     const commonRequest: Partial<IAccountLinkBreak> = {
-      refundAmount: -currentTransaction.inflow ?? -currentTransaction.outflow ?? 0,
+      refundAmount:
+        -currentTransaction.inflow ?? -currentTransaction.outflow ?? 0,
       budgetId: currentTransaction.budgetId,
       transaction: {
         id: currentTransaction.id,
         label: SupportedLabel.Transaction,
         budgetId: currentTransaction.budgetId,
       },
-    }
+    };
 
     return forkJoin([
       this.payeeService.removeLinkWithRefund({
@@ -289,7 +361,7 @@ export class TransactionService {
           label: SupportedLabel.Category,
         },
       } as IAccountLinkBreak),
-    ])
+    ]);
   }
 
   /**
@@ -301,18 +373,28 @@ export class TransactionService {
    * @returns {Observable<IDeleteResponse>}
    * @memberof TransactionService
    */
-  private deleteTransactionById$(transactionId: string, budgetId: string): Observable<IDeleteResponse> {
-    const { statement, props } = TransactionQueries.deleteTransactionStatement(transactionId, budgetId)
-    type TODO_PR_OPEN = any // ? https://github.com/neo4j/neo4j-javascript-driver/issues/531
-    return this.neo4jService.rxSession.writeTransaction(trx =>
+  private deleteTransactionById$(
+    transactionId: string,
+    budgetId: string
+  ): Observable<IDeleteResponse> {
+    const { statement, props } = TransactionQueries.deleteTransactionStatement(
+      transactionId,
+      budgetId
+    );
+    type TODO_PR_OPEN = any; // ? https://github.com/neo4j/neo4j-javascript-driver/issues/531
+    return this.neo4jService.rxSession.writeTransaction((trx) =>
       (trx.run(statement, props) as TODO_PR_OPEN)
         .consume() // TODO: This is currently missing on the types neo4j-exports should be able to remove on next update (I hope)
         .pipe(
           map((result: TODO_PR_OPEN) => ({
-            message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
+            message: `Deleted ${
+              result.counters.updates().nodesDeleted || 0
+            } record(s)`,
           })),
-          tap((mappedResult: TODO_PR_OPEN) => this.logger.debug(mappedResult.message)),
-        ),
-    )
+          tap((mappedResult: TODO_PR_OPEN) =>
+            this.logger.debug(mappedResult.message)
+          )
+        )
+    );
   }
 }
