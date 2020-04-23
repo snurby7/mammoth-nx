@@ -12,7 +12,6 @@
             "**/CVS": true,
             "**/.DS_Store": true,
             "**/node_modules": true,
-            "./apps/mammoth/": true,
             "apps/mammoth": true,
             "apps/mammoth-e2e": true
         }
