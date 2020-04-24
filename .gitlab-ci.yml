@@ -1,0 +1,52 @@
+image: node:latest
+
+stages:
+  - prebuild
+  - build
+  - test
+  # - release
+
+cache:
+  paths:
+    - node_modules/
+
+install_dependencies:
+  stage: prebuild
+  script:
+    - npm install
+  artifacts:
+    paths:
+      - node_modules/
+
+build:
+  stage: build
+  script: npm run affected:build -- --base="${CI_DEFAULT_BRANCH}" --head="${CI_COMMIT_REF_NAME}"
+
+# release:
+#   stage: release
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == 'master' # Execute jobs when a new commit is pushed to master branch
+#   before_script:
+#     - git config --global user.name "${GITLAB_USER_NAME}"
+#     - git config --global user.email "${GITLAB_USER_EMAIL}"
+#   script:
+#     - npm i --non-interactive --pure-lockfile
+#     - npm run semantic-release
+
+nx-test-affected:
+  stage: test
+  script: npm run affected:test -- --base="${CI_DEFAULT_BRANCH}" --head=${CI_COMMIT_REF_NAME}
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+
+nx-lint-affected:
+  stage: test
+  script: npm run affected:lint -- --base="${CI_DEFAULT_BRANCH}" --head=${CI_COMMIT_REF_NAME}
+  rules:
+    - if: $CI_MERGE_REQUEST_ID # Execute jobs in merge request context
+
+nx-e2e-affected:
+  stage: test
+  script: npm run affected:e2e -- --base="${CI_DEFAULT_BRANCH}" --head=${CI_COMMIT_REF_NAME}
+  rules:
+    - if: $CI_MERGE_REQUEST_ID # Execute jobs in merge request context
