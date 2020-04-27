@@ -20,7 +20,9 @@ install_dependencies:
 
 build:
   stage: build
-  script: npm run affected:build -- --base="${CI_DEFAULT_BRANCH}" --head="${CI_COMMIT_REF_NAME}"
+  before_script:
+    - git fetch origin
+  script: npm run affected:build -- --base="origin/master" --head="origin/${CI_COMMIT_REF_NAME}"
 
 # release:
 #   stage: release
@@ -35,18 +37,24 @@ build:
 
 nx-test-affected:
   stage: test
-  script: npm run affected:test -- --base="${CI_DEFAULT_BRANCH}" --head=${CI_COMMIT_REF_NAME}
+  before_script:
+    - git fetch origin
+  script: npm run affected:test -- --base="origin/master" --head=origin/${CI_COMMIT_REF_NAME}
   rules:
     - if: $CI_MERGE_REQUEST_ID
 
 nx-lint-affected:
   stage: test
-  script: npm run affected:lint -- --base="${CI_DEFAULT_BRANCH}" --head=${CI_COMMIT_REF_NAME}
+  before_script:
+    - git fetch origin
+  script: npm run affected:lint -- --base="origin/master" --head=origin/${CI_COMMIT_REF_NAME}
   rules:
     - if: $CI_MERGE_REQUEST_ID # Execute jobs in merge request context
 
 nx-e2e-affected:
   stage: test
-  script: npm run affected:e2e -- --base="${CI_DEFAULT_BRANCH}" --head=${CI_COMMIT_REF_NAME}
+  before_script:
+    - git fetch origin
+  script: npm run affected:e2e -- --base="origin/master" --head=origin/${CI_COMMIT_REF_NAME}
   rules:
     - if: $CI_MERGE_REQUEST_ID # Execute jobs in merge request context

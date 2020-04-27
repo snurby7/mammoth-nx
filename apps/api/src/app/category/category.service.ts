@@ -6,7 +6,6 @@ import {
 } from '@mammoth/api-interfaces';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import * as uuid from 'uuid/v4';
-import { BudgetService } from '../budget';
 import { NodeRelationship, SupportedLabel } from '../constants';
 import {
   CommonAccountService,
@@ -29,10 +28,7 @@ export class CategoryService extends CommonAccountService
   implements ICommonAccountConverter {
   protected readonly logger = new Logger(CategoryService.name);
 
-  constructor(
-    protected neo4jService: Neo4jService,
-    private readonly budgetService: BudgetService
-  ) {
+  constructor(protected neo4jService: Neo4jService) {
     super(neo4jService);
   }
 
@@ -244,7 +240,7 @@ export class CategoryService extends CommonAccountService
     return await this.neo4jService
       .executeStatement({
         statement: `
-          MATCH (budget:${this.budgetService.BudgetLabel} {id: $budgetId})
+          MATCH (budget:${SupportedLabel.Budget} {id: $budgetId})
           CREATE (${key}:${SupportedLabel.Category} $nodeProps)
           MERGE (${key})-[r:${NodeRelationship.CategoryOf}]->(budget)
           RETURN ${key}

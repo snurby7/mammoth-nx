@@ -17,7 +17,6 @@ export class AccountService extends CommonAccountService
   implements ICommonAccountConverter {
   protected readonly logger = new Logger(AccountService.name);
   private readonly AccountRelationship = 'ACCOUNT_OF';
-  public readonly AccountLabel = 'Account';
 
   constructor(protected neo4jService: Neo4jService) {
     super(neo4jService);
@@ -36,7 +35,7 @@ export class AccountService extends CommonAccountService
     const statementResult = await this.neo4jService.executeStatement({
       statement: `
         MATCH (budget:Budget {id: $budgetId})
-        CREATE (${account}:${this.AccountLabel} $nodeProps)
+        CREATE (${account}:${SupportedLabel.Account} $nodeProps)
         MERGE (${account})-[r:${this.AccountRelationship}]->(budget)
         RETURN ${account}
       `,
@@ -67,7 +66,7 @@ export class AccountService extends CommonAccountService
     const nodes = 'accounts';
     const statementResult = await this.neo4jService.executeStatement({
       statement: `
-        MATCH (${nodes}:${this.AccountLabel} {budgetId: $budgetId})
+        MATCH (${nodes}:${SupportedLabel.Account} {budgetId: $budgetId})
         RETURN ${nodes}
         ${query.limit ? `LIMIT ${query.limit}` : ''}
       `,
@@ -94,7 +93,7 @@ export class AccountService extends CommonAccountService
     const node = 'account';
     const statementResult = await this.neo4jService.executeStatement({
       statement: `
-        MATCH (${node}:${this.AccountLabel} {id: $accountId})
+        MATCH (${node}:${SupportedLabel.Account} {id: $accountId})
         RETURN ${node}
       `,
       props: {
@@ -125,7 +124,7 @@ export class AccountService extends CommonAccountService
     const node = 'account';
     const statementResult = await this.neo4jService.executeStatement({
       statement: `
-        MATCH (${node}:${this.AccountLabel} {id: $accountId, budgetId: $budgetId})
+        MATCH (${node}:${SupportedLabel.Account} {id: $accountId, budgetId: $budgetId})
         SET ${node} += {name: $updatedName, balance: $updatedBalance}
         RETURN ${node}
       `,
@@ -153,7 +152,7 @@ export class AccountService extends CommonAccountService
     this.logger.debug(`Deleting account - ${id}`);
     const result = await this.neo4jService.executeStatement({
       statement: `
-        MATCH (node:${this.AccountLabel} { id: '${id}' })
+        MATCH (node:${SupportedLabel.Account} { id: '${id}' })
         DETACH DELETE node
       `,
     });
