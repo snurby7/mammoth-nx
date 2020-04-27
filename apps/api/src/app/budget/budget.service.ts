@@ -19,7 +19,6 @@ import {
 @Injectable()
 export class BudgetService {
   private readonly logger = new Logger(BudgetService.name);
-  public readonly BudgetLabel = 'Budget';
 
   constructor(private neo4jService: Neo4jService) {}
 

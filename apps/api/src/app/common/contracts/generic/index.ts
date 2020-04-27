@@ -1,1 +1,0 @@
-export { IDeleteResponse } from './IDeleteResponse';
