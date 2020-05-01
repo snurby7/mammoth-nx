@@ -4,7 +4,7 @@
     }],
     "settings": {
         "typescript.tsdk": "node_modules\\typescript\\lib",
-        "vsicons.presets.nestjs": true,
+        "vsicons.presets.angular": true,
         "files.exclude": {
             "**/.git": true,
             "**/.svn": true,
