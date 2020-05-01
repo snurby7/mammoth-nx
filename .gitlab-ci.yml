@@ -1,9 +1,9 @@
 image: node:latest
 
-stages:
-  - prebuild
-  - build
-  - test
+# stages:
+  # - prebuild
+  # - build
+  # - test
   # - release
 
 cache:
