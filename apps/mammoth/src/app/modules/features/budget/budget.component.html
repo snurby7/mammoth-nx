@@ -1,0 +1,5 @@
+<div>
+  <button *ngFor="let budget of budgets$ | async" (click)="onBudgetClick(budget)">
+    {{ budget.name }}
+  </button>
+</div>

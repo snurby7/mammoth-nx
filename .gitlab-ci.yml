@@ -1,17 +1,17 @@
 image: node:latest
 
 # stages:
-  # - prebuild
-  # - build
-  # - test
-  # - release
+# - prebuild
+# - build
+# - test
+# - release
 
 cache:
   paths:
     - node_modules/
 
 install_dependencies:
-  stage: prebuild
+  # #  prebuild
   script:
     - npm install
   artifacts:
@@ -19,13 +19,13 @@ install_dependencies:
       - node_modules/
 
 build:
-  stage: build
+  # stage: build
   before_script:
     - git fetch origin
   script: npm run affected:build -- --base="origin/master" --head="origin/${CI_COMMIT_REF_NAME}"
 
 # release:
-#   stage: release
+#  release
 #   rules:
 #     - if: $CI_COMMIT_BRANCH == 'master' # Execute jobs when a new commit is pushed to master branch
 #   before_script:
@@ -36,7 +36,7 @@ build:
 #     - npm run semantic-release
 
 nx-test-affected:
-  stage: test
+  #  test
   before_script:
     - git fetch origin
   script: npm run affected:test -- --base="origin/master" --head=origin/${CI_COMMIT_REF_NAME}
@@ -44,7 +44,7 @@ nx-test-affected:
     - if: $CI_MERGE_REQUEST_ID
 
 nx-lint-affected:
-  stage: test
+  #  test
   before_script:
     - git fetch origin
   script: npm run affected:lint -- --base="origin/master" --head=origin/${CI_COMMIT_REF_NAME}
@@ -52,7 +52,7 @@ nx-lint-affected:
     - if: $CI_MERGE_REQUEST_ID # Execute jobs in merge request context
 
 nx-e2e-affected:
-  stage: test
+  #  test
   before_script:
     - git fetch origin
   script: npm run affected:e2e -- --base="origin/master" --head=origin/${CI_COMMIT_REF_NAME}

@@ -6,6 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { NavBarModule } from '../../core/nav-bar';
 import { LandingRoutingModule } from './landing-routing.module';
 import { LandingComponent } from './landing.component';
 
@@ -19,6 +20,7 @@ import { LandingComponent } from './landing.component';
     MatButtonModule,
     LayoutModule,
     LandingRoutingModule,
+    NavBarModule,
   ],
   declarations: [LandingComponent],
 })

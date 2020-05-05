@@ -10,7 +10,9 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AccountService } from './account.service';
 import { AccountQuery, CreateAccount, UpdateAccount } from './dto';
@@ -31,7 +33,10 @@ export class AccountController {
     status: 201,
     description: 'The newly created account is returned',
   })
-  async create(@Body() accountRequest: CreateAccount): Promise<IAccount> {
+  @UseGuards(AuthGuard('jwt'))
+  public async create(
+    @Body() accountRequest: CreateAccount
+  ): Promise<IAccount> {
     if (!accountRequest.budgetId) {
       this.logger.error('No budgetId found on request');
       throw new HttpException(
@@ -51,7 +56,8 @@ export class AccountController {
     status: 200,
     description: 'A list of all accounts and their properties and labels.',
   })
-  async findAll(@Body() query?: AccountQuery): Promise<IAccount[]> {
+  @UseGuards(AuthGuard('jwt'))
+  public async findAll(@Body() query?: AccountQuery): Promise<IAccount[]> {
     return await this.accountService.findAccounts(query);
   }
 
@@ -64,7 +70,8 @@ export class AccountController {
     status: 200,
     description: 'A single account and its properties and labels',
   })
-  async findOne(@Param('id') id: string): Promise<IAccount> {
+  @UseGuards(AuthGuard('jwt'))
+  public async findOne(@Param('id') id: string): Promise<IAccount> {
     return await this.accountService.findAccount(id);
   }
 
@@ -74,7 +81,8 @@ export class AccountController {
     description:
       'Update a single account, currently only updates the name property and everything else remains the same',
   })
-  async update(
+  @UseGuards(AuthGuard('jwt'))
+  public async update(
     @Param('id') id: string,
     @Body() updateAccount: UpdateAccount
   ): Promise<IAccount> {
@@ -99,7 +107,8 @@ export class AccountController {
       'Returns back a message saying how many nodes have been deleted. Data will need to refresh itself after making this request.',
   })
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<{ message: string }> {
+  @UseGuards(AuthGuard('jwt'))
+  public async remove(@Param('id') id: string): Promise<{ message: string }> {
     return await this.accountService.deleteAccount(id);
   }
 }

@@ -1,13 +1,18 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"type": "shell",
-			"command": "ng serve",
-			"group": "build",
-			"problemMatcher": [],
-			"label": "ng serve",
-			"detail": "ng serve"
-		}
-	]
+    "version": "2.0.0",
+    "tasks": [{
+        "type": "shell",
+        "command": "ng serve --open",
+        "group": "build",
+        "problemMatcher": [],
+        "label": "ng serve",
+        "detail": "ng serve"
+    }, {
+        "type": "npm",
+        "script": "start:api",
+        "problemMatcher": [],
+        "group": "build",
+        "label": "npm start:api",
+        "detail": "Start the api in watch mode"
+    }]
 }
