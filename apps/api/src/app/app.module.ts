@@ -3,6 +3,7 @@ import { RouterModule, Routes } from 'nest-router';
 import { AccountModule } from './account/account.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthzModule } from './authz/authz.module';
 import { BudgetModule } from './budget/budget.module';
 import { CategoryModule } from './category/category.module';
 import { Neo4jModule } from './neo4j/neo4j.module';
@@ -29,12 +30,13 @@ const routes: Routes = [
 @Module({
   imports: [
     RouterModule.forRoutes(routes),
+    AccountModule,
+    AuthzModule,
     BudgetModule,
     CategoryModule,
     Neo4jModule,
-    AccountModule,
-    TransactionModule,
     PayeeModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

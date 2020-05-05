@@ -9,7 +9,9 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
 import { CategoryQuery, CreateCategory, UpdateCategory } from './dto';
@@ -25,6 +27,7 @@ export class CategoryController {
     status: 201,
     description: 'The newly created category is returned',
   })
+  @UseGuards(AuthGuard('jwt'))
   public async create(
     @Body() categoryRequest: CreateCategory
   ): Promise<ICategory> {
@@ -41,6 +44,7 @@ export class CategoryController {
     status: 200,
     description: 'A list of all categories and their properties and labels.',
   })
+  @UseGuards(AuthGuard('jwt'))
   public async findAll(
     @Body() query?: CategoryQuery
   ): Promise<ICategorySearchResponse[]> {
@@ -57,6 +61,7 @@ export class CategoryController {
     status: 200,
     description: 'A single category and its properties and labels',
   })
+  @UseGuards(AuthGuard('jwt'))
   public async findOne(
     @Param('id') id: string,
     @Param('budgetId') budgetId: string
@@ -78,6 +83,7 @@ export class CategoryController {
     description:
       'Returns back the updated category with its properties and labels after being updated',
   })
+  @UseGuards(AuthGuard('jwt'))
   public async update(
     @Param('id') id: string,
     @Body() updateCategory: UpdateCategory
@@ -103,6 +109,7 @@ export class CategoryController {
     description:
       'Returns back a message saying how many nodes have been deleted. Data will need to refresh itself after making this request.',
   })
+  @UseGuards(AuthGuard('jwt'))
   public async remove(@Param('id') id: string): Promise<{ message: string }> {
     return await this.categoryService.deleteCategory(id);
   }

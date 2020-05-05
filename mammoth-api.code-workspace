@@ -15,5 +15,6 @@
             "apps/mammoth": true,
             "apps/mammoth-e2e": true
         }
-    }
+    },
+    "extensions": {}
 }

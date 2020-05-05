@@ -1,5 +1,6 @@
 import { IPayee } from '@mammoth/api-interfaces';
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePayee, PayeeQuery } from './dto';
 import { PayeeService } from './payee.service';
@@ -15,6 +16,7 @@ export class PayeeController {
     status: 201,
     description: 'Returns the newly created payee',
   })
+  @UseGuards(AuthGuard('jwt'))
   public async createPayee(
     @Body() createRequest: CreatePayee
   ): Promise<IPayee> {
@@ -27,6 +29,7 @@ export class PayeeController {
     status: 201,
     description: 'All payees that match the given request',
   })
+  @UseGuards(AuthGuard('jwt'))
   public async getAllPayees(@Body() request: PayeeQuery): Promise<IPayee[]> {
     return await this.payeeService.getAllPayees(request);
   }

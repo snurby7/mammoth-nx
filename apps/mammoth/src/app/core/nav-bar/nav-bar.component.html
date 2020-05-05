@@ -1,0 +1,18 @@
+<div>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="authService.login()"
+    *ngIf="!authService.loggedIn"
+  >
+    Log In
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="authService.logout()"
+    *ngIf="authService.loggedIn"
+  >
+    Log Out
+  </button>
+</div>
