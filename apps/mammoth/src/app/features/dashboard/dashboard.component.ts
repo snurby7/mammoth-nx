@@ -1,6 +1,9 @@
 import { MediaMatcher } from '@angular/cdk/layout';
 import { ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { GetBudget } from '../../ngrx-store/actions/budget.actions';
+import { IMammothState } from '../../ngrx-store/state/mammoth.state';
 
 @Component({
   selector: 'mammoth-dashboard',
@@ -16,9 +19,10 @@ export class DashboardComponent implements OnDestroy {
   constructor(
     changeDetectorRef: ChangeDetectorRef,
     media: MediaMatcher,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private _store: Store<IMammothState>
   ) {
-    console.log(this.route.snapshot.params['budgetId']);
+    this._store.dispatch(new GetBudget(this.route.snapshot.params['budgetId']));
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);

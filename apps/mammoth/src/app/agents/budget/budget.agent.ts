@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IBudget } from '@mammoth/api-interfaces';
 import { Observable } from 'rxjs';
-import { HttpService } from '../../../../core/http';
+import { HttpService } from '../../core';
 import { BudgetApiRoute } from './budget-api-routes';
 
 @Injectable()

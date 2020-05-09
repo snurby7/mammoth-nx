@@ -6,19 +6,17 @@ const routes: Routes = [
   {
     path: '',
     loadChildren: () =>
-      import('./modules/landing/landing.module').then((m) => m.LandingModule),
+      import('./landing/landing.module').then((m) => m.LandingModule),
   },
   {
     path: 'login',
     loadChildren: () =>
-      import('./modules/login/login.module').then((m) => m.LoginModule),
+      import('./login/login.module').then((m) => m.LoginModule),
   },
   {
     path: 'app',
     loadChildren: () =>
-      import('./modules/features/features.module').then(
-        (m) => m.FeaturesModule
-      ),
+      import('./features/features.module').then((m) => m.FeaturesModule),
     canActivate: [AuthGuard],
   },
 ];

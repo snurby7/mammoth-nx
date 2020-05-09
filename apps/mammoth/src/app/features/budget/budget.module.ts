@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { HttpModule } from '../../../core/http';
-import { BudgetAgent } from './agent/budget.agent';
+import { HttpModule } from '../../core/http';
+import { BudgetAgent } from '../../agents/budget/budget.agent';
 import { BudgetComponent } from './budget.component';
 import { BudgetService } from './budget.service';
 import { RouterModule } from '@angular/router';
