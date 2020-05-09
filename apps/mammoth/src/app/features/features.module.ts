@@ -6,6 +6,6 @@ import { FeaturesRoutingModule } from './features-routing.module';
 
 @NgModule({
   declarations: [],
-  imports: [CommonModule, FeaturesRoutingModule, BudgetModule, DashboardModule],
+  imports: [BudgetModule, CommonModule, DashboardModule, FeaturesRoutingModule],
 })
 export class FeaturesModule {}

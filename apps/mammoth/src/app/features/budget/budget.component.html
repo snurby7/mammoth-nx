@@ -1,0 +1,8 @@
+<div>
+  <button
+    *ngFor="let budget of budgets$ | async"
+    (click)="navigateToBudget(budget)"
+  >
+    {{ budget.name }}
+  </button>
+</div>

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { BudgetAgent } from './budget.agent';
+import { BudgetAgent } from '../budget.agent';
 
 describe('BudgetAgent', () => {
   let service: BudgetAgent;
