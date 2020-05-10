@@ -1,20 +1,23 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatButtonModule } from '@angular/material/button';
+import { AuthService } from '../auth';
 import { NavBarComponent } from './nav-bar.component';
 
 describe('NavBarComponent', () => {
   let component: NavBarComponent;
   let fixture: ComponentFixture<NavBarComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ NavBarComponent ]
-    })
-    .compileComponents();
-  }));
-
   beforeEach(() => {
-    fixture = TestBed.createComponent(NavBarComponent);
+    fixture = TestBed.configureTestingModule({
+      declarations: [NavBarComponent],
+      imports: [MatButtonModule],
+      providers: [
+        {
+          provide: AuthService,
+          useValue: {},
+        },
+      ]
+    }).createComponent(NavBarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

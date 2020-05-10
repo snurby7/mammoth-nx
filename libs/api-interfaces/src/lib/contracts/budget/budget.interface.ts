@@ -30,4 +30,5 @@ export interface IBudget extends Omit<ICoreNode, 'budgetId'> {
    * @memberof IBudget
    */
   startDate: string;
+  createdDate: string;
 }

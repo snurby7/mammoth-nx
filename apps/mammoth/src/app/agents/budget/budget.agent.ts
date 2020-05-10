@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IBudget } from '@mammoth/api-interfaces';
+import { IBudget, ICreateBudget, IUpdateBudget } from '@mammoth/api-interfaces';
 import { Observable } from 'rxjs';
 import { HttpService } from '../../core';
 import { BudgetApiRoute } from './budget-api-routes';
@@ -10,5 +10,21 @@ export class BudgetAgent {
 
   public getBudgets(): Observable<IBudget[]> {
     return this.httpService.get(BudgetApiRoute.GetBudgets);
+  }
+
+  public deleteBudget(budgetId: string): Observable<void> {
+    return this.httpService.delete(BudgetApiRoute.DeleteBudget, {
+      budgetId,
+    });
+  }
+
+  public createBudget(budget: ICreateBudget): Observable<IBudget> {
+    return this.httpService.post(BudgetApiRoute.CreateBudget, budget);
+  }
+
+  public updateBudget(budget: IUpdateBudget): Observable<IBudget> {
+    return this.httpService.post(BudgetApiRoute.UpdateBudget, budget, {
+      budgetId: budget.id,
+    });
   }
 }

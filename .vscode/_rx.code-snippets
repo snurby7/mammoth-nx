@@ -1,0 +1,12 @@
+{
+    "rxTap": {
+        "prefix": ["rxTap", "tap"],
+        "scope": "typescript",
+        "description": "Quickly add a tap",
+        "body": [
+            "tap(($1) => {",
+            "\tthis.logger.debug('-----Tap Ran-----')",
+            "}),"
+        ]
+    },
+}

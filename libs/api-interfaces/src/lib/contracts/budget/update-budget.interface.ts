@@ -7,4 +7,5 @@ import { IBudget } from './budget.interface';
  * @interface IUpdateBudget
  * @extends {Omit<IBudget, 'startDate'>}
  */
-export interface IUpdateBudget extends Omit<IBudget, 'startDate'> {}
+export interface IUpdateBudget
+  extends Omit<IBudget, 'startDate' | 'createdDate'> {}

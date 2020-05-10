@@ -1,12 +1,12 @@
 import { IBudget } from '@mammoth/api-interfaces';
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   Param,
   Post,
-  Put,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -65,16 +65,20 @@ export class BudgetController {
     return this.budgetService.getBudget(id);
   }
 
-  @Put()
+  @Post(':id')
   @ApiOperation({
     description:
       'Update a single budget, currently only updates the name property and everything else remains the same',
   })
   @UseGuards(AuthGuard('jwt'))
   public updateExistingBudget(
-    @Body() updateRequest: UpdateBudget
+    @Param('id') budgetId: string,
+    @Body() request: UpdateBudget
   ): Observable<IBudget> {
-    return this.budgetService.saveBudget(updateRequest);
+    if (budgetId !== request.id) {
+      throw new BadRequestException();
+    }
+    return this.budgetService.saveBudget(request);
   }
 
   @ApiOperation({

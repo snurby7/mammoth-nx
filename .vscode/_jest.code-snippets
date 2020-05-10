@@ -1,0 +1,18 @@
+{
+    "Jest-it-async": {
+        "scope": "typescript",
+        "prefix": "jita",
+        "body": [
+            "it('should ${1}', async () => {", "\t$0", "});"
+        ],
+        "description": "Create an async jest it test"
+    },
+    "jest-testbed-inject": {
+        "scope": "typescript",
+        "prefix": ["testbedinject, testbed-inject"],
+        "body": [
+            "const $2 = TestBed.inject($1)$0;"
+        ],
+        "description": "Jest - TestBed.inject snippet"
+    }
+}

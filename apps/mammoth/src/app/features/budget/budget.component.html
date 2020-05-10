@@ -1,8 +1,35 @@
 <div>
-  <button
-    *ngFor="let budget of budgets$ | async"
-    (click)="navigateToBudget(budget)"
-  >
-    {{ budget.name }}
+  <h3>Please select your budget</h3>
+  <button mat-icon-button (click)="addNewBudget()">
+    <mat-icon>add</mat-icon> New Budget
   </button>
+  <div class="budget-card-container">
+    <mat-card class="card" *ngFor="let budget of budgets$ | async">
+      <mat-card-header>
+        <mat-card-title>{{ budget.name }}</mat-card-title>
+        <mat-card-subtitle
+          >Created - {{ budget.createdDate | date }}</mat-card-subtitle
+        >
+      </mat-card-header>
+      <mat-card-actions>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="navigateToBudget(budget)"
+        >
+          Select
+        </button>
+        <button
+          mat-raised-button
+          color="secondary"
+          (click)="updateBudget(budget)"
+        >
+          Edit
+        </button>
+        <button mat-raised-button color="warn" (click)="deleteBudget(budget)">
+          Delete
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
 </div>
