@@ -6,11 +6,17 @@ import { Observable, of } from 'rxjs';
 import { map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { BudgetAgent } from '../../agents';
 import {
+  CreateBudget,
+  CreateBudgetSuccess,
+  DeleteBudget,
+  DeleteBudgetSuccess,
   EBudgetAction,
   GetBudget,
   GetBudgets,
   GetBudgetsSuccess,
   GetBudgetSuccess,
+  UpdateBudget,
+  UpdateBudgetSuccess,
 } from '../actions/budget.actions';
 import { selectBudgetList } from '../selectors/budget.selectors';
 import { IMammothState } from '../state/mammoth.state';
@@ -22,6 +28,15 @@ export class BudgetEffects {
 
   @Effect()
   public getBudgets$: Observable<GetBudgetsSuccess>;
+
+  @Effect()
+  public deleteBudget$: Observable<DeleteBudgetSuccess>;
+
+  @Effect()
+  public createBudget$: Observable<CreateBudgetSuccess>;
+
+  @Effect()
+  public updateBudget$: Observable<UpdateBudgetSuccess>;
 
   constructor(
     private _budgetAgent: BudgetAgent,
@@ -44,6 +59,29 @@ export class BudgetEffects {
       switchMap((budgetResponse: IBudget[]) =>
         of(new GetBudgetsSuccess(budgetResponse))
       )
+    );
+
+    this.deleteBudget$ = this._action$.pipe(
+      ofType<DeleteBudget>(EBudgetAction.DeleteBudget),
+      map((action) => action.payload),
+      switchMap((budgetId) =>
+        this._budgetAgent.deleteBudget(budgetId).pipe(map(() => budgetId))
+      ),
+      switchMap((budgetId) => of(new DeleteBudgetSuccess(budgetId)))
+    );
+
+    this.createBudget$ = this._action$.pipe(
+      ofType<CreateBudget>(EBudgetAction.CreateBudget),
+      map((action) => action.payload),
+      switchMap((budget) => this._budgetAgent.createBudget(budget)),
+      switchMap((budget) => of(new CreateBudgetSuccess(budget)))
+    );
+
+    this.updateBudget$ = this._action$.pipe(
+      ofType<UpdateBudget>(EBudgetAction.UpdateBudget),
+      map((action) => action.payload),
+      switchMap((budget) => this._budgetAgent.updateBudget(budget)),
+      switchMap((budget) => of(new UpdateBudgetSuccess(budget)))
     );
   }
 }

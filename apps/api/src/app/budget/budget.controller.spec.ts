@@ -13,7 +13,8 @@ describe('Budget Controller', () => {
   const defaultBudget: IBudget = {
     id: '123',
     name: 'test',
-    startDate: 'testDate',
+    startDate: 'testStartDate',
+    createdDate: 'testCreatedDate',
   };
 
   beforeEach(async () => {
@@ -77,13 +78,23 @@ describe('Budget Controller', () => {
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
-  it('should hit the saveBudget method with same ids', () => {
+  it('should hit the updateExistingBudget method with same ids', () => {
     const spy = jest.fn();
     jest
       .spyOn(budgetService, 'saveBudget')
       .mockImplementation((request) => spy(request));
-    controller.updateExistingBudget({ id: 'test123', name: '' });
+    controller.updateExistingBudget('test123', { id: 'test123', name: '' });
     expect(spy).toHaveBeenCalledWith({ id: 'test123', name: '' });
+  });
+
+  it('should throw from updateExistingBudget method with different ids', () => {
+    const spy = jest.fn();
+    jest
+      .spyOn(budgetService, 'saveBudget')
+      .mockImplementation((request) => spy(request));
+    expect(() =>
+      controller.updateExistingBudget('test1235', { id: 'test123', name: '' })
+    ).toThrow();
   });
 
   it('should hit the deleteBudget method with the id', () => {

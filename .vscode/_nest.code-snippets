@@ -1,0 +1,34 @@
+{
+    "post": {
+        "prefix": ["nest-post", "nepo"],
+        "scope": "typescript",
+        "description": "Create a post method for nest",
+        "body": [
+            "@Post($1)",
+            "@ApiOperation({ description: '$4' })",
+            "@ApiResponse({",
+            "  status: 201,",
+            "  description: '$5',",
+            "})",
+            "public async ${2:method_name}(): Promise<$3> {",
+            "\tthrow new NotImplementedException(); $0",
+            "}",
+        ]
+    },
+    "get": {
+        "prefix": ["nest-get", "nege"],
+        "scope": "typescript",
+        "description": "Create a get method for nest",
+        "body": [
+            "@Get($1)",
+            "@ApiOperation({ description: '$5' })",
+            "@ApiResponse({",
+            "  status: 201,",
+            "  description: '$6',",
+            "})",
+            "public async ${2:method_name}($4): Promise<$3> {",
+            "\tthrow new NotImplementedException(); $0",
+            "}",
+        ]
+    }
+}

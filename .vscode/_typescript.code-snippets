@@ -1,0 +1,38 @@
+{
+    "interface": {
+        "scope": "typescript, typescriptreact",
+        "description": "Snippet for scaffolding an exported typescript interface",
+        "prefix": ["tsi", "ts-i-filename"],
+        "body": ["export interface $TM_FILENAME_BASE {", "\t$1", "}"]
+    },
+    "export-all-from": {
+        "scope": "typescript",
+        "description": "Export all from file",
+        "prefix": ["tse*"],
+        "body": ["export * from '$1'; $2"]
+    },
+    "export-select-from": {
+        "scope": "typescript",
+        "description": "Export select from file",
+        "prefix": ["tses"],
+        "body": ["export { $2 } from '$1'; $0"]
+    },
+    "import-select-from": {
+        "scope": "typescript",
+        "description": "Import select from file",
+        "prefix": ["tsis", "ts-import-some"],
+        "body": ["import { $2 } from '$1'; $0"]
+    },
+    "export-select-file-name": {
+        "scope": "typescript",
+        "description": "Export filename from file",
+        "prefix": ["tsesf"],
+        "body": ["export { $1 } from './$1'; $0"]
+    },
+    "destructure": {
+        "scope": "typescript, typescriptreact",
+        "description": "Destructure an object",
+        "prefix": ["destruct"],
+        "body": ["const { $2 } = $1; $0"]
+    }
+}

@@ -1,0 +1,22 @@
+<h1 mat-dialog-title>Add new budget</h1>
+<div mat-dialog-content>
+  <p>Add your new budget, just fill out some fields.</p>
+  <form (ngSubmit)="submitForm()">
+    <mat-form-field>
+      <mat-label>Title</mat-label>
+      <input matInput required name="budgetTitle" [(ngModel)]="budgetTitle" />
+    </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button color="warn" (click)="onNoClick()">Cancel</button>
+  <button
+    mat-button
+    color="primary"
+    type="submit"
+    mat-button
+    (click)="submitForm()"
+  >
+    Save
+  </button>
+</div>
