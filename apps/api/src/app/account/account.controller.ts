@@ -34,7 +34,7 @@ export class AccountController {
     description: 'The newly created account is returned',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async create(
+  public async createAccount(
     @Body() accountRequest: CreateAccount
   ): Promise<IAccount> {
     if (!accountRequest.budgetId) {
@@ -57,7 +57,9 @@ export class AccountController {
     description: 'A list of all accounts and their properties and labels.',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async findAll(@Body() query?: AccountQuery): Promise<IAccount[]> {
+  public async getAllAccounts(
+    @Body() query?: AccountQuery
+  ): Promise<IAccount[]> {
     return await this.accountService.findAccounts(query);
   }
 
@@ -71,22 +73,22 @@ export class AccountController {
     description: 'A single account and its properties and labels',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async findOne(@Param('id') id: string): Promise<IAccount> {
+  public async getAccountById(@Param('id') id: string): Promise<IAccount> {
     return await this.accountService.findAccount(id);
   }
 
-  @Put(':id')
+  @Put(':accountId')
   @ApiOperation({
     summary: 'Update a given account',
     description:
       'Update a single account, currently only updates the name property and everything else remains the same',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async update(
-    @Param('id') id: string,
+  public async updateAccount(
+    @Param('accountId') accountId: string,
     @Body() updateAccount: UpdateAccount
   ): Promise<IAccount> {
-    if (id !== updateAccount.id) {
+    if (accountId !== updateAccount.id) {
       throw new HttpException(
         'The parameter id and the body id do not match.',
         HttpStatus.CONFLICT
@@ -108,7 +110,9 @@ export class AccountController {
   })
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
-  public async remove(@Param('id') id: string): Promise<{ message: string }> {
+  public async deleteAccountById(
+    @Param('id') id: string
+  ): Promise<{ message: string }> {
     return await this.accountService.deleteAccount(id);
   }
 }

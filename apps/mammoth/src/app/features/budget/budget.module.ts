@@ -15,7 +15,6 @@ import { BudgetService } from './budget.service';
   declarations: [BudgetComponent],
   imports: [
     CommonModule,
-    HttpModule,
     MatButtonModule,
     MatCardModule,
     MatDialogModule,

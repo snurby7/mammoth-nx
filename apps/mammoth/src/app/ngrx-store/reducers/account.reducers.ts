@@ -15,7 +15,9 @@ export const accountReducers = (
     case EAccountAction.GetAccount_Success: {
       return {
         ...state,
-        selectedAccount: action.payload,
+        selectedAccount: state.accounts.filter(
+          (account) => account.id === action.payload
+        )[0],
       };
     }
     default:

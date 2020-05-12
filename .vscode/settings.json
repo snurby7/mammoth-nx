@@ -3,6 +3,7 @@
         "Authz",
         "commitlint",
         "nestjs",
+        "ngrx",
         "prebuild",
         "vetur"
     ],
