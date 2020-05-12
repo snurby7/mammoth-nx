@@ -23,6 +23,7 @@ export class AuthService {
       client_id: 'X8Nt1Ih9IhR4v2fmgrb0KelYrrt6mVWe',
       redirect_uri: `${window.location.origin}`,
       audience: 'https://mammoth.api.com',
+      cacheLocation: 'localstorage',
     })
   ) as Observable<Auth0Client>).pipe(
     shareReplay(1), // Every subscription receives the same shared value
