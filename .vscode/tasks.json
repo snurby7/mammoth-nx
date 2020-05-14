@@ -25,6 +25,14 @@
         },
         {
             "type": "shell",
+            "command": "nx test mammoth --watch",
+            "problemMatcher": [],
+            "group": "test",
+            "label": "nx:test:watch mammoth",
+            "detail": "Watch tests for the mammoth-ui"
+        },
+        {
+            "type": "shell",
             "command": "nx test mammoth",
             "problemMatcher": [],
             "group": "test",

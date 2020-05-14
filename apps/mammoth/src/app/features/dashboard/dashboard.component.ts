@@ -19,10 +19,7 @@ export class DashboardComponent implements OnDestroy {
   constructor(
     changeDetectorRef: ChangeDetectorRef,
     media: MediaMatcher,
-    private route: ActivatedRoute,
-    private _store: Store<IMammothState>
   ) {
-    this._store.dispatch(new GetBudget(this.route.snapshot.params['budgetId']));
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);

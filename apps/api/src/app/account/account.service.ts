@@ -88,7 +88,7 @@ export class AccountService extends CommonAccountService
    * @returns {Promise<IAccount>}
    * @memberof AccountService
    */
-  public async findAccount(id: string): Promise<IAccount> {
+  public async findAccount(budgetId: string, id: string): Promise<IAccount> {
     this.logger.log(`Finding account with ${id}`);
     const node = 'account';
     const statementResult = await this.neo4jService.executeStatement({
