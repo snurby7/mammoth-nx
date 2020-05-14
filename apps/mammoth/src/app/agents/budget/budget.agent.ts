@@ -9,7 +9,13 @@ export class BudgetAgent {
   constructor(private httpService: HttpService) {}
 
   public getBudgets(): Observable<IBudget[]> {
-    return this.httpService.get(BudgetApiRoute.GetBudgets);
+    return this.httpService.get(BudgetApiRoute.GetBudgetList);
+  }
+
+  public getBudgetDetail(budgetId: string): Observable<IBudget> {
+    return this.httpService.get(BudgetApiRoute.GetBudget, {
+      budgetId,
+    });
   }
 
   public deleteBudget(budgetId: string): Observable<void> {

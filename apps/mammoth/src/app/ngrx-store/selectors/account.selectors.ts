@@ -9,7 +9,7 @@ export const selectAccountList = createSelector(
   (state: IAccountState) => state.accounts
 );
 
-export const setSelectedAccount = createSelector(
+export const selectSelectedAccount = createSelector(
   selectAccounts,
   (state: IAccountState) => state.selectedAccount
 );

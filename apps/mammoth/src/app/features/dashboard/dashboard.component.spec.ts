@@ -7,6 +7,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { AccountModule } from '../account/account.module';
 import { DashboardComponent } from './dashboard.component';
 
 describe('DashboardComponent', () => {
@@ -18,6 +19,7 @@ describe('DashboardComponent', () => {
     TestBed.configureTestingModule({
       declarations: [DashboardComponent],
       imports: [
+        AccountModule,
         MatButtonModule,
         MatIconModule,
         MatListModule,

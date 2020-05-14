@@ -1,9 +1,9 @@
-import { IAccount, ICreateAccount } from '@mammoth/api-interfaces';
-import { Action } from '@ngrx/store';
+import { IAccount } from '@mammoth/api-interfaces';
+import { createAction, props } from '@ngrx/store';
 
 export enum EAccountAction {
-  GetAccounts = '[Account] Get Accounts',
-  GetAccounts_Success = '[Account] Get Accounts Success',
+  GetAccountList = '[Account] Get Account List',
+  GetAccountList_Success = '[Account] Get Account List Success',
   GetAccount = '[Account] Get Account',
   GetAccount_Success = '[Account] Get Account Success',
   DeleteAccount = '[Account] Delete Account',
@@ -12,59 +12,19 @@ export enum EAccountAction {
   CreateAccount_Success = '[Account] Create Account Success',
 }
 
-export class GetAccounts implements Action {
-  public readonly type = EAccountAction.GetAccounts;
-}
+// Get many accounts.
+export const ng_GetAccountList = createAction(EAccountAction.GetAccountList);
+export const ng_GetAccountList_Success = createAction(
+  EAccountAction.GetAccountList_Success,
+  props<{ accounts: IAccount[] }>()
+);
 
-export class GetAccountsSuccess implements Action {
-  public readonly type = EAccountAction.GetAccounts_Success;
-  constructor(public payload: IAccount[]) {}
-}
-
-export class GetAccount implements Action {
-  public readonly type = EAccountAction.GetAccount;
-  constructor(public payload: string) {}
-}
-
-export class GetAccountSuccess implements Action {
-  public readonly type = EAccountAction.GetAccount_Success;
-  constructor(public payload: string) {}
-}
-
-export class DeleteAccount implements Action {
-  public readonly type = EAccountAction.DeleteAccount;
-  constructor(public payload: string) {}
-}
-
-export class DeleteAccountSuccess implements Action {
-  public readonly type = EAccountAction.DeleteAccount_Success;
-  constructor(public payload: string) {}
-}
-
-export class CreateAccount implements Action {
-  public readonly type = EAccountAction.CreateAccount;
-  constructor(public payload: ICreateAccount) {}
-}
-
-export class CreateAccountSuccess implements Action {
-  public readonly type = EAccountAction.CreateAccount_Success;
-  constructor(public payload: IAccount) {}
-}
-
-// TODO Need to be able to update an account
-// export class UpdateAccount implements Action {
-//   public readonly type = EAccountAction.UpdateAccount;
-//   constructor(public payload: IAccount) {}
-// }
-
-// export class UpdateAccountSuccess implements Action {
-//   public readonly type = EAccountAction.UpdateAccount_Success;
-//   constructor(public payload: IAccount) {}
-// }
-export type AccountActions =
-  | DeleteAccount
-  | DeleteAccountSuccess
-  | GetAccounts
-  | GetAccountsSuccess
-  | GetAccount
-  | GetAccountSuccess;
+// Get a single account
+export const ng_GetAccount = createAction(
+  EAccountAction.GetAccount_Success,
+  props<{ accountId: string }>()
+);
+export const ng_GetAccount_Success = createAction(
+  EAccountAction.GetAccount_Success,
+  props<{ selectedAccount: IAccount }>()
+);

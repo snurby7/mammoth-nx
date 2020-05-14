@@ -23,7 +23,12 @@ import { mammothReducers } from './ngrx-store/reducers/mammoth.reducers';
     BrowserAnimationsModule,
     HttpClientModule,
     AppRoutingModule,
-    StoreModule.forRoot(mammothReducers),
+    StoreModule.forRoot(mammothReducers, {
+      runtimeChecks: {
+        strictActionWithinNgZone: true,
+        strictStateImmutability: true,
+      },
+    }),
     EffectsModule.forRoot([BudgetEffects, AccountEffects]),
     StoreRouterConnectingModule.forRoot({ stateKey: 'router' }),
     !environment.production ? StoreDevtoolsModule.instrument() : [],

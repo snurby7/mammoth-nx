@@ -9,21 +9,20 @@ import {
   Logger,
   Param,
   Post,
-  Put,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AccountService } from './account.service';
-import { AccountQuery, CreateAccount, UpdateAccount } from './dto';
+import { CreateAccount, UpdateAccount } from './dto';
 
-@Controller('account')
+@Controller('accounts')
 @ApiTags('account')
 export class AccountController {
   private readonly logger = new Logger(AccountController.name);
   constructor(private readonly accountService: AccountService) {}
 
-  @Post()
+  @Post(':budgetId')
   @ApiOperation({
     summary: 'Create Account',
     description:
@@ -34,10 +33,11 @@ export class AccountController {
     description: 'The newly created account is returned',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async createAccount(
+  public async createNewAccount(
+    @Param('budgetId') budgetId: string,
     @Body() accountRequest: CreateAccount
   ): Promise<IAccount> {
-    if (!accountRequest.budgetId) {
+    if (!accountRequest.budgetId || accountRequest.budgetId !== budgetId) {
       this.logger.error('No budgetId found on request');
       throw new HttpException(
         'No budgetId found on request',
@@ -47,7 +47,7 @@ export class AccountController {
     return await this.accountService.createAccount(accountRequest);
   }
 
-  @Get()
+  @Get(':budgetId')
   @ApiOperation({
     summary: 'Find all accounts',
     description: 'Get all the accounts that have Account as its label',
@@ -57,13 +57,15 @@ export class AccountController {
     description: 'A list of all accounts and their properties and labels.',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async getAllAccounts(
-    @Body() query?: AccountQuery
+  public async getAllAccountsForBudgetId(
+    @Param('budgetId') budgetId: string
   ): Promise<IAccount[]> {
-    return await this.accountService.findAccounts(query);
+    return await this.accountService.findAccounts({
+      budgetId,
+    });
   }
 
-  @Get(':id')
+  @Get(':budgetId/detail/:accountId')
   @ApiOperation({
     summary: 'Find a single account',
     description: 'Get a account that has Account as its label',
@@ -73,11 +75,14 @@ export class AccountController {
     description: 'A single account and its properties and labels',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async getAccountById(@Param('id') id: string): Promise<IAccount> {
-    return await this.accountService.findAccount(id);
+  public async getAccount(
+    @Param('budgetId') budgetId: string,
+    @Param('accountId') id: string
+  ): Promise<IAccount> {
+    return await this.accountService.findAccount(budgetId, id);
   }
 
-  @Put(':accountId')
+  @Post(':budgetId/account/:accountId')
   @ApiOperation({
     summary: 'Update a given account',
     description:
@@ -85,10 +90,11 @@ export class AccountController {
   })
   @UseGuards(AuthGuard('jwt'))
   public async updateAccount(
-    @Param('accountId') accountId: string,
+    @Param('budgetId') budgetId: string,
+    @Param('accountId') id: string,
     @Body() updateAccount: UpdateAccount
   ): Promise<IAccount> {
-    if (accountId !== updateAccount.id) {
+    if (id !== updateAccount.id && budgetId !== updateAccount.budgetId) {
       throw new HttpException(
         'The parameter id and the body id do not match.',
         HttpStatus.CONFLICT
@@ -108,10 +114,11 @@ export class AccountController {
     description:
       'Returns back a message saying how many nodes have been deleted. Data will need to refresh itself after making this request.',
   })
-  @Delete(':id')
+  @Delete(':budgetId/account/:accountId')
   @UseGuards(AuthGuard('jwt'))
-  public async deleteAccountById(
-    @Param('id') id: string
+  public async deleteAccount(
+    @Param('budgetId') budgetId: string,
+    @Param('accountId') id: string
   ): Promise<{ message: string }> {
     return await this.accountService.deleteAccount(id);
   }

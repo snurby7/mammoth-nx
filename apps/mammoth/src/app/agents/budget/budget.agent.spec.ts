@@ -32,6 +32,13 @@ describe('BudgetAgent', () => {
     expect(httpService.get).toHaveBeenCalledWith('api/v1/budget');
   });
 
+  it('should get all budgets', () => {
+    budgetAgent.getBudgetDetail('123');
+    expect(httpService.get).toHaveBeenCalledWith('api/v1/budget/:budgetId', {
+      budgetId: '123',
+    });
+  });
+
   it('should delete a budget', () => {
     budgetAgent.deleteBudget('123');
     expect(httpService.delete).toHaveBeenCalledWith('api/v1/budget/:budgetId', {

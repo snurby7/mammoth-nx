@@ -3,7 +3,7 @@ import { IBudget } from '@mammoth/api-interfaces';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { select, Store } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
-import { map, switchMap, withLatestFrom } from 'rxjs/operators';
+import { flatMap, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { BudgetAgent } from '../../agents';
 import {
   CreateBudget,
@@ -41,6 +41,7 @@ export class BudgetEffects {
   constructor(
     private _budgetAgent: BudgetAgent,
     private _action$: Actions,
+
     private _store: Store<IMammothState>
   ) {
     this.getBudget$ = this._action$.pipe(
@@ -48,8 +49,19 @@ export class BudgetEffects {
       map((action) => action.payload),
       withLatestFrom(this._store.pipe(select(selectBudgetList))),
       switchMap(([id, budgets]) => {
-        const selectedBudget = budgets.filter((budget) => budget.id === id)[0];
-        return of(new GetBudgetSuccess(selectedBudget));
+        const response$ = (selectedBudget: IBudget) =>
+          of(new GetBudgetSuccess(selectedBudget));
+        if (
+          budgets &&
+          budgets.length > 0 &&
+          budgets.some((budget) => budget.id === id)
+        ) {
+          return response$(budgets.find((budget) => budget.id === id));
+        }
+        console.log('request fired');
+        return this._budgetAgent
+          .getBudgetDetail(id)
+          .pipe(flatMap((budget) => response$(budget)));
       })
     );
 
