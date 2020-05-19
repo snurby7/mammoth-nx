@@ -1,4 +1,4 @@
-import { IAccount } from '@mammoth/api-interfaces';
+import { IAccount, IDeleteResponse } from '@mammoth/api-interfaces';
 import {
   Body,
   Controller,
@@ -68,7 +68,7 @@ export class AccountController {
   @Get(':budgetId/detail/:accountId')
   @ApiOperation({
     summary: 'Find a single account',
-    description: 'Get a account that has Account as its label',
+    description: 'Get a specific account by the accountId in a given budgetId',
   })
   @ApiResponse({
     status: 200,
@@ -82,14 +82,14 @@ export class AccountController {
     return await this.accountService.findAccount(budgetId, id);
   }
 
-  @Post(':budgetId/account/:accountId')
+  @Post(':budgetId/detail/:accountId')
   @ApiOperation({
     summary: 'Update a given account',
     description:
       'Update a single account, currently only updates the name property and everything else remains the same',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async updateAccount(
+  public async updateAccountDetails(
     @Param('budgetId') budgetId: string,
     @Param('accountId') id: string,
     @Body() updateAccount: UpdateAccount
@@ -118,8 +118,8 @@ export class AccountController {
   @UseGuards(AuthGuard('jwt'))
   public async deleteAccount(
     @Param('budgetId') budgetId: string,
-    @Param('accountId') id: string
-  ): Promise<{ message: string }> {
-    return await this.accountService.deleteAccount(id);
+    @Param('accountId') accountId: string
+  ): Promise<IDeleteResponse> {
+    return await this.accountService.deleteAccount(budgetId, accountId);
   }
 }

@@ -22,4 +22,13 @@ export interface IDeleteResponse {
    * @memberof IDeleteResponse
    */
   isDeleted: boolean;
+
+  /**
+   * The Id of the record that was deleted. If you are storing the records you can use this ID to filter
+   * out the current data you have so that record is no longer shown.
+   *
+   * @type {string}
+   * @memberof IDeleteResponse
+   */
+  id: string;
 }

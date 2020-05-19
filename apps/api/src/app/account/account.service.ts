@@ -1,6 +1,10 @@
-import { IAccount, ITransaction } from '@mammoth/api-interfaces';
+import {
+  IAccount,
+  ICreateAccount,
+  IDeleteResponse,
+  ITransaction,
+} from '@mammoth/api-interfaces';
 import { Injectable, Logger } from '@nestjs/common';
-import * as uuid from 'uuid/v4';
 import { SupportedLabel } from '../constants';
 import {
   CommonAccountService,
@@ -10,7 +14,8 @@ import {
   ICommonAccountConverter,
 } from '../extensions';
 import { Neo4jService } from '../neo4j';
-import { AccountQuery, CreateAccount, UpdateAccount } from './dto';
+import { AccountQuery } from './dto';
+import { accountQueries } from './queries';
 
 @Injectable()
 export class AccountService extends CommonAccountService
@@ -25,28 +30,17 @@ export class AccountService extends CommonAccountService
   /**
    * Create a new account, something like a credit card or checking account.
    *
-   * @param {CreateAccountDto} accountRequest
+   * @param {CreateAccountDto} request
    * @returns {Promise<IAccount>}
    * @memberof AccountService
    */
-  public async createAccount(accountRequest: CreateAccount): Promise<IAccount> {
+  public async createAccount(request: ICreateAccount): Promise<IAccount> {
     this.logger.log('Creating an account');
-    const account = 'node';
+    const account = 'account';
+    const { statement, props } = accountQueries.createAccount(account, request);
     const statementResult = await this.neo4jService.executeStatement({
-      statement: `
-        MATCH (budget:Budget {id: $budgetId})
-        CREATE (${account}:${SupportedLabel.Account} $nodeProps)
-        MERGE (${account})-[r:${this.AccountRelationship}]->(budget)
-        RETURN ${account}
-      `,
-      props: {
-        budgetId: accountRequest.budgetId,
-        nodeProps: {
-          ...accountRequest,
-          createdDate: new Date().toISOString(),
-          id: uuid(),
-        },
-      },
+      statement,
+      props,
     });
     return this.neo4jService.flattenStatementResult<IAccount>(
       statementResult,
@@ -118,7 +112,7 @@ export class AccountService extends CommonAccountService
    * @returns {Promise<IAccount>}
    * @memberof AccountService
    */
-  public async saveAccount(request: UpdateAccount): Promise<IAccount> {
+  public async saveAccount(request: IAccount): Promise<IAccount> {
     const { id, budgetId, name, balance } = request;
     this.logger.log(`Updating an account with ${id}`);
     const node = 'account';
@@ -148,15 +142,18 @@ export class AccountService extends CommonAccountService
    * @returns {Promise<{ message: string }>}
    * @memberof AccountService
    */
-  public async deleteAccount(id: string): Promise<{ message: string }> {
-    this.logger.debug(`Deleting account - ${id}`);
+  public async deleteAccount(
+    budgetId: string,
+    accountId: string
+  ): Promise<IDeleteResponse> {
+    this.logger.debug(`Deleting account - ${accountId}`);
     const result = await this.neo4jService.executeStatement({
       statement: `
-        MATCH (node:${SupportedLabel.Account} { id: '${id}' })
+        MATCH (node:${SupportedLabel.Account} { id: '${accountId}' })
         DETACH DELETE node
       `,
     });
-    this.logger.debug(`Deleted category - ${id}`);
+    this.logger.debug(`Deleted category - ${accountId}`);
     this.logger.verbose(
       `Deleted ${
         result.summary.counters.updates().relationshipsDeleted
@@ -166,6 +163,8 @@ export class AccountService extends CommonAccountService
       message: `Deleted ${
         result.summary.counters.updates().relationshipsDeleted || 0
       } record(s)`,
+      isDeleted: true,
+      id: accountId,
     };
   }
 
