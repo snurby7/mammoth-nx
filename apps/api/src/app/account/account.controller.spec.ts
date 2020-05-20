@@ -1,27 +1,29 @@
+import { INestApplication } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Neo4jService } from '../neo4j';
-import { AccountController } from './account.controller';
-import { AccountService } from './account.service';
+import * as request from 'supertest';
+import { AccountModule } from './account.module';
 
 describe('Accounts Controller', () => {
-  let controller: AccountController;
+  let app: INestApplication;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AccountService,
-        {
-          provide: Neo4jService,
-          useValue: {},
-        },
-      ],
-      controllers: [AccountController],
-    }).compile();
+      imports: [AccountModule],
+    })
+      .overrideGuard(AuthGuard('jwt'))
+      .useValue({})
+      .compile();
 
-    controller = module.get<AccountController>(AccountController);
+    app = module.createNestApplication();
+    await app.init();
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 
   it('should be defined', () => {
-    expect(controller).toBeDefined();
+    return request(app.getHttpServer()).get('/accounts/123').expect(200);
   });
 });
