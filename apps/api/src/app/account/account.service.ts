@@ -1,5 +1,6 @@
 import {
   IAccount,
+  IAccountQuery,
   ICreateAccount,
   IDeleteResponse,
   ITransaction,
@@ -14,7 +15,6 @@ import {
   ICommonAccountConverter,
 } from '../extensions';
 import { Neo4jService } from '../neo4j';
-import { AccountQuery } from './dto';
 import { accountQueries } from './queries';
 
 @Injectable()
@@ -51,26 +51,21 @@ export class AccountService extends CommonAccountService
   /**
    * Find all the given categories that below to a certain budget
    *
-   * @param {AccountQueryDto} query
+   * @param {IAccountQueryDto} query
    * @returns {Promise<IAccount[]>}
    * @memberof AccountService
    */
-  public async findAccounts(query: AccountQuery): Promise<IAccount[]> {
+  public async findAccounts(query: IAccountQuery): Promise<IAccount[]> {
     this.logger.log(`Finding accounts with budgetId - ${query.budgetId}`);
-    const nodes = 'accounts';
+    const resultKey = 'accounts';
+    const { statement, props } = accountQueries.findAccounts(resultKey, query);
     const statementResult = await this.neo4jService.executeStatement({
-      statement: `
-        MATCH (${nodes}:${SupportedLabel.Account} {budgetId: $budgetId})
-        RETURN ${nodes}
-        ${query.limit ? `LIMIT ${query.limit}` : ''}
-      `,
-      props: {
-        budgetId: query.budgetId,
-      },
+      statement,
+      props,
     });
     return this.neo4jService.flattenStatementResult<IAccount>(
       statementResult,
-      nodes
+      resultKey
     );
   }
 
@@ -82,21 +77,24 @@ export class AccountService extends CommonAccountService
    * @returns {Promise<IAccount>}
    * @memberof AccountService
    */
-  public async findAccount(budgetId: string, id: string): Promise<IAccount> {
-    this.logger.log(`Finding account with ${id}`);
-    const node = 'account';
+  public async findAccount(
+    budgetId: string,
+    accountId: string
+  ): Promise<IAccount> {
+    this.logger.log(`Finding account with ${accountId}`);
+    const resultKey = 'account';
+    const { statement, props } = accountQueries.getAccountById(
+      resultKey,
+      budgetId,
+      accountId
+    );
     const statementResult = await this.neo4jService.executeStatement({
-      statement: `
-        MATCH (${node}:${SupportedLabel.Account} {id: $accountId})
-        RETURN ${node}
-      `,
-      props: {
-        accountId: id,
-      },
+      statement,
+      props,
     });
     return this.neo4jService.flattenStatementResult<IAccount>(
       statementResult,
-      node
+      resultKey
     )[0];
   }
 
@@ -112,26 +110,21 @@ export class AccountService extends CommonAccountService
    * @returns {Promise<IAccount>}
    * @memberof AccountService
    */
-  public async saveAccount(request: IAccount): Promise<IAccount> {
+  public async updateAccountDetails(request: IAccount): Promise<IAccount> {
     const { id, budgetId, name, balance } = request;
     this.logger.log(`Updating an account with ${id}`);
-    const node = 'account';
+    const resultKey = 'account';
+    const { statement, props } = accountQueries.updateExistingAccount(
+      resultKey,
+      request
+    );
     const statementResult = await this.neo4jService.executeStatement({
-      statement: `
-        MATCH (${node}:${SupportedLabel.Account} {id: $accountId, budgetId: $budgetId})
-        SET ${node} += {name: $updatedName, balance: $updatedBalance}
-        RETURN ${node}
-      `,
-      props: {
-        accountId: id,
-        budgetId,
-        updatedName: name,
-        updatedBalance: balance,
-      },
+      statement,
+      props,
     });
     return this.neo4jService.flattenStatementResult<IAccount>(
       statementResult,
-      node
+      resultKey
     )[0];
   }
 
@@ -147,11 +140,15 @@ export class AccountService extends CommonAccountService
     accountId: string
   ): Promise<IDeleteResponse> {
     this.logger.debug(`Deleting account - ${accountId}`);
+    const resultKey = 'deletedAccount';
+    const { statement, props } = accountQueries.deleteAccountById(
+      resultKey,
+      budgetId,
+      accountId
+    );
     const result = await this.neo4jService.executeStatement({
-      statement: `
-        MATCH (node:${SupportedLabel.Account} { id: '${accountId}' })
-        DETACH DELETE node
-      `,
+      statement,
+      props,
     });
     this.logger.debug(`Deleted category - ${accountId}`);
     this.logger.verbose(

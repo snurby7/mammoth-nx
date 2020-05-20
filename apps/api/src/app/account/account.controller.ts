@@ -100,7 +100,7 @@ export class AccountController {
         HttpStatus.CONFLICT
       );
     }
-    return await this.accountService.saveAccount(updateAccount);
+    return await this.accountService.updateAccountDetails(updateAccount);
   }
 
   @ApiOperation({
