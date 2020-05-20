@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Observable } from 'rxjs';
 import { AccountService } from './account.service';
 import { CreateAccount, UpdateAccount } from './dto';
 
@@ -33,10 +34,10 @@ export class AccountController {
     description: 'The newly created account is returned',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async createNewAccount(
+  public createNewAccount(
     @Param('budgetId') budgetId: string,
     @Body() accountRequest: CreateAccount
-  ): Promise<IAccount> {
+  ): Observable<IAccount> {
     if (!accountRequest.budgetId || accountRequest.budgetId !== budgetId) {
       this.logger.error('No budgetId found on request');
       throw new HttpException(
@@ -44,7 +45,7 @@ export class AccountController {
         HttpStatus.CONFLICT
       );
     }
-    return await this.accountService.createAccount(accountRequest);
+    return this.accountService.createAccount(accountRequest);
   }
 
   @Get(':budgetId')
@@ -57,10 +58,10 @@ export class AccountController {
     description: 'A list of all accounts and their properties and labels.',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async getAllAccountsForBudgetId(
+  public getAllAccountsForBudgetId(
     @Param('budgetId') budgetId: string
-  ): Promise<IAccount[]> {
-    return await this.accountService.findAccounts({
+  ): Observable<IAccount[]> {
+    return this.accountService.findAccounts({
       budgetId,
     });
   }
@@ -75,11 +76,11 @@ export class AccountController {
     description: 'A single account and its properties and labels',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async getAccount(
+  public getAccount(
     @Param('budgetId') budgetId: string,
     @Param('accountId') id: string
-  ): Promise<IAccount> {
-    return await this.accountService.findAccount(budgetId, id);
+  ): Observable<IAccount> {
+    return this.accountService.findAccount(budgetId, id);
   }
 
   @Post(':budgetId/detail/:accountId')
@@ -89,18 +90,18 @@ export class AccountController {
       'Update a single account, currently only updates the name property and everything else remains the same',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async updateAccountDetails(
+  public updateAccountDetails(
     @Param('budgetId') budgetId: string,
     @Param('accountId') id: string,
     @Body() updateAccount: UpdateAccount
-  ): Promise<IAccount> {
+  ): Observable<IAccount> {
     if (id !== updateAccount.id && budgetId !== updateAccount.budgetId) {
       throw new HttpException(
         'The parameter id and the body id do not match.',
         HttpStatus.CONFLICT
       );
     }
-    return await this.accountService.updateAccountDetails(updateAccount);
+    return this.accountService.updateAccountDetails(updateAccount);
   }
 
   @ApiOperation({
@@ -116,10 +117,10 @@ export class AccountController {
   })
   @Delete(':budgetId/account/:accountId')
   @UseGuards(AuthGuard('jwt'))
-  public async deleteAccount(
+  public deleteAccount(
     @Param('budgetId') budgetId: string,
     @Param('accountId') accountId: string
-  ): Promise<IDeleteResponse> {
-    return await this.accountService.deleteAccount(budgetId, accountId);
+  ): Observable<IDeleteResponse> {
+    return this.accountService.deleteAccount(budgetId, accountId);
   }
 }
