@@ -2,7 +2,6 @@ import { INestApplication } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { getNeo4jDriver } from '../neo4j/neo4j.module';
 import { BudgetModule } from './budget.module';
 import { Budget } from './dto';
 
@@ -12,12 +11,6 @@ describe('Accounts Controller', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [BudgetModule],
-      providers: [
-        {
-          provide: 'Neo4j',
-          useFactory: () => getNeo4jDriver(true),
-        },
-      ],
     })
       .overrideGuard(AuthGuard('jwt'))
       .useValue({})
