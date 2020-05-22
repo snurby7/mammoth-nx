@@ -3,6 +3,7 @@ import {
   ITransaction,
   ITransactionDeleteRequest,
   ITransactionQuery,
+  IDeleteResponse,
 } from '@mammoth/api-interfaces';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { forkJoin, Observable, throwError } from 'rxjs';
@@ -17,7 +18,6 @@ import {
 } from 'rxjs/operators';
 import { AccountService } from '../account';
 import { CategoryService } from '../category';
-import { IDeleteResponse } from '../common';
 import { SupportedLabel } from '../constants';
 import { IAccountLinkBreak, IAccountLinkResponse } from '../extensions';
 import {

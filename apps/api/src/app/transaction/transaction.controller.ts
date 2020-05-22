@@ -1,4 +1,4 @@
-import { ITransaction } from '@mammoth/api-interfaces';
+import { ITransaction,IDeleteResponse } from '@mammoth/api-interfaces';
 import {
   Body,
   Controller,
@@ -11,7 +11,6 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
-import { IDeleteResponse } from '../common';
 import {
   TransactionCreateDto,
   TransactionDeleteDto,

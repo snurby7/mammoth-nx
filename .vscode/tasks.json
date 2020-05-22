@@ -39,5 +39,13 @@
             "label": "nx:test mammoth",
             "detail": "Run tests for the mammoth-ui"
         },
+        {
+            "type": "shell",
+            "command": " nx run-many --target=serve --projects=api,mammoth",
+            "problemMatcher": [],
+            "group": "build",
+            "label": "nx:run-many mammoth & api",
+            "detail": "Run the Angular UI and NestJs API"
+        },
     ]
 }

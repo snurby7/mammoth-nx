@@ -56,3 +56,4 @@ describe('Budget Controller', () => {
       });
   });
 });
+ nx run-many --target=serve --projects=api,mammoth
