@@ -1,12 +1,11 @@
-import { ICreateAccount } from '@mammoth/api-interfaces';
+import { ICreateAccount, SupportedAccountType } from '@mammoth/api-interfaces';
 import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
   IsString,
-  IsUUID,
+  IsUUID
 } from 'class-validator';
-import { SupportedAccountType } from '../../constants';
 
 export class CreateAccount implements ICreateAccount {
   @IsUUID()

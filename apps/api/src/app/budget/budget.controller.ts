@@ -1,4 +1,4 @@
-import { IBudget } from '@mammoth/api-interfaces';
+import { IBudget, IDeleteResponse } from '@mammoth/api-interfaces';
 import {
   BadRequestException,
   Body,
@@ -96,7 +96,7 @@ export class BudgetController {
   @UseGuards(AuthGuard('jwt'))
   public removeBudgetById(
     @Param('id') id: string
-  ): Observable<{ message: string }> {
+  ): Observable<IDeleteResponse> {
     return this.budgetService.deleteBudget(id);
   }
 }

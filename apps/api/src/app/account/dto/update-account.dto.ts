@@ -1,4 +1,4 @@
-import { IAccount } from '@mammoth/api-interfaces';
+import { IAccount, SupportedAccountType } from '@mammoth/api-interfaces';
 import {
   IsEnum,
   IsNotEmpty,
@@ -6,7 +6,6 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator';
-import { SupportedAccountType } from '../../constants';
 
 export class UpdateAccount implements IAccount {
   @IsUUID()

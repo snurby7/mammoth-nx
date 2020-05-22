@@ -62,6 +62,7 @@ export class Neo4jService {
    * @param {string} key The key you used, typically this is the RETURN (something) value. This would be your (something)
    * @returns {TResponse[]} An array response of your elements.
    * @memberof Neo4jService
+   * @deprecated Use the reactive session
    */
   public flattenStatementResult<TResponse>(
     queryResult: QueryResult,

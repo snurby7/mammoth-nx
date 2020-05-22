@@ -1,6 +1,13 @@
-import { IAccount, ITransaction } from '@mammoth/api-interfaces';
+import {
+  IAccount,
+  IAccountQuery,
+  ICreateAccount,
+  IDeleteResponse,
+  ITransaction,
+} from '@mammoth/api-interfaces';
 import { Injectable, Logger } from '@nestjs/common';
-import * as uuid from 'uuid/v4';
+import { Observable } from 'rxjs';
+import { map, materialize, toArray } from 'rxjs/operators';
 import { SupportedLabel } from '../constants';
 import {
   CommonAccountService,
@@ -9,14 +16,17 @@ import {
   IAccountLinkRequest,
   ICommonAccountConverter,
 } from '../extensions';
-import { Neo4jService } from '../neo4j';
-import { AccountQuery, CreateAccount, UpdateAccount } from './dto';
+import {
+  getRecordsByKey,
+  getRecordsByKeyNotification,
+  Neo4jService,
+} from '../neo4j';
+import { accountQueries } from './queries';
 
 @Injectable()
 export class AccountService extends CommonAccountService
   implements ICommonAccountConverter {
   protected readonly logger = new Logger(AccountService.name);
-  private readonly AccountRelationship = 'ACCOUNT_OF';
 
   constructor(protected neo4jService: Neo4jService) {
     super(neo4jService);
@@ -25,58 +35,42 @@ export class AccountService extends CommonAccountService
   /**
    * Create a new account, something like a credit card or checking account.
    *
-   * @param {CreateAccountDto} accountRequest
-   * @returns {Promise<IAccount>}
+   * @param {ICreateAccount} request
+   * @returns {Observable<IAccount>}
    * @memberof AccountService
    */
-  public async createAccount(accountRequest: CreateAccount): Promise<IAccount> {
+  public createAccount(request: ICreateAccount): Observable<IAccount> {
     this.logger.log('Creating an account');
-    const account = 'node';
-    const statementResult = await this.neo4jService.executeStatement({
-      statement: `
-        MATCH (budget:Budget {id: $budgetId})
-        CREATE (${account}:${SupportedLabel.Account} $nodeProps)
-        MERGE (${account})-[r:${this.AccountRelationship}]->(budget)
-        RETURN ${account}
-      `,
-      props: {
-        budgetId: accountRequest.budgetId,
-        nodeProps: {
-          ...accountRequest,
-          createdDate: new Date().toISOString(),
-          id: uuid(),
-        },
-      },
-    });
-    return this.neo4jService.flattenStatementResult<IAccount>(
-      statementResult,
-      account
-    )[0];
+    const resultKey = 'account';
+    const { statement, props } = accountQueries.createAccount(
+      resultKey,
+      request
+    );
+    return this.neo4jService.rxSession.writeTransaction((trx) =>
+      trx
+        .run(statement, props)
+        .records()
+        .pipe(getRecordsByKey<IAccount>(resultKey))
+    );
   }
 
   /**
    * Find all the given categories that below to a certain budget
    *
-   * @param {AccountQueryDto} query
-   * @returns {Promise<IAccount[]>}
+   * @param {IAccountQueryDto} query
+   * @returns {Observable<IAccount[]>}
    * @memberof AccountService
    */
-  public async findAccounts(query: AccountQuery): Promise<IAccount[]> {
+  public findAccounts(query: IAccountQuery): Observable<IAccount[]> {
     this.logger.log(`Finding accounts with budgetId - ${query.budgetId}`);
-    const nodes = 'accounts';
-    const statementResult = await this.neo4jService.executeStatement({
-      statement: `
-        MATCH (${nodes}:${SupportedLabel.Account} {budgetId: $budgetId})
-        RETURN ${nodes}
-        ${query.limit ? `LIMIT ${query.limit}` : ''}
-      `,
-      props: {
-        budgetId: query.budgetId,
-      },
-    });
-    return this.neo4jService.flattenStatementResult<IAccount>(
-      statementResult,
-      nodes
+    const resultKey = 'accounts';
+    const { statement, props } = accountQueries.findAccounts(resultKey, query);
+    return this.neo4jService.rxSession.readTransaction((trx) =>
+      trx.run(statement).records().pipe(
+        materialize(), // gather all the notifications from the stream
+        toArray(), // turn them all into an array
+        getRecordsByKeyNotification(resultKey) // * Grab results
+      )
     );
   }
 
@@ -85,60 +79,47 @@ export class AccountService extends CommonAccountService
    * update can fix that one.
    *
    * @param {string} id
-   * @returns {Promise<IAccount>}
+   * @returns {Observable<IAccount>}
    * @memberof AccountService
    */
-  public async findAccount(budgetId: string, id: string): Promise<IAccount> {
-    this.logger.log(`Finding account with ${id}`);
-    const node = 'account';
-    const statementResult = await this.neo4jService.executeStatement({
-      statement: `
-        MATCH (${node}:${SupportedLabel.Account} {id: $accountId})
-        RETURN ${node}
-      `,
-      props: {
-        accountId: id,
-      },
-    });
-    return this.neo4jService.flattenStatementResult<IAccount>(
-      statementResult,
-      node
-    )[0];
+  public findAccount(
+    budgetId: string,
+    accountId: string
+  ): Observable<IAccount> {
+    this.logger.log(`Finding account with ${accountId}`);
+    const resultKey = 'account';
+    const { statement, props } = accountQueries.getAccountById(
+      resultKey,
+      budgetId,
+      accountId
+    );
+    return this.neo4jService.rxSession.readTransaction((trx) =>
+      trx.run(statement, props).records().pipe(
+        getRecordsByKey<IAccount>(resultKey) // this knowingly only grabs the first record, only one should be emitted here
+      )
+    );
   }
 
   /**
    * Updates an accounts name and balance, more properties will need to be added later.
    *
-   * @param {UpdateAccountDto} {
-   *     id,
-   *     budgetId,
-   *     name,
-   *     balance,
-   *   }
-   * @returns {Promise<IAccount>}
+   * @param {IAccount} request
+   * @returns {Observable<IAccount>}
    * @memberof AccountService
    */
-  public async saveAccount(request: UpdateAccount): Promise<IAccount> {
-    const { id, budgetId, name, balance } = request;
-    this.logger.log(`Updating an account with ${id}`);
-    const node = 'account';
-    const statementResult = await this.neo4jService.executeStatement({
-      statement: `
-        MATCH (${node}:${SupportedLabel.Account} {id: $accountId, budgetId: $budgetId})
-        SET ${node} += {name: $updatedName, balance: $updatedBalance}
-        RETURN ${node}
-      `,
-      props: {
-        accountId: id,
-        budgetId,
-        updatedName: name,
-        updatedBalance: balance,
-      },
-    });
-    return this.neo4jService.flattenStatementResult<IAccount>(
-      statementResult,
-      node
-    )[0];
+  public updateAccountDetails(request: IAccount): Observable<IAccount> {
+    this.logger.log(`Updating an account with ${request.id}`);
+    const resultKey = 'account';
+    const { statement, props } = accountQueries.updateExistingAccount(
+      resultKey,
+      request
+    );
+    return this.neo4jService.rxSession.writeTransaction((trx) =>
+      trx
+        .run(statement, props)
+        .records()
+        .pipe(getRecordsByKey<IAccount>(resultKey))
+    );
   }
 
   /**
@@ -148,25 +129,31 @@ export class AccountService extends CommonAccountService
    * @returns {Promise<{ message: string }>}
    * @memberof AccountService
    */
-  public async deleteAccount(id: string): Promise<{ message: string }> {
-    this.logger.debug(`Deleting account - ${id}`);
-    const result = await this.neo4jService.executeStatement({
-      statement: `
-        MATCH (node:${SupportedLabel.Account} { id: '${id}' })
-        DETACH DELETE node
-      `,
-    });
-    this.logger.debug(`Deleted category - ${id}`);
-    this.logger.verbose(
-      `Deleted ${
-        result.summary.counters.updates().relationshipsDeleted
-      } relationship(s)`
+  public deleteAccount(
+    budgetId: string,
+    accountId: string
+  ): Observable<IDeleteResponse> {
+    this.logger.debug(`Deleting account - ${accountId}`);
+    const resultKey = 'deletedAccount';
+    const { statement, props } = accountQueries.deleteAccountById(
+      resultKey,
+      budgetId,
+      accountId
     );
-    return {
-      message: `Deleted ${
-        result.summary.counters.updates().relationshipsDeleted || 0
-      } record(s)`,
-    };
+    type TODO_PR_OPEN = any; // ? https://github.com/neo4j/neo4j-javascript-driver/issues/531
+    return this.neo4jService.rxSession.writeTransaction((trx) =>
+      (trx.run(statement, props) as TODO_PR_OPEN)
+        .consume() // TODO: This is currently missing on the types neo4j-exports should be able to remove on next update (I hope)
+        .pipe(
+          map((result: TODO_PR_OPEN) => ({
+            message: `Deleted ${
+              result.counters.updates().nodesDeleted || 0
+            } record(s)`,
+            id: accountId,
+            isDeleted: true,
+          }))
+        )
+    );
   }
 
   /**

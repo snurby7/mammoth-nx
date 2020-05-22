@@ -29,6 +29,5 @@ export interface IBudget extends Omit<ICoreNode, 'budgetId'> {
    * @type {string}
    * @memberof IBudget
    */
-  startDate: string;
   createdDate: string;
 }

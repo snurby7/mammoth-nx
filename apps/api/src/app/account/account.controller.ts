@@ -1,4 +1,4 @@
-import { IAccount } from '@mammoth/api-interfaces';
+import { IAccount, IDeleteResponse } from '@mammoth/api-interfaces';
 import {
   Body,
   Controller,
@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Observable } from 'rxjs';
 import { AccountService } from './account.service';
 import { CreateAccount, UpdateAccount } from './dto';
 
@@ -33,10 +34,10 @@ export class AccountController {
     description: 'The newly created account is returned',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async createNewAccount(
+  public createNewAccount(
     @Param('budgetId') budgetId: string,
     @Body() accountRequest: CreateAccount
-  ): Promise<IAccount> {
+  ): Observable<IAccount> {
     if (!accountRequest.budgetId || accountRequest.budgetId !== budgetId) {
       this.logger.error('No budgetId found on request');
       throw new HttpException(
@@ -44,7 +45,7 @@ export class AccountController {
         HttpStatus.CONFLICT
       );
     }
-    return await this.accountService.createAccount(accountRequest);
+    return this.accountService.createAccount(accountRequest);
   }
 
   @Get(':budgetId')
@@ -57,10 +58,10 @@ export class AccountController {
     description: 'A list of all accounts and their properties and labels.',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async getAllAccountsForBudgetId(
+  public getAllAccountsForBudgetId(
     @Param('budgetId') budgetId: string
-  ): Promise<IAccount[]> {
-    return await this.accountService.findAccounts({
+  ): Observable<IAccount[]> {
+    return this.accountService.findAccounts({
       budgetId,
     });
   }
@@ -68,39 +69,39 @@ export class AccountController {
   @Get(':budgetId/detail/:accountId')
   @ApiOperation({
     summary: 'Find a single account',
-    description: 'Get a account that has Account as its label',
+    description: 'Get a specific account by the accountId in a given budgetId',
   })
   @ApiResponse({
     status: 200,
     description: 'A single account and its properties and labels',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async getAccount(
+  public getAccount(
     @Param('budgetId') budgetId: string,
     @Param('accountId') id: string
-  ): Promise<IAccount> {
-    return await this.accountService.findAccount(budgetId, id);
+  ): Observable<IAccount> {
+    return this.accountService.findAccount(budgetId, id);
   }
 
-  @Post(':budgetId/account/:accountId')
+  @Post(':budgetId/detail/:accountId')
   @ApiOperation({
     summary: 'Update a given account',
     description:
       'Update a single account, currently only updates the name property and everything else remains the same',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async updateAccount(
+  public updateAccountDetails(
     @Param('budgetId') budgetId: string,
     @Param('accountId') id: string,
     @Body() updateAccount: UpdateAccount
-  ): Promise<IAccount> {
+  ): Observable<IAccount> {
     if (id !== updateAccount.id && budgetId !== updateAccount.budgetId) {
       throw new HttpException(
         'The parameter id and the body id do not match.',
         HttpStatus.CONFLICT
       );
     }
-    return await this.accountService.saveAccount(updateAccount);
+    return this.accountService.updateAccountDetails(updateAccount);
   }
 
   @ApiOperation({
@@ -116,10 +117,10 @@ export class AccountController {
   })
   @Delete(':budgetId/account/:accountId')
   @UseGuards(AuthGuard('jwt'))
-  public async deleteAccount(
+  public deleteAccount(
     @Param('budgetId') budgetId: string,
-    @Param('accountId') id: string
-  ): Promise<{ message: string }> {
-    return await this.accountService.deleteAccount(id);
+    @Param('accountId') accountId: string
+  ): Observable<IDeleteResponse> {
+    return this.accountService.deleteAccount(budgetId, accountId);
   }
 }

@@ -1,7 +1,7 @@
-import { IBudget } from '@mammoth/api-interfaces';
+import { IBudget, IDeleteResponse } from '@mammoth/api-interfaces';
 import { Injectable, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { map, materialize, tap, toArray } from 'rxjs/operators';
+import { map, materialize, toArray } from 'rxjs/operators';
 import {
   getRecordsByKey,
   getRecordsByKeyNotification,
@@ -80,10 +80,10 @@ export class BudgetService {
    * TODO: Whenever a budget deletes, need to destroy all linked nodes to it.
    *
    * @param {string} id
-   * @returns {Observable<{ message: string }>}
+   * @returns {Observable<IDeleteResponse>}
    * @memberof BudgetService
    */
-  public deleteBudget(id: string): Observable<{ message: string }> {
+  public deleteBudget(id: string): Observable<IDeleteResponse> {
     this.logger.debug(`Deleting budget - ${id}`);
     const { statement, props } = deleteBudgetById(id);
     /**
@@ -94,15 +94,15 @@ export class BudgetService {
       (trx.run(statement, props) as TODO_PR_OPEN)
         .consume() // TODO: This is currently missing on the types neo4j-exports should be able to remove on next update (I hope)
         .pipe(
-          map((result: TODO_PR_OPEN) => ({
-            message: `Deleted ${
-              result.counters.updates().nodesDeleted || 0
-            } record(s)`,
-          })),
-          // map(() => ({ message: `Delete attempted, this is the best I can do. PR open` })),
-          tap((mappedResult: TODO_PR_OPEN) =>
-            this.logger.debug(mappedResult.message)
-          )
+          map((result: TODO_PR_OPEN) => {
+            return {
+              message: `Deleted ${
+                result.counters.updates().nodesDeleted || 0
+              } record(s)`,
+              id,
+              isDeleted: result.counters.updates().nodesDeleted > 0,
+            };
+          })
         )
     );
   }
