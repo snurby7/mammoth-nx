@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { IAccount } from '@mammoth/api-interfaces';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { ng_GetAccountList } from '../../../ngrx-store/actions/account.actions';
+import { GetAccountList } from '../../../ngrx-store/actions/account.actions';
 import { selectAccountList } from '../../../ngrx-store/selectors/account.selectors';
 import { IMammothState } from '../../../ngrx-store/state/mammoth.state';
 
@@ -18,6 +18,6 @@ export class AccountListComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this._store.dispatch(ng_GetAccountList());
+    this._store.dispatch(GetAccountList());
   }
 }

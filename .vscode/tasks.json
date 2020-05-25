@@ -41,7 +41,7 @@
         },
         {
             "type": "shell",
-            "command": " nx run-many --target=serve --projects=api,mammoth",
+            "command": "nx run-many --target=serve --projects=api,mammoth",
             "problemMatcher": [],
             "group": "build",
             "label": "nx:run-many mammoth & api",

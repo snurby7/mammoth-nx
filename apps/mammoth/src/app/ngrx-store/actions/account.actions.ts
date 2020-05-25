@@ -13,18 +13,18 @@ export enum EAccountAction {
 }
 
 // Get many accounts.
-export const ng_GetAccountList = createAction(EAccountAction.GetAccountList);
-export const ng_GetAccountList_Success = createAction(
+export const GetAccountList = createAction(EAccountAction.GetAccountList);
+export const GetAccountList_Success = createAction(
   EAccountAction.GetAccountList_Success,
   props<{ accounts: IAccount[] }>()
 );
 
 // Get a single account
-export const ng_GetAccount = createAction(
+export const GetAccount = createAction(
   EAccountAction.GetAccount_Success,
   props<{ accountId: string }>()
 );
-export const ng_GetAccount_Success = createAction(
+export const GetAccount_Success = createAction(
   EAccountAction.GetAccount_Success,
   props<{ selectedAccount: IAccount }>()
 );

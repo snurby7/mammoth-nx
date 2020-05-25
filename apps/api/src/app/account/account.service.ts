@@ -1,26 +1,10 @@
-import {
-  IAccount,
-  IAccountQuery,
-  ICreateAccount,
-  IDeleteResponse,
-  ITransaction,
-} from '@mammoth/api-interfaces';
+import { IAccount, IAccountQuery, ICreateAccount, IDeleteResponse, ITransaction } from '@mammoth/api-interfaces';
 import { Injectable, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map, materialize, toArray } from 'rxjs/operators';
 import { SupportedLabel } from '../constants';
-import {
-  CommonAccountService,
-  IAccountBalanceRequest,
-  IAccountLinkedNodeMeta,
-  IAccountLinkRequest,
-  ICommonAccountConverter,
-} from '../extensions';
-import {
-  getRecordsByKey,
-  getRecordsByKeyNotification,
-  Neo4jService,
-} from '../neo4j';
+import { CommonAccountService, IAccountBalanceRequest, IAccountLinkedNodeMeta, IAccountLinkRequest, ICommonAccountConverter } from '../extensions';
+import { getRecordsByKey, getRecordsByKeyNotification, Neo4jService } from '../neo4j';
 import { accountQueries } from './queries';
 
 @Injectable()
@@ -66,7 +50,7 @@ export class AccountService extends CommonAccountService
     const resultKey = 'accounts';
     const { statement, props } = accountQueries.findAccounts(resultKey, query);
     return this.neo4jService.rxSession.readTransaction((trx) =>
-      trx.run(statement).records().pipe(
+      trx.run(statement, props).records().pipe(
         materialize(), // gather all the notifications from the stream
         toArray(), // turn them all into an array
         getRecordsByKeyNotification(resultKey) // * Grab results
