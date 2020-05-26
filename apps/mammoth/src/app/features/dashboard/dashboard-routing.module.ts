@@ -8,6 +8,13 @@ const routes: Routes = [
     path: 'v1/:budgetId',
     component: DashboardComponent,
     canActivate: [DashboardLoadGuard],
+    children: [
+      {
+        path: 'account',
+        loadChildren: () =>
+          import('../account/account.module').then((m) => m.AccountModule),
+      },
+    ],
   },
 ];
 

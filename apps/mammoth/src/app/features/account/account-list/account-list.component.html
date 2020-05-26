@@ -1,6 +1,8 @@
 <p>account-list works!</p>
 <ul>
   <li *ngFor="let account of accounts$ | async">
-    {{ account.name }} - {{ account.balance }}
+    <button mat-button (click)="onAccountClick(account)">
+      {{ account.name }} - {{ account.balance }}
+    </button>
   </li>
 </ul>
