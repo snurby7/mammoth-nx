@@ -1,17 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'mammoth-account-detail',
   templateUrl: './account-detail.component.html',
   styleUrls: ['./account-detail.component.scss'],
 })
-export class AccountDetailComponent implements OnInit {
-  constructor() {}
-
-  ngOnInit(): void {}
-
-  public onClickGetTransaction(): void {
-    // going to fire a query for testing. In order to nicely display the transactions in a grid. It needs to be
-    // a FormattedValue of sorts.
+export class AccountDetailComponent {
+  public accountId: string;
+  constructor(private _activatedRoute: ActivatedRoute) {
+    this.accountId = this._activatedRoute.snapshot.paramMap.get('accountId');
   }
 }
