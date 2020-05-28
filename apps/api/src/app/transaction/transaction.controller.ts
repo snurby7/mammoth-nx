@@ -1,11 +1,12 @@
-import { ITransaction,IDeleteResponse } from '@mammoth/api-interfaces';
+import { IDeleteResponse, ITransaction } from '@mammoth/api-interfaces';
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  Param,
   Post,
-  Put,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -25,7 +26,7 @@ export class TransactionController {
   constructor(private transactionService: TransactionService) {}
 
   @UseGuards(AuthGuard('jwt'))
-  @Post()
+  @Post(':budgetId')
   @ApiOperation({
     summary: 'Create a single transaction and link it accordingly',
     description: `
@@ -38,12 +39,16 @@ export class TransactionController {
     description: 'Returns back a single, newly created transaction',
   })
   public createTransaction(
+    @Param('budgetId') budgetId: string,
     @Body() request: TransactionCreateDto
   ): Observable<ITransaction> {
+    if (budgetId !== request.budgetId) {
+      throw new BadRequestException();
+    }
     return this.transactionService.createTransaction(request);
   }
 
-  @Get()
+  @Get(':budgetId')
   @ApiOperation({
     summary: 'Query the transactions with a collection of Id values',
     description: 'Get the transactions that match the given query',
@@ -54,12 +59,13 @@ export class TransactionController {
   })
   @UseGuards(AuthGuard('jwt'))
   public getTransactionsByQuery(
+    @Param('budgetId') budgetId: string,
     @Body() query: TransactionQueryDto
   ): Observable<ITransaction[]> {
     return this.transactionService.getTransactionsByQuery(query);
   }
 
-  @Put()
+  @Post(':budgetId/detail/:transactionId')
   @ApiOperation({
     summary: 'Update a transaction',
     description: `
@@ -69,10 +75,12 @@ export class TransactionController {
   @ApiResponse({
     status: 200,
     description:
-    'Returns back the updated transactions with its properties and labels after being updated',
+      'Returns back the updated transactions with its properties and labels after being updated',
   })
-    @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   public updateTransaction(
+    @Param('budgetId') budgetId: string,
+    @Param('transactionId') transactionId: string,
     @Body() transactionData: TransactionDto
   ): Observable<ITransaction> {
     return this.transactionService.updateTransaction$(transactionData);
@@ -88,11 +96,13 @@ export class TransactionController {
   @ApiResponse({
     status: 200,
     description:
-    'Returns back a message saying how many nodes have been deleted. Data will need to refresh itself after making this request.',
+      'Returns back a message saying how many nodes have been deleted. Data will need to refresh itself after making this request.',
   })
-  @Delete()
+  @Delete(':budgetId/detail/:transactionId')
   @UseGuards(AuthGuard('jwt'))
   public deleteTransaction(
+    @Param('budgetId') budgetId: string,
+    @Param('transactionId') transactionId: string,
     @Body() request: TransactionDeleteDto
   ): Observable<IDeleteResponse> {
     return this.transactionService.deleteTransaction$(request);
