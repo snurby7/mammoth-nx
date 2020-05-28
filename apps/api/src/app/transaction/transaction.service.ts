@@ -1,9 +1,11 @@
 import {
   ICreateTransaction,
-  ITransaction,
+
+
+
+  IDeleteResponse, ITransaction,
   ITransactionDeleteRequest,
-  ITransactionQuery,
-  IDeleteResponse,
+  ITransactionQuery
 } from '@mammoth/api-interfaces';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { forkJoin, Observable, throwError } from 'rxjs';
@@ -14,7 +16,7 @@ import {
   materialize,
   switchMap,
   tap,
-  toArray,
+  toArray
 } from 'rxjs/operators';
 import { AccountService } from '../account';
 import { CategoryService } from '../category';
@@ -23,13 +25,13 @@ import { IAccountLinkBreak, IAccountLinkResponse } from '../extensions';
 import {
   getRecordsByKey,
   getRecordsByKeyNotification,
-  Neo4jService,
+  Neo4jService
 } from '../neo4j';
 import { PayeeService } from '../payee';
 import {
   Transaction_UsedAccount,
   Transaction_UsedCategory,
-  Transaction_UsedPayee,
+  Transaction_UsedPayee
 } from './constants';
 import { TransactionQueries } from './queries';
 
@@ -42,7 +44,7 @@ export class TransactionService {
     private accountService: AccountService,
     private categoryService: CategoryService,
     private payeeService: PayeeService
-  ) {}
+  ) { }
 
   /**
    * Creates a transaction and links it to a given category, payee, and account. Once the links are made, and their is a flattened result.
@@ -67,14 +69,7 @@ export class TransactionService {
           .run(statement, props)
           .records()
           .pipe(
-            getRecordsByKey<ITransaction>(resultKey),
-            tap((result) => {
-              this.logger.log(
-                `Transaction ---- ${
-                  result ? 'Transaction created' : 'No transaction created'
-                }`
-              );
-            })
+            getRecordsByKey<ITransaction>(resultKey)
           )
     );
     return createTransaction$.pipe(
@@ -157,8 +152,8 @@ export class TransactionService {
         return transaction
           ? transaction
           : throwError(
-              new NotFoundException('No current transaction found to match!')
-            );
+            new NotFoundException('No current transaction found to match!')
+          );
       })
     );
 
@@ -389,7 +384,7 @@ export class TransactionService {
           map((result: TODO_PR_OPEN) => ({
             message: `Deleted ${
               result.counters.updates().nodesDeleted || 0
-            } record(s)`,
+              } record(s)`,
           })),
           tap((mappedResult: TODO_PR_OPEN) =>
             this.logger.debug(mappedResult.message)

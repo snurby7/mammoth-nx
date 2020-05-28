@@ -3,6 +3,7 @@ import { AccountModule } from '../account';
 import { CategoryModule } from '../category';
 import { Neo4jModule } from '../neo4j';
 import { PayeeModule } from '../payee';
+import { TransactionSearchController } from './transaction-search.controller';
 import { TransactionController } from './transaction.controller';
 import { TransactionService } from './transaction.service';
 /**
@@ -13,8 +14,8 @@ import { TransactionService } from './transaction.service';
  * @class TransactionModule
  */
 @Module({
-  controllers: [TransactionController],
+  controllers: [TransactionController, TransactionSearchController],
   providers: [TransactionService],
   imports: [Neo4jModule, PayeeModule, CategoryModule, AccountModule],
 })
-export class TransactionModule {}
+export class TransactionModule { }

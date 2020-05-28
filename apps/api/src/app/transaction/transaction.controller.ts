@@ -25,19 +25,19 @@ import { TransactionService } from './transaction.service';
 export class TransactionController {
   constructor(private transactionService: TransactionService) { }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Post(':budgetId')
   @ApiOperation({
     summary: 'Create a single transaction and link it accordingly',
     description: `
       When a transaction is created this is going to first create the transaction. It will then go and link to the account,
       category, and payee. It will update the balances on those with the current inflow/outflow of the transaction.
-    `,
+      `,
   })
   @ApiResponse({
     status: 201,
     description: 'Returns back a single, newly created transaction',
   })
+  @Post(':budgetId')
+  @UseGuards(AuthGuard('jwt'))
   public createTransaction(
     @Param('budgetId') budgetId: string,
     @Body() request: TransactionCreateDto
@@ -48,7 +48,6 @@ export class TransactionController {
     return this.transactionService.createTransaction(request);
   }
 
-  @Get(':budgetId')
   @ApiOperation({
     summary: 'Query the transactions with a collection of Id values',
     description: 'Get the transactions that match the given query',
@@ -57,6 +56,7 @@ export class TransactionController {
     status: 201,
     description: 'Transactions that match some property on the ',
   })
+  @Get(':budgetId')
   @UseGuards(AuthGuard('jwt'))
   public getTransactionsByQuery(
     @Param('budgetId') budgetId: string,
@@ -65,7 +65,6 @@ export class TransactionController {
     return this.transactionService.getTransactionsByQuery(query);
   }
 
-  @Post(':budgetId/detail/:transactionId')
   @ApiOperation({
     summary: 'Update a transaction',
     description: `
@@ -77,6 +76,7 @@ export class TransactionController {
     description:
       'Returns back the updated transactions with its properties and labels after being updated',
   })
+  @Post(':budgetId/detail/:transactionId')
   @UseGuards(AuthGuard('jwt'))
   public updateTransaction(
     @Param('budgetId') budgetId: string,
