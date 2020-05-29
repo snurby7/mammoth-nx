@@ -1,4 +1,4 @@
-import { ITransaction } from '@mammoth/api-interfaces';
+import { ITransaction, ITransactionDetail } from '@mammoth/api-interfaces';
 import {
   Controller,
   NotImplementedException,
@@ -29,7 +29,7 @@ export class TransactionSearchController {
   public getTransactionsForAccount(
     @Param('budgetId') budgetId: string,
     @Param('accountId') accountId: string
-  ): Observable<ITransaction[]> {
+  ): Observable<ITransactionDetail[]> {
     return this.transactionSearchService.getTransactionsByAccount(
       budgetId,
       accountId

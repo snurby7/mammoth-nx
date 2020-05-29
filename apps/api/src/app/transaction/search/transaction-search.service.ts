@@ -1,3 +1,4 @@
+import { ITransactionDetail } from '@mammoth/api-interfaces';
 import { Injectable, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { materialize, toArray } from 'rxjs/operators';
@@ -13,7 +14,7 @@ export class TransactionSearchService {
   public getTransactionsByAccount(
     budgetId: string,
     accountId: string
-  ): Observable<any> {
+  ): Observable<ITransactionDetail[]> {
     this.logger.log('running search query');
     const {
       statement,
