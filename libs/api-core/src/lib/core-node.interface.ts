@@ -14,6 +14,8 @@ export interface ICoreNode {
    */
   id: string;
 
+  name?: string;
+
   /**
    * Budget Id to find the node in
    *

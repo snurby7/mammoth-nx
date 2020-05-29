@@ -25,6 +25,7 @@ export const searchQueries = {
         accountId,
         budgetId,
       },
+      recordBase: transaction,
       formatKeyMap: {
         [account]: 'account',
         [payee]: 'payee',
@@ -48,6 +49,7 @@ export const searchQueries = {
         payeeId,
         budgetId,
       },
+      recordBase: transaction,
       formatKeyMap: {
         [account]: 'account',
         [payee]: 'payee',
@@ -71,6 +73,7 @@ export const searchQueries = {
         categoryId,
         budgetId,
       },
+      recordBase: transaction,
       formatKeyMap: {
         [account]: 'account',
         [payee]: 'payee',

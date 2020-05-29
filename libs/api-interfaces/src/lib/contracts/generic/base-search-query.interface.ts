@@ -6,7 +6,7 @@ import { ICoreNode } from '@mammoth/api-core';
  * @export
  * @interface IBaseSearchQuery
  */
-export interface IBaseSearchQuery extends Omit<ICoreNode, 'id'> {
+export interface IBaseSearchQuery extends Omit<ICoreNode, 'id' | 'name'> {
   /**
    * Number of items you want to have be returned back
    *
@@ -14,4 +14,5 @@ export interface IBaseSearchQuery extends Omit<ICoreNode, 'id'> {
    * @memberof IBaseSearchQuery
    */
   limit?: number;
+  name?: string;
 }
