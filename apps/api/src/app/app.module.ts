@@ -8,6 +8,7 @@ import { BudgetModule } from './budget/budget.module';
 import { CategoryModule } from './category/category.module';
 import { Neo4jModule } from './neo4j/neo4j.module';
 import { PayeeModule } from './payee/payee.module';
+import { TransactionSearchModule } from './transaction';
 import { TransactionModule } from './transaction/transaction.module';
 
 const routes: Routes = [
@@ -18,6 +19,7 @@ const routes: Routes = [
       CategoryModule,
       AccountModule,
       TransactionModule,
+      TransactionSearchModule,
       PayeeModule,
     ],
   },
@@ -37,6 +39,7 @@ const routes: Routes = [
     Neo4jModule,
     PayeeModule,
     TransactionModule,
+    TransactionSearchModule,
   ],
   controllers: [AppController],
   providers: [AppService],

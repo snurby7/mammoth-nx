@@ -1,24 +1,20 @@
 import { ITransaction } from '@mammoth/api-interfaces';
 import {
   Controller,
-
-  Get,
-
-
-
-  NotImplementedException, Param,
-
-  UseGuards
+  NotImplementedException,
+  Param,
+  Post,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
-import { TransactionService } from './transaction.service';
+import { TransactionSearchService } from './transaction-search.service';
 
 @Controller('transaction')
 @ApiTags('transaction-search')
 export class TransactionSearchController {
-  constructor(private transactionService: TransactionService) { }
+  constructor(private transactionSearchService: TransactionSearchService) {}
 
   @ApiOperation({
     summary: 'Query the transactions that are linked to a given account',
@@ -28,13 +24,16 @@ export class TransactionSearchController {
     status: 201,
     description: 'Transactions that are linked to the accountId',
   })
-  @Get(':budgetId/account/:accountId')
-  @UseGuards(AuthGuard('jwt'))
+  @Post(':budgetId/account/:accountId')
+  // @UseGuards(AuthGuard('jwt'))
   public getTransactionsForAccount(
     @Param('budgetId') budgetId: string,
-    @Param('accountId') accountId: string,
+    @Param('accountId') accountId: string
   ): Observable<ITransaction[]> {
-    throw new NotImplementedException();
+    return this.transactionSearchService.getTransactionsByAccount(
+      budgetId,
+      accountId
+    );
   }
 
   @ApiOperation({
@@ -45,11 +44,11 @@ export class TransactionSearchController {
     status: 201,
     description: 'Transactions that are linked to the payeeId',
   })
-  @Get(':budgetId/payee/:payeeId')
+  @Post(':budgetId/payee/:payeeId')
   @UseGuards(AuthGuard('jwt'))
   public getTransactionsForPayee(
     @Param('budgetId') budgetId: string,
-    @Param('payeeId') payeeId: string,
+    @Param('payeeId') payeeId: string
   ): Observable<ITransaction[]> {
     throw new NotImplementedException();
   }
@@ -62,11 +61,11 @@ export class TransactionSearchController {
     status: 201,
     description: 'Transactions that are linked to the categoryId',
   })
-  @Get(':budgetId/category/:categoryId')
+  @Post(':budgetId/category/:categoryId')
   @UseGuards(AuthGuard('jwt'))
   public getTransactionsForCategory(
     @Param('budgetId') budgetId: string,
-    @Param('categoryId') categoryId: string,
+    @Param('categoryId') categoryId: string
   ): Observable<ITransaction[]> {
     throw new NotImplementedException();
   }
