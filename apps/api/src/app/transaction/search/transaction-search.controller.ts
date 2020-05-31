@@ -1,11 +1,5 @@
-import { ITransaction, ITransactionDetail } from '@mammoth/api-interfaces';
-import {
-  Controller,
-  NotImplementedException,
-  Param,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { ITransactionDetail } from '@mammoth/api-interfaces';
+import { Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
@@ -25,7 +19,7 @@ export class TransactionSearchController {
     description: 'Transactions that are linked to the accountId',
   })
   @Post(':budgetId/account/:accountId')
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   public getTransactionsForAccount(
     @Param('budgetId') budgetId: string,
     @Param('accountId') accountId: string
@@ -49,8 +43,11 @@ export class TransactionSearchController {
   public getTransactionsForPayee(
     @Param('budgetId') budgetId: string,
     @Param('payeeId') payeeId: string
-  ): Observable<ITransaction[]> {
-    throw new NotImplementedException();
+  ): Observable<ITransactionDetail[]> {
+    return this.transactionSearchService.getTransactionsByPayee(
+      budgetId,
+      payeeId
+    );
   }
 
   @ApiOperation({
@@ -66,7 +63,10 @@ export class TransactionSearchController {
   public getTransactionsForCategory(
     @Param('budgetId') budgetId: string,
     @Param('categoryId') categoryId: string
-  ): Observable<ITransaction[]> {
-    throw new NotImplementedException();
+  ): Observable<ITransactionDetail[]> {
+    return this.transactionSearchService.getTransactionByCategory(
+      budgetId,
+      categoryId
+    );
   }
 }
