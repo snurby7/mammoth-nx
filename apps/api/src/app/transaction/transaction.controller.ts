@@ -4,26 +4,24 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
   Param,
   Post,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
 import {
   TransactionCreateDto,
-  TransactionDeleteDto,
   TransactionDto,
-  TransactionQueryDto
+  TransactionQueryDto,
 } from './dto';
 import { TransactionService } from './transaction.service';
 
 @Controller('transaction')
 @ApiTags('transaction')
 export class TransactionController {
-  constructor(private transactionService: TransactionService) { }
+  constructor(private transactionService: TransactionService) {}
 
   @ApiOperation({
     summary: 'Create a single transaction and link it accordingly',
@@ -56,7 +54,7 @@ export class TransactionController {
     status: 201,
     description: 'Transactions that match some property on the ',
   })
-  @Get(':budgetId')
+  @Post(':budgetId/search')
   @UseGuards(AuthGuard('jwt'))
   public getTransactionsByQuery(
     @Param('budgetId') budgetId: string,
@@ -83,6 +81,12 @@ export class TransactionController {
     @Param('transactionId') transactionId: string,
     @Body() transactionData: TransactionDto
   ): Observable<ITransaction> {
+    if (
+      transactionData.budgetId !== budgetId ||
+      transactionData.id !== transactionId
+    ) {
+      throw new BadRequestException();
+    }
     return this.transactionService.updateTransaction$(transactionData);
   }
 
@@ -102,9 +106,8 @@ export class TransactionController {
   @UseGuards(AuthGuard('jwt'))
   public deleteTransaction(
     @Param('budgetId') budgetId: string,
-    @Param('transactionId') transactionId: string,
-    @Body() request: TransactionDeleteDto
+    @Param('transactionId') transactionId: string
   ): Observable<IDeleteResponse> {
-    return this.transactionService.deleteTransaction$(request);
+    return this.transactionService.deleteTransaction$(budgetId, transactionId);
   }
 }

@@ -89,7 +89,7 @@ export class TransactionSearchService {
       statement,
       props,
       recordBase,
-      formatKeyMap, // TODO take these values and turn them into an IFormattedNode
+      formatKeyMap,
     } = searchQueries.getTransactionByAccount(accountId, budgetId);
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx

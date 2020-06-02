@@ -1,11 +1,8 @@
 import {
   ICreateTransaction,
-
-
-
-  IDeleteResponse, ITransaction,
-  ITransactionDeleteRequest,
-  ITransactionQuery
+  IDeleteResponse,
+  ITransaction,
+  ITransactionQuery,
 } from '@mammoth/api-interfaces';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { forkJoin, Observable, throwError } from 'rxjs';
@@ -16,7 +13,7 @@ import {
   materialize,
   switchMap,
   tap,
-  toArray
+  toArray,
 } from 'rxjs/operators';
 import { AccountService } from '../account';
 import { CategoryService } from '../category';
@@ -25,13 +22,13 @@ import { IAccountLinkBreak, IAccountLinkResponse } from '../extensions';
 import {
   getRecordsByKey,
   getRecordsByKeyNotification,
-  Neo4jService
+  Neo4jService,
 } from '../neo4j';
 import { PayeeService } from '../payee';
 import {
   Transaction_UsedAccount,
   Transaction_UsedCategory,
-  Transaction_UsedPayee
+  Transaction_UsedPayee,
 } from './constants';
 import { TransactionQueries } from './queries';
 
@@ -44,7 +41,7 @@ export class TransactionService {
     private accountService: AccountService,
     private categoryService: CategoryService,
     private payeeService: PayeeService
-  ) { }
+  ) {}
 
   /**
    * Creates a transaction and links it to a given category, payee, and account. Once the links are made, and their is a flattened result.
@@ -68,9 +65,7 @@ export class TransactionService {
         txc
           .run(statement, props)
           .records()
-          .pipe(
-            getRecordsByKey<ITransaction>(resultKey)
-          )
+          .pipe(getRecordsByKey<ITransaction>(resultKey))
     );
     return createTransaction$.pipe(
       switchMap((result) => this.updateLinkedNodeBalanceByService$(result))
@@ -152,8 +147,8 @@ export class TransactionService {
         return transaction
           ? transaction
           : throwError(
-            new NotFoundException('No current transaction found to match!')
-          );
+              new NotFoundException('No current transaction found to match!')
+            );
       })
     );
 
@@ -168,16 +163,18 @@ export class TransactionService {
   /**
    * Deletes a given transaction, when the transaction is matched it will refund all the previous links.
    *
-   * @param {ITransactionDeleteRequest} request
+   * @param {string} budgetId
+   * @param {string} transactionId
    * @returns {Observable<IDeleteResponse>}
    * @memberof TransactionService
    */
   public deleteTransaction$(
-    request: ITransactionDeleteRequest
+    budgetId: string,
+    transactionId: string
   ): Observable<IDeleteResponse> {
     return this.getTransactionsByQuery({
-      budgetId: request.budgetId,
-      id: request.id,
+      budgetId: budgetId,
+      id: transactionId,
     }).pipe(
       map((results) => results[0]),
       map((transaction) => {
@@ -187,7 +184,7 @@ export class TransactionService {
         return transaction;
       }),
       flatMap((transaction) => this.removeLinkWithRefund$(transaction)),
-      flatMap((_) => this.deleteTransactionById$(request.id, request.budgetId))
+      flatMap((_) => this.deleteTransactionById$(transactionId, budgetId))
     );
   }
 
@@ -384,7 +381,7 @@ export class TransactionService {
           map((result: TODO_PR_OPEN) => ({
             message: `Deleted ${
               result.counters.updates().nodesDeleted || 0
-              } record(s)`,
+            } record(s)`,
           })),
           tap((mappedResult: TODO_PR_OPEN) =>
             this.logger.debug(mappedResult.message)
