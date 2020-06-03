@@ -18,7 +18,8 @@
           "build",
           "lint",
           "test",
-          "e2e"
+          "e2e",
+          "build-storybook"
         ]
       }
     }
@@ -41,6 +42,15 @@
     },
     "api-core": {
       "tags": []
+    },
+    "components": {
+      "tags": []
+    },
+    "components-e2e": {
+      "tags": [],
+      "implicitDependencies": [
+        "components"
+      ]
     }
   }
 }
