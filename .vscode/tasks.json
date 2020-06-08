@@ -47,5 +47,13 @@
             "label": "nx:run-many mammoth & api",
             "detail": "Run the Angular UI and NestJs API"
         },
+        {
+            "type": "shell",
+            "command": "nx run components:storybook",
+            "problemMatcher": [],
+            "group": "build",
+            "label": "nx run components:storybook",
+            "detail": "Run Storybook for Angular Components"
+        },
     ]
 }
