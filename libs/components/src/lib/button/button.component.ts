@@ -1,15 +1,25 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+
+type ButtonType = 'primary' | 'secondary' | 'tertiary' | 'delete' | 'warn';
 
 @Component({
   selector: 'mammoth-button',
-  templateUrl: 'button.component.html',
+  template: `
+    <button (click)="onClickHandler()" class="btn {{ variant }}">
+      Button
+    </button>
+  `,
+  styleUrls: ['./button.component.scss'],
 })
-export class ButtonComponent implements OnInit {
+export class ButtonComponent {
   @Output() onClick: EventEmitter<string> = new EventEmitter();
   @Input() value: string;
   @Input() id: string;
+  @Input() variant?: ButtonType = 'primary';
 
   constructor() {}
 
-  ngOnInit() {}
+  public onClickHandler() {
+    this.onClick.next(this.id);
+  }
 }
