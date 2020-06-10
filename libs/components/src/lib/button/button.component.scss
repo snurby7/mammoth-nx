@@ -6,37 +6,30 @@
   @apply font-bold py-2 px-4 rounded;
 }
 
-.primary {
+.btn-outline {
+  @apply bg-transparent text-blue-700 border border-blue-500;
+  &:hover {
+    @apply bg-blue-500 text-white border-transparent;
+  }
+}
+
+.btn-primary {
   @apply bg-blue-500 text-white;
   &:hover {
     @apply bg-blue-700;
   }
 }
 
-.secondary {
-  @apply bg-purple-500 text-white;
-  &:hover {
-    @apply bg-purple-700;
-  }
-}
-
-.tertiary {
-  @apply bg-indigo-500 text-white;
-  &:hover {
-    @apply bg-indigo-700;
-  }
-}
-
-.delete {
+.btn-delete {
   @apply bg-red-500 text-white;
   &:hover {
     @apply bg-red-700;
   }
 }
 
-.warn {
-  @apply bg-yellow-500 text-white;
+.btn-warn {
+  @apply bg-red-500 text-white;
   &:hover {
-    @apply bg-yellow-700;
+    @apply bg-red-700;
   }
 }

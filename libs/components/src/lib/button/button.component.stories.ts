@@ -5,7 +5,7 @@ export default {
   title: 'Common/Buttons',
 };
 
-export const Default = () => ({
+export const DefaultOutline = () => ({
   moduleMetadata: {
     imports: [],
   },
@@ -17,7 +17,7 @@ export const Default = () => ({
   },
 });
 
-export const Secondary = () => ({
+export const Primary = () => ({
   moduleMetadata: {
     imports: [],
   },
@@ -26,20 +26,7 @@ export const Secondary = () => ({
     onClick: action('Button Clicked'),
     value: 'Storybook',
     id: '123',
-    variant: 'secondary',
-  },
-});
-
-export const Tertiary = () => ({
-  moduleMetadata: {
-    imports: [],
-  },
-  component: ButtonComponent,
-  props: {
-    onClick: action('Button Clicked'),
-    value: 'Storybook',
-    id: '123',
-    variant: 'tertiary',
+    variant: 'primary',
   },
 });
 
@@ -53,18 +40,5 @@ export const Delete = () => ({
     value: 'Storybook',
     id: '123',
     variant: 'delete',
-  },
-});
-
-export const Warn = () => ({
-  moduleMetadata: {
-    imports: [],
-  },
-  component: ButtonComponent,
-  props: {
-    onClick: action('Button Clicked'),
-    value: 'Storybook',
-    id: '123',
-    variant: 'warn',
   },
 });
