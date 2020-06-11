@@ -43,11 +43,11 @@ export class BudgetComponent implements OnInit {
   /**
    * Navigate to the selected budget
    *
-   * @param {IBudget} budget Selected budget data to navigate to
+   * @param {string} budgetId Selected budget Id to navigate to
    * @memberof BudgetComponent
    */
-  public onSelect(budget: IBudget): void {
-    this.router.navigate(['v1', budget.id], {
+  public onSelect(budgetId: string): void {
+    this.router.navigate(['v1', budgetId], {
       relativeTo: this.activatedRoute,
     });
   }
