@@ -23,11 +23,9 @@
       </p>
     </div>
     <div class="flex space-x-4">
-      <mammoth-button value="Select" (onClick)="onSelect()"> </mammoth-button>
-      <mammoth-button value="Edit" variant="primary" (onClick)="onEdit()">
-      </mammoth-button>
-      <mammoth-button value="Delete" variant="delete" (onClick)="onDelete()">
-      </mammoth-button>
+      <mammoth-button (onClick)="onSelectClick()">Select</mammoth-button>
+      <mammoth-button variant="primary" (onClick)="onEditClick()">Edit</mammoth-button>
+      <mammoth-button variant="delete" (onClick)="onDeleteClick()">Delete</mammoth-button>
     </div>
   </div>
 </div>

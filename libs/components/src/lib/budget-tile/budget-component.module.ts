@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { ButtonModule } from '../button/button.module';
+import { MammothButtonModule } from '../button/button.module';
 import { BudgetTileComponent } from './tile/budget-tile.component';
 
 @NgModule({
+  imports: [CommonModule, MammothButtonModule],
   declarations: [BudgetTileComponent],
-  imports: [CommonModule, ButtonModule],
   exports: [BudgetTileComponent],
 })
-export class BudgetComponentModule {}
+export class MammothBudgetComponentModule {}

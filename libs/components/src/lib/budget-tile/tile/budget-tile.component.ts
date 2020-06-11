@@ -8,21 +8,21 @@ import { IBudget } from '@mammoth/api-interfaces';
 })
 export class BudgetTileComponent {
   @Input() budgetDetail: IBudget;
-  @Output() onBudgetDelete: EventEmitter<string> = new EventEmitter();
-  @Output() onBudgetSelect: EventEmitter<string> = new EventEmitter();
-  @Output() onBudgetEdit: EventEmitter<IBudget> = new EventEmitter();
+  @Output() onDelete: EventEmitter<string> = new EventEmitter();
+  @Output() onSelect: EventEmitter<string> = new EventEmitter();
+  @Output() onEdit: EventEmitter<IBudget> = new EventEmitter();
 
   constructor() {}
 
-  public onSelect(): void {
-    this.onBudgetSelect.next(this.budgetDetail.id);
+  public onSelectClick(): void {
+    this.onSelect.next(this.budgetDetail.id);
   }
 
-  public onDelete(): void {
-    this.onBudgetDelete.next(this.budgetDetail.id);
+  public onDeleteClick(): void {
+    this.onDelete.next(this.budgetDetail.id);
   }
 
-  public onEdit(): void {
-    this.onBudgetEdit.next(this.budgetDetail);
+  public onEditClick(): void {
+    this.onEdit.next(this.budgetDetail);
   }
 }
