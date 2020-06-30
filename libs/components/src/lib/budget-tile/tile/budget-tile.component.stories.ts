@@ -1,3 +1,4 @@
+import { MatCardModule } from '@angular/material/card';
 import { IBudget } from '@mammoth/api-interfaces';
 import { action } from '@storybook/addon-actions';
 import { MammothButtonModule } from '../../button/button.module';
@@ -9,7 +10,7 @@ export default {
 
 export const Primary = () => ({
   moduleMetadata: {
-    imports: [MammothButtonModule],
+    imports: [MammothButtonModule, MatCardModule],
   },
   component: BudgetTileComponent,
   props: {

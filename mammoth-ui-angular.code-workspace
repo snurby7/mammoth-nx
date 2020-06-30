@@ -18,7 +18,10 @@
             "apps/api/**/{common,authz,enum,dto,queries,contracts,constants,common-queries,extensions,neo4j,assets,environments}": true,
             "**/bower_components": true,
             "libs/api-core": true,
-        }
+        },
+        "cSpell.words": [
+            "theming"
+        ]
     },
     "extensions": {
         "recommendations": [
