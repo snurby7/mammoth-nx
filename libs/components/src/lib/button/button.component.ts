@@ -1,11 +1,16 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-type ButtonType = 'outline' | 'primary' | 'delete';
+type ButtonType = 'primary' | 'accent' | 'warn';
 
 @Component({
   selector: 'mammoth-button',
   template: `
-    <button (click)="onClickHandler()" class="btn btn-{{ variant }}">
+    <button
+      mat-stroked-button
+      [color]="variant"
+      (click)="onClickHandler()"
+      class="btn btn-{{ variant }}"
+    >
       <ng-content></ng-content>
     </button>
   `,
@@ -14,7 +19,7 @@ type ButtonType = 'outline' | 'primary' | 'delete';
 export class ButtonComponent {
   @Output() onClick: EventEmitter<string> = new EventEmitter();
   @Input() id: string;
-  @Input() variant?: ButtonType = 'outline';
+  @Input() variant?: ButtonType;
 
   constructor() {}
 

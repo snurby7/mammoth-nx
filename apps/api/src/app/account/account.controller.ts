@@ -6,7 +6,6 @@ import {
   Get,
   HttpException,
   HttpStatus,
-  Logger,
   Param,
   Post,
   UseGuards,
@@ -20,14 +19,12 @@ import { CreateAccount, UpdateAccount } from './dto';
 @Controller('accounts')
 @ApiTags('account')
 export class AccountController {
-  private readonly logger = new Logger(AccountController.name);
   constructor(private readonly accountService: AccountService) {}
 
   @Post(':budgetId')
   @ApiOperation({
     summary: 'Create Account',
-    description:
-      'Creates an account, a account is a top level node for the system.',
+    description: 'Creates an account, a account is a top level node for the system.',
   })
   @ApiResponse({
     status: 201,
@@ -39,11 +36,7 @@ export class AccountController {
     @Body() accountRequest: CreateAccount
   ): Observable<IAccount> {
     if (!accountRequest.budgetId || accountRequest.budgetId !== budgetId) {
-      this.logger.error('No budgetId found on request');
-      throw new HttpException(
-        'No budgetId found on request',
-        HttpStatus.CONFLICT
-      );
+      throw new HttpException('No budgetId found on request', HttpStatus.CONFLICT);
     }
     return this.accountService.createAccount(accountRequest);
   }
@@ -58,9 +51,7 @@ export class AccountController {
     description: 'A list of all accounts and their properties and labels.',
   })
   @UseGuards(AuthGuard('jwt'))
-  public getAllAccountsForBudgetId(
-    @Param('budgetId') budgetId: string
-  ): Observable<IAccount[]> {
+  public getAllAccountsForBudgetId(@Param('budgetId') budgetId: string): Observable<IAccount[]> {
     return this.accountService.findAccounts({
       budgetId,
     });

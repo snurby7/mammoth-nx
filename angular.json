@@ -15,9 +15,6 @@
         "build": {
           "builder": "@angular-builders/custom-webpack:browser",
           "options": {
-            "customWebpackConfig": {
-              "path": "./webpack.config.js"
-            },
             "outputPath": "dist/apps/mammoth",
             "index": "apps/mammoth/src/index.html",
             "main": "apps/mammoth/src/main.ts",
@@ -67,9 +64,6 @@
         "serve": {
           "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
-            "customWebpackConfig": {
-              "path": "./webpack.config.js"
-            },
             "browserTarget": "mammoth:build",
             "proxyConfig": "apps/mammoth/proxy.conf.json"
           },

@@ -83,8 +83,7 @@ export const transformRecordToDetail = <TData>(
 
         Object.keys(recordDetailMap).forEach((key) => {
           console.log(key, notification.value?.get(key));
-          const { properties: formatProperties } =
-            notification.value?.get(key) ?? {};
+          const { properties: formatProperties } = notification.value?.get(key) ?? {};
 
           baseRecord[recordDetailMap[key]] = getFormattedNode(formatProperties);
         });

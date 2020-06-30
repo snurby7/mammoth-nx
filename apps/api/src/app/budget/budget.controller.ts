@@ -94,9 +94,7 @@ export class BudgetController {
   })
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
-  public removeBudgetById(
-    @Param('id') id: string
-  ): Observable<IDeleteResponse> {
+  public removeBudgetById(@Param('id') id: string): Observable<IDeleteResponse> {
     return this.budgetService.deleteBudget(id);
   }
 }
