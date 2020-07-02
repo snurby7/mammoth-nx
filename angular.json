@@ -288,7 +288,10 @@
             "port": 4400,
             "config": {
               "configFolder": "libs/components/.storybook"
-            }
+            },
+            "styles": [
+              "../node_modules/@angular/material/prebuilt-themes/purple-green.css"
+            ]
           },
           "configurations": {
             "ci": {

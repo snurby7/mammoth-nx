@@ -1,48 +1,39 @@
+import { MatButtonModule } from '@angular/material/button';
 import { action } from '@storybook/addon-actions';
-import { ButtonComponent } from './button.component';
+import { storiesOf } from '@storybook/angular';
 import { MammothButtonModule } from './button.module';
 
-export default {
-  title: 'Components/Buttons',
-};
-
-export const DefaultOutline = () => ({
-  moduleMetadata: {
-    imports: [MammothButtonModule],
-  },
-  component: ButtonComponent,
-  props: {
-    onClick: action('Button Clicked'),
-    value: 'Storybook',
-    id: '123',
-  },
-  template: `<mammoth-button>Default</mammoth-button>`,
-});
-
-export const Primary = () => ({
-  moduleMetadata: {
-    imports: [MammothButtonModule],
-  },
-  component: ButtonComponent,
-  props: {
-    onClick: action('Button Clicked'),
-    value: 'Storybook',
-    id: '123',
-    variant: 'primary',
-  },
-  template: `<mammoth-button variant="primary">Primary</mammoth-button>`,
-});
-
-export const Delete = () => ({
-  moduleMetadata: {
-    imports: [MammothButtonModule],
-  },
-  component: ButtonComponent,
-  props: {
-    onClick: action('Button Clicked'),
-    value: 'Storybook',
-    id: '123',
-    variant: 'delete',
-  },
-  template: `<mammoth-button variant="delete">Delete</mammoth-button>`,
-});
+storiesOf('Button', module)
+  .add('Basic', () => ({
+    template: `
+      <mammoth-button (onClick)="onClick($event)" color="primary">Primary</mammoth-button>
+    `,
+    moduleMetadata: {
+      imports: [MatButtonModule, MammothButtonModule],
+    },
+    props: {
+      onClick: action('Button was clicked'),
+    },
+  }))
+  .add('Warn', () => ({
+    template: `
+      <mammoth-button (onClick)="onClick($event)" color="warn">Warning Button</mammoth-button>
+    `,
+    moduleMetadata: {
+      imports: [MatButtonModule, MammothButtonModule],
+    },
+    props: {
+      onClick: action('Button was clicked'),
+    },
+  }))
+  .add('Accent', () => ({
+    template: `
+      <mammoth-button (onClick)="onClick($event)" color="accent">Accent Button</mammoth-button>
+    `,
+    moduleMetadata: {
+      imports: [MatButtonModule, MammothButtonModule],
+    },
+    props: {
+      onClick: action('Button was clicked'),
+    },
+  }));
