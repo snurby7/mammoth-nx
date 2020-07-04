@@ -39,9 +39,7 @@ export class Neo4jService {
    * @returns {Promise<QueryResult>}
    * @memberof Neo4jService
    */
-  public async executeStatement(
-    statementProps: ExecuteStatement
-  ): Promise<QueryResult> {
+  public async executeStatement(statementProps: ExecuteStatement): Promise<QueryResult> {
     const { statement, props } = statementProps;
     this.logger.log(`Executing the following statement - ${statement}`);
     const session = this.neo4jDriver.session();
@@ -64,10 +62,7 @@ export class Neo4jService {
    * @memberof Neo4jService
    * @deprecated Use the reactive session
    */
-  public flattenStatementResult<TResponse>(
-    queryResult: QueryResult,
-    key: string
-  ): TResponse[] {
+  public flattenStatementResult<TResponse>(queryResult: QueryResult, key: string): TResponse[] {
     // TODO Throw if no results - https://3.basecamp.com/4326074/buckets/14452756/todos/2328314149
     if (queryResult.records.length === 0) {
       this.logger.warn('No results matched the given query.');
@@ -76,9 +71,7 @@ export class Neo4jService {
     return queryResult.records.map<TResponse>((record) => {
       const { properties } = record.get(key);
       if (!properties) {
-        this.logger.warn(
-          `There are results here, but no result is matched by ${key}`
-        );
+        this.logger.warn(`There are results here, but no result is matched by ${key}`);
         return {};
       }
       // * There is an identity property here which I haven't quite figured out yet.
@@ -98,9 +91,7 @@ export class Neo4jService {
    * @returns {TResponse[]}
    * @memberof Neo4jService
    */
-  public flattenOptionalMatch<TResponse = any>(
-    statementResult: QueryResult
-  ): TResponse[] {
+  public flattenOptionalMatch<TResponse = any>(statementResult: QueryResult): TResponse[] {
     const response: TResponse[] = [];
     statementResult.records.map((record) => {
       record.keys.map((key) => {
@@ -145,9 +136,7 @@ export class Neo4jService {
       },
     }).then((result) => {
       this.logger.verbose(
-        `Deleted ${
-          result.summary.counters.updates().relationshipsDeleted
-        } relationship(s)`
+        `Deleted ${result.summary.counters.updates().relationshipsDeleted} relationship(s)`
       );
       return result;
     });
@@ -179,9 +168,7 @@ export class Neo4jService {
         .consume() // TODO: This is currently missing on the types neo4j-exports should be able to remove on next update (I hope)
         .pipe(
           map((result: TODO_PR_OPEN) => ({
-            message: `Deleted ${
-              result.counters.updates().nodesDeleted || 0
-            } record(s)`,
+            message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
           })),
           catchError((err) => throwError(err))
         )
@@ -204,11 +191,7 @@ export class Neo4jService {
     relationship: string
   ): Promise<QueryResult> {
     const { label: toLabel, budgetId: toBudgetId, ...toNodeProps } = toNode;
-    const {
-      label: fromLabel,
-      budgetId: fromBudgetId,
-      ...fromNodeProps
-    } = fromNode;
+    const { label: fromLabel, budgetId: fromBudgetId, ...fromNodeProps } = fromNode;
     // throw an error if both the budgetIds do not match. Not going to use them though, they're not needed if they're both the same
     if (toBudgetId !== fromBudgetId) {
       throw new Error('Error - Budget Id on the two nodes must match.');

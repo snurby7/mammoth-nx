@@ -2,11 +2,8 @@ import { IBudget, IDeleteResponse } from '@mammoth/api-interfaces';
 import { Injectable, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map, materialize, toArray } from 'rxjs/operators';
-import {
-  getRecordsByKey,
-  getRecordsByKeyNotification,
-  Neo4jService,
-} from '../neo4j';
+import { RxResultWrapper } from '../extensions';
+import { getRecordsByKey, getRecordsByKeyNotification, Neo4jService } from '../neo4j';
 import { Budget, BudgetQuery, UpdateBudget } from './dto';
 import {
   deleteBudgetById,
@@ -89,21 +86,14 @@ export class BudgetService {
     /**
      * TODO: https://3.basecamp.com/4326074/buckets/14452756/todos/2448973409
      */
-    type TODO_PR_OPEN = any; // ? https://github.com/neo4j/neo4j-javascript-driver/issues/531
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      (trx.run(statement, props) as TODO_PR_OPEN)
-        .consume() // TODO: This is currently missing on the types neo4j-exports should be able to remove on next update (I hope)
-        .pipe(
-          map((result: TODO_PR_OPEN) => {
-            return {
-              message: `Deleted ${
-                result.counters.updates().nodesDeleted || 0
-              } record(s)`,
-              id,
-              isDeleted: result.counters.updates().nodesDeleted > 0,
-            };
-          })
-        )
+      (trx.run(statement, props) as RxResultWrapper).consume().pipe(
+        map((result) => ({
+          message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
+          id,
+          isDeleted: result.counters.updates().nodesDeleted > 0,
+        }))
+      )
     );
   }
 
@@ -119,10 +109,7 @@ export class BudgetService {
     const budgetKey = 'budget';
     const { statement, props } = updateBudgetRequest(budgetKey, request);
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      trx
-        .run(statement, props)
-        .records()
-        .pipe(getRecordsByKey<IBudget>(budgetKey))
+      trx.run(statement, props).records().pipe(getRecordsByKey<IBudget>(budgetKey))
     );
   }
 }
