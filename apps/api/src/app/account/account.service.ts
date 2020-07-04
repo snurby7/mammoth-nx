@@ -1,15 +1,27 @@
-import { IAccount, IAccountQuery, ICreateAccount, IDeleteResponse, ITransaction } from '@mammoth/api-interfaces';
+import {
+  IAccount,
+  IAccountQuery,
+  ICreateAccount,
+  IDeleteResponse,
+  ITransaction,
+} from '@mammoth/api-interfaces';
 import { Injectable, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map, materialize, toArray } from 'rxjs/operators';
 import { SupportedLabel } from '../constants';
-import { CommonAccountService, IAccountBalanceRequest, IAccountLinkedNodeMeta, IAccountLinkRequest, ICommonAccountConverter } from '../extensions';
+import {
+  CommonAccountService,
+  IAccountBalanceRequest,
+  IAccountLinkedNodeMeta,
+  IAccountLinkRequest,
+  ICommonAccountConverter,
+  RxResultWrapper,
+} from '../extensions';
 import { getRecordsByKey, getRecordsByKeyNotification, Neo4jService } from '../neo4j';
 import { accountQueries } from './queries';
 
 @Injectable()
-export class AccountService extends CommonAccountService
-  implements ICommonAccountConverter {
+export class AccountService extends CommonAccountService implements ICommonAccountConverter {
   protected readonly logger = new Logger(AccountService.name);
 
   constructor(protected neo4jService: Neo4jService) {
@@ -26,15 +38,9 @@ export class AccountService extends CommonAccountService
   public createAccount(request: ICreateAccount): Observable<IAccount> {
     this.logger.log('Creating an account');
     const resultKey = 'account';
-    const { statement, props } = accountQueries.createAccount(
-      resultKey,
-      request
-    );
+    const { statement, props } = accountQueries.createAccount(resultKey, request);
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      trx
-        .run(statement, props)
-        .records()
-        .pipe(getRecordsByKey<IAccount>(resultKey))
+      trx.run(statement, props).records().pipe(getRecordsByKey<IAccount>(resultKey))
     );
   }
 
@@ -66,17 +72,10 @@ export class AccountService extends CommonAccountService
    * @returns {Observable<IAccount>}
    * @memberof AccountService
    */
-  public findAccount(
-    budgetId: string,
-    accountId: string
-  ): Observable<IAccount> {
+  public findAccount(budgetId: string, accountId: string): Observable<IAccount> {
     this.logger.log(`Finding account with ${accountId}`);
     const resultKey = 'account';
-    const { statement, props } = accountQueries.getAccountById(
-      resultKey,
-      budgetId,
-      accountId
-    );
+    const { statement, props } = accountQueries.getAccountById(resultKey, budgetId, accountId);
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx.run(statement, props).records().pipe(
         getRecordsByKey<IAccount>(resultKey) // this knowingly only grabs the first record, only one should be emitted here
@@ -94,15 +93,9 @@ export class AccountService extends CommonAccountService
   public updateAccountDetails(request: IAccount): Observable<IAccount> {
     this.logger.log(`Updating an account with ${request.id}`);
     const resultKey = 'account';
-    const { statement, props } = accountQueries.updateExistingAccount(
-      resultKey,
-      request
-    );
+    const { statement, props } = accountQueries.updateExistingAccount(resultKey, request);
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      trx
-        .run(statement, props)
-        .records()
-        .pipe(getRecordsByKey<IAccount>(resultKey))
+      trx.run(statement, props).records().pipe(getRecordsByKey<IAccount>(resultKey))
     );
   }
 
@@ -113,30 +106,18 @@ export class AccountService extends CommonAccountService
    * @returns {Promise<{ message: string }>}
    * @memberof AccountService
    */
-  public deleteAccount(
-    budgetId: string,
-    accountId: string
-  ): Observable<IDeleteResponse> {
+  public deleteAccount(budgetId: string, accountId: string): Observable<IDeleteResponse> {
     this.logger.debug(`Deleting account - ${accountId}`);
     const resultKey = 'deletedAccount';
-    const { statement, props } = accountQueries.deleteAccountById(
-      resultKey,
-      budgetId,
-      accountId
-    );
-    type TODO_PR_OPEN = any; // ? https://github.com/neo4j/neo4j-javascript-driver/issues/531
+    const { statement, props } = accountQueries.deleteAccountById(resultKey, budgetId, accountId);
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      (trx.run(statement, props) as TODO_PR_OPEN)
-        .consume() // TODO: This is currently missing on the types neo4j-exports should be able to remove on next update (I hope)
-        .pipe(
-          map((result: TODO_PR_OPEN) => ({
-            message: `Deleted ${
-              result.counters.updates().nodesDeleted || 0
-            } record(s)`,
-            id: accountId,
-            isDeleted: true,
-          }))
-        )
+      (trx.run(statement, props) as RxResultWrapper).consume().pipe(
+        map((result) => ({
+          message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
+          id: accountId,
+          isDeleted: true,
+        }))
+      )
     );
   }
 

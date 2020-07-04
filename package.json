@@ -1,6 +1,6 @@
 {
   "name": "mammoth",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -61,7 +61,7 @@
     "class-validator": "0.12.1",
     "core-js": "^2.5.4",
     "jwks-rsa": "^1.8.0",
-    "neo4j-driver": "4.0.2",
+    "neo4j-driver": "4.1.0",
     "nest-router": "1.0.9",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
