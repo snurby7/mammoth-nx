@@ -5,7 +5,7 @@ import { MammothButtonModule } from '../../button/button.module';
 import { BudgetTileComponent } from './budget-tile.component';
 
 export default {
-  title: 'Budget/BudgetTileComponent',
+  title: 'Components/Budget/BudgetTileComponent',
 };
 
 export const Primary = () => ({

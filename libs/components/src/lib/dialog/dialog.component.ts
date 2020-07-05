@@ -5,7 +5,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   templateUrl: './dialog.component.html',
   styleUrls: ['./dialog.component.scss'],
 })
-export class DialogComponent {
+export class MammothDialogComponent {
   public isModalActive = false;
   @Input() buttonText: string;
 
