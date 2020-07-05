@@ -1,8 +1,10 @@
+import { IDeleteResponse } from '@mammoth/api-interfaces';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Driver, QueryResult } from 'neo4j-driver';
 import RxSession from 'neo4j-driver/types/session-rx';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { RxResultWrapper } from '../extensions';
 import { ExecuteStatement, IMammothCoreNode } from './interface';
 import { Neo4jCommonQueries } from './queries';
 import { getRecordsByKey } from './rxjs';
@@ -157,18 +159,19 @@ export class Neo4jService {
     id: string,
     label: string,
     relationship: string
-  ): Observable<QueryResult> {
+  ): Observable<IDeleteResponse> {
     const statement = `
       MATCH (:${label} {id: $id})-[r:${relationship}]-()
       DELETE r
     `;
-    type TODO_PR_OPEN = any; // ? https://github.com/neo4j/neo4j-javascript-driver/issues/531
     return this.rxSession.writeTransaction((trx) =>
-      (trx.run(statement, { id }) as TODO_PR_OPEN)
+      (trx.run(statement, { id }) as RxResultWrapper)
         .consume() // TODO: This is currently missing on the types neo4j-exports should be able to remove on next update (I hope)
         .pipe(
-          map((result: TODO_PR_OPEN) => ({
+          map((result) => ({
             message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
+            isDeleted: result.counters.updates().nodesDeleted > 0,
+            id,
           })),
           catchError((err) => throwError(err))
         )
