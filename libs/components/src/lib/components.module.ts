@@ -4,6 +4,6 @@ import { MammothBudgetComponentModule } from './budget-tile/budget-component.mod
 import { MammothButtonModule } from './button/button.module';
 
 @NgModule({
-  imports: [CommonModule, MammothButtonModule, MammothBudgetComponentModule, MammothDialogModule],
+  imports: [CommonModule, MammothButtonModule, MammothBudgetComponentModule],
 })
 export class ComponentsModule {}
