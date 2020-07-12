@@ -1,5 +1,6 @@
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { storiesOf } from '@storybook/angular';
 import { GridComponent } from './grid.component';
 
@@ -26,7 +27,7 @@ const ELEMENT_DATA: PeriodicElement[] = [
 storiesOf('Components/Grid', module).add('Basic', () => ({
   component: GridComponent,
   moduleMetadata: {
-    imports: [MatTableModule, MatPaginatorModule],
+    imports: [BrowserAnimationsModule, MatTableModule, MatPaginatorModule],
   },
   props: {
     dataSource: ELEMENT_DATA,
