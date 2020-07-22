@@ -41,6 +41,13 @@
     "components-e2e": {
       "tags": [],
       "implicitDependencies": ["components"]
+    },
+    "insights": {
+      "tags": []
+    },
+    "insights-e2e": {
+      "tags": [],
+      "implicitDependencies": ["insights"]
     }
   },
   "affected": {

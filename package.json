@@ -55,6 +55,7 @@
     "@ngrx/store": "^9.1.2",
     "@ngrx/store-devtools": "^9.1.2",
     "@nrwl/angular": "10.0.2",
+    "@nrwl/react": "^10.0.2",
     "ajv": "6.12.0",
     "auth0": "^2.25.0",
     "class-transformer": "0.2.3",
@@ -69,7 +70,13 @@
     "rimraf": "3.0.2",
     "rxjs": "~6.5.5",
     "uuid": "7.0.3",
-    "zone.js": "^0.10.2"
+    "zone.js": "^0.10.2",
+    "document-register-element": "1.13.1",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-is": "16.13.1",
+    "styled-components": "5.1.1",
+    "react-router-dom": "5.2.0"
   },
   "devDependencies": {
     "@angular-builders/custom-webpack": "^9.1.0",
@@ -128,6 +135,20 @@
     "ts-node": "8.8.2",
     "tsconfig-paths": "3.9.0",
     "tslint": "~6.1.0",
-    "typescript": "~3.9.7"
+    "typescript": "~3.9.7",
+    "@nrwl/web": "10.0.2",
+    "@nrwl/react": "10.0.2",
+    "@types/react": "16.9.38",
+    "@types/react-dom": "16.9.8",
+    "@testing-library/react": "10.4.1",
+    "@babel/core": "7.9.6",
+    "@babel/preset-env": "7.9.6",
+    "@babel/preset-typescript": "7.9.0",
+    "@babel/preset-react": "7.9.4",
+    "babel-jest": "25.1.0",
+    "@types/styled-components": "5.1.0",
+    "@types/react-is": "16.7.1",
+    "babel-plugin-styled-components": "1.10.7",
+    "@types/react-router-dom": "5.1.5"
   }
 }
