@@ -6,21 +6,15 @@
       "dependencies": "*",
       "devDependencies": "*"
     },
-    "tsconfig.json": "*",
     "tslint.json": "*",
-    "nx.json": "*"
+    "nx.json": "*",
+    "tsconfig.base.json": "*"
   },
   "tasksRunnerOptions": {
     "default": {
       "runner": "@nrwl/workspace/tasks-runners/default",
       "options": {
-        "cacheableOperations": [
-          "build",
-          "lint",
-          "test",
-          "e2e",
-          "build-storybook"
-        ]
+        "cacheableOperations": ["build", "lint", "test", "e2e", "build-storybook"]
       }
     }
   },
@@ -30,9 +24,7 @@
     },
     "mammoth-e2e": {
       "tags": [],
-      "implicitDependencies": [
-        "mammoth"
-      ]
+      "implicitDependencies": ["mammoth"]
     },
     "api": {
       "tags": []
@@ -48,9 +40,10 @@
     },
     "components-e2e": {
       "tags": [],
-      "implicitDependencies": [
-        "components"
-      ]
+      "implicitDependencies": ["components"]
     }
+  },
+  "affected": {
+    "defaultBase": "master"
   }
 }
