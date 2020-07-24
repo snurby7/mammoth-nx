@@ -48,6 +48,9 @@
     "insights-e2e": {
       "tags": [],
       "implicitDependencies": ["insights"]
+    },
+    "insights-ui": {
+      "tags": []
     }
   },
   "affected": {

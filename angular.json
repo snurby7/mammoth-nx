@@ -405,8 +405,9 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@nrwl/linter:lint",
           "options": {
+            "linter": "eslint",
             "tsConfig": [
               "apps/insights/tsconfig.app.json",
               "apps/insights/tsconfig.spec.json"
@@ -458,6 +459,36 @@
           }
         }
       }
+    },
+    "insights-ui": {
+      "root": "libs/insights-ui",
+      "sourceRoot": "libs/insights-ui/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": [
+              "libs/insights-ui/tsconfig.lib.json",
+              "libs/insights-ui/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/insights-ui/**/*"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/insights-ui/jest.config.js",
+            "tsConfig": "libs/insights-ui/tsconfig.spec.json",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {
@@ -475,7 +506,7 @@
     "@nrwl/react": {
       "application": {
         "style": "@emotion/styled",
-        "linter": "tslint",
+        "linter": "eslint",
         "babel": true
       },
       "component": {
@@ -483,7 +514,7 @@
       },
       "library": {
         "style": "@emotion/styled",
-        "linter": "tslint"
+        "linter": "eslint"
       }
     }
   },

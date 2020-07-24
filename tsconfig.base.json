@@ -18,7 +18,8 @@
     "paths": {
       "@mammoth/api-interfaces": ["libs/api-interfaces/src/index.ts"],
       "@mammoth/api-core": ["libs/api-core/src/index.ts"],
-      "@mammoth/components": ["libs/components/src/index.ts"]
+      "@mammoth/components": ["libs/components/src/index.ts"],
+      "@mammoth/insights-ui": ["libs/insights-ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
