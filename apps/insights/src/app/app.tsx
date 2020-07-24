@@ -1,11 +1,8 @@
+import styled from '@emotion/styled';
 import React from 'react';
-
-import styled from 'styled-components';
-
+import { Link, Route } from 'react-router-dom';
 import { ReactComponent as Logo } from './logo.svg';
 import star from './star.svg';
-
-import { Route, Link } from 'react-router-dom';
 
 const StyledApp = styled.div`
   font-family: sans-serif;

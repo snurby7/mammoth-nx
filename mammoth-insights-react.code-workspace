@@ -1,0 +1,36 @@
+{
+    "folders": [{
+        "path": "."
+    }],
+    "settings": {
+        "typescript.tsdk": "node_modules\\typescript\\lib",
+        "vsicons.presets.angular": true,
+        "files.exclude": {
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/CVS": true,
+            "**/.DS_Store": true,
+            "**/node_modules": true,
+            "apps/mammoth*": true,
+            "apps/components-e2e": true,
+            "apps/api/**/*.{service,module,service.spec,dto,config}.{js,ts}": true,
+            "apps/api/**/{index,main}.ts": true,
+            "apps/api/**/*.json": true,
+            "apps/api/**/{common,authz,enum,dto,queries,contracts,constants,common-queries,extensions,neo4j,assets,environments}": true,
+            "**/bower_components": true,
+            "libs/api-core": true,
+            "libs/components": true,
+        },
+        "cSpell.words": [
+            "theming"
+        ]
+    },
+    "extensions": {
+        "recommendations": [
+            "johnpapa.angular2",
+            "angular.ng-template",
+            "cyrilletuzi.angular-schematics"
+        ]
+    }
+}
