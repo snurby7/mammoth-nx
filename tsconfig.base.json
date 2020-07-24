@@ -1,26 +1,27 @@
 {
-  "compileOnSave": false,
-  "compilerOptions": {
-    "rootDir": ".",
-    "sourceMap": true,
-    "declaration": false,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "target": "es2015",
-    "module": "esnext",
-    "typeRoots": ["node_modules/@types"],
-    "lib": ["es2017", "dom"],
-    "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@mammoth/api-interfaces": ["libs/api-interfaces/src/index.ts"],
-      "@mammoth/api-core": ["libs/api-core/src/index.ts"],
-      "@mammoth/components": ["libs/components/src/index.ts"],
-      "@mammoth/insights-ui": ["libs/insights-ui/src/index.ts"]
-    }
-  },
-  "exclude": ["node_modules", "tmp"]
+    "compileOnSave": false,
+    "compilerOptions": {
+        "rootDir": ".",
+        "sourceMap": true,
+        "declaration": false,
+        "strictNullChecks": true,
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "importHelpers": true,
+        "target": "es2015",
+        "module": "esnext",
+        "typeRoots": ["node_modules/@types"],
+        "lib": ["es2017", "dom"],
+        "skipLibCheck": true,
+        "skipDefaultLibCheck": true,
+        "baseUrl": ".",
+        "paths": {
+            "@mammoth/api-interfaces": ["libs/api-interfaces/src/index.ts"],
+            "@mammoth/api-core": ["libs/api-core/src/index.ts"],
+            "@mammoth/components": ["libs/components/src/index.ts"],
+            "@mammoth/insights-ui": ["libs/insights-ui/src/index.ts"]
+        }
+    },
+    "exclude": ["node_modules", "tmp"]
 }
