@@ -23,6 +23,7 @@
             "libs/components": true,
         },
         "cSpell.words": [
+            "antd",
             "theming"
         ]
     },
