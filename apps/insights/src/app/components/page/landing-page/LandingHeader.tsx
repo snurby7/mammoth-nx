@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
-import { Button, Header, MammothIcon } from '@mammoth/insights-ui';
-import { Person } from '@material-ui/icons';
+import { Header, MammothIcon } from '@mammoth/insights-ui';
 import React from 'react';
+import { AuthButton } from '../../common';
 
 const StyledMammothIcon = styled(MammothIcon)`
   align-self: flex-start;
@@ -19,10 +19,7 @@ export const LandingHeader: React.FC = (): JSX.Element => {
       <StyledMammothIcon />
       <FlexEndContainer>
         <div className="ml-auto">
-          <Button>
-            <Person />
-            Login
-          </Button>
+          <AuthButton />
         </div>
       </FlexEndContainer>
     </Header>
