@@ -9,9 +9,9 @@ export const AuthButton: React.FC = (): JSX.Element => {
   const onClick = () => {
     if (user) {
       logout()
-      return
+    } else {
+      loginWithRedirect({})
     }
-    loginWithRedirect()
   }
 
   return (
