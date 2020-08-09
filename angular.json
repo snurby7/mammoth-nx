@@ -396,7 +396,8 @@
         "serve": {
           "builder": "@nrwl/web:dev-server",
           "options": {
-            "buildTarget": "insights:build"
+            "buildTarget": "insights:build",
+            "proxyConfig": "apps/insights/proxy.conf.json"
           },
           "configurations": {
             "production": {

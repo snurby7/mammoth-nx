@@ -3,19 +3,19 @@ import {
   ICategorySearchResponse,
   ICreateCategory,
   ITransaction,
-} from '@mammoth/api-interfaces';
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import * as uuid from 'uuid/v4';
-import { NodeRelationship, SupportedLabel } from '../constants';
+} from '@mammoth/api-interfaces'
+import { Injectable, Logger, NotFoundException } from '@nestjs/common'
+import * as uuid from 'uuid/v4'
+import { NodeRelationship, SupportedLabel } from '../constants'
 import {
   CommonAccountService,
   IAccountBalanceRequest,
   IAccountLinkedNodeMeta,
   IAccountLinkRequest,
   ICommonAccountConverter,
-} from '../extensions';
-import { IMammothCoreNode, Neo4jService } from '../neo4j';
-import { CategoryQuery, CreateCategory, UpdateCategory } from './dto';
+} from '../extensions'
+import { IMammothCoreNode, Neo4jService } from '../neo4j'
+import { CategoryQuery, CreateCategory, UpdateCategory } from './dto'
 
 /**
  * Category service is for handling all things category related.
@@ -24,12 +24,11 @@ import { CategoryQuery, CreateCategory, UpdateCategory } from './dto';
  * @class CategoryService
  */
 @Injectable()
-export class CategoryService extends CommonAccountService
-  implements ICommonAccountConverter {
-  protected readonly logger = new Logger(CategoryService.name);
+export class CategoryService extends CommonAccountService implements ICommonAccountConverter {
+  protected readonly logger = new Logger(CategoryService.name)
 
   constructor(protected neo4jService: Neo4jService) {
-    super(neo4jService);
+    super(neo4jService)
   }
 
   /**
@@ -43,9 +42,9 @@ export class CategoryService extends CommonAccountService
    */
   public async createCategory(request: CreateCategory): Promise<ICategory> {
     if (request.parentId) {
-      return await this.createChildCategory(request);
+      return await this.createChildCategory(request)
     }
-    return await this.createTopLevelCategory(request);
+    return await this.createTopLevelCategory(request)
   }
 
   /**
@@ -55,9 +54,7 @@ export class CategoryService extends CommonAccountService
    * @returns {Promise<ICategorySearchResponse[]>}
    * @memberof CategoryService
    */
-  public async findCategories(
-    query: CategoryQuery
-  ): Promise<ICategorySearchResponse[]> {
+  public async findCategories(query: CategoryQuery): Promise<ICategorySearchResponse[]> {
     const statementResult = await this.neo4jService.executeStatement({
       statement: `
         MATCH (parent:${SupportedLabel.Category} {budgetId: $budgetId})
@@ -71,10 +68,10 @@ export class CategoryService extends CommonAccountService
       props: {
         budgetId: query.budgetId,
       },
-    });
+    })
     return this.neo4jService
       .flattenOptionalMatch<ICategorySearchResponse>(statementResult)
-      .filter((node) => node.budgetId || node.children.length > 0);
+      .filter((node) => node.budgetId || (node.children && node.children.length > 0))
     // * filter out the nodes with no children, they're collected via their parent.
   }
 
@@ -87,12 +84,9 @@ export class CategoryService extends CommonAccountService
    * @returns {Promise<ICategorySearchResponse>}
    * @memberof CategoryService
    */
-  public async findCategory(
-    id: string,
-    budgetId: string
-  ): Promise<ICategorySearchResponse[]> {
-    const nodeParent = 'category';
-    const nodeChild = 'categoryChild';
+  public async findCategory(id: string, budgetId: string): Promise<ICategorySearchResponse[]> {
+    const nodeParent = 'category'
+    const nodeChild = 'categoryChild'
     return await this.neo4jService
       .executeStatement({
         statement: `
@@ -112,9 +106,7 @@ export class CategoryService extends CommonAccountService
           budgetId,
         },
       })
-      .then((result) =>
-        this.neo4jService.flattenOptionalMatch<ICategorySearchResponse>(result)
-      );
+      .then((result) => this.neo4jService.flattenOptionalMatch<ICategorySearchResponse>(result))
   }
 
   /**
@@ -127,59 +119,57 @@ export class CategoryService extends CommonAccountService
    * @memberof CategoryService
    */
   public async updateCategory(request: UpdateCategory): Promise<ICategory> {
-    const key = 'category';
-    const { id, budgetId } = request;
-    const category = await this.getCategoryById(id, budgetId);
+    const key = 'category'
+    const { id, budgetId } = request
+    const category = await this.getCategoryById(id, budgetId)
 
     if (!category) {
-      throw new NotFoundException(`No category record exists with id - ${id}`);
+      throw new NotFoundException(`No category record exists with id - ${id}`)
     }
     // All relationships from the node are removed.
     await this.neo4jService.removeTargetedRelationshipFromNode(
       category.id,
       SupportedLabel.Category,
       NodeRelationship.CategoryOf
-    );
+    )
     // Node is floating in space by this point
 
     const fromNode: IMammothCoreNode = {
       id: category.id,
       label: SupportedLabel.Category,
       budgetId: category.budgetId,
-    };
-    let toNode: IMammothCoreNode = null;
+    }
+    let toNode: IMammothCoreNode | null = null
 
     const hadExistingParentWithNewParentId =
-      category.parentId !== null &&
-      category.parentId !== request.parentId &&
-      request.parentId;
+      category.parentId !== null && category.parentId !== request.parentId && request.parentId
 
     if (hadExistingParentWithNewParentId || request.parentId) {
       toNode = {
         id: request.parentId,
         label: SupportedLabel.Category,
         budgetId: category.budgetId,
-      };
+      }
       // * Pointing the category to the new relationship. This is a child of a category now
     } else {
       toNode = {
         id: request.budgetId,
         label: SupportedLabel.Budget,
         budgetId: category.budgetId,
-      };
+      }
     }
     await this.neo4jService.createRelationshipBetweenNodes(
       fromNode,
       toNode,
       NodeRelationship.CategoryOf
-    );
+    )
 
     /**
      * Need to do a update, the rest of the properties should already be fixed.
      */
 
     // Need to pick off the balance if there is one
-    const balance = await this.getNodeBalance(fromNode);
+    const balance = await this.getNodeBalance(fromNode)
     return await this.neo4jService
       .executeStatement({
         statement: `
@@ -194,12 +184,9 @@ export class CategoryService extends CommonAccountService
         },
       })
       .then((statementResult) => {
-        const [result] = this.neo4jService.flattenStatementResult<ICategory>(
-          statementResult,
-          key
-        );
-        return result;
-      });
+        const [result] = this.neo4jService.flattenStatementResult<ICategory>(statementResult, key)
+        return result
+      })
   }
 
   /**
@@ -210,19 +197,17 @@ export class CategoryService extends CommonAccountService
    * @memberof CategoryService
    */
   public async deleteCategory(id: string): Promise<{ message: string }> {
-    this.logger.debug(`Deleting category - ${id}`);
+    this.logger.debug(`Deleting category - ${id}`)
     const result = await this.neo4jService.executeStatement({
       statement: `
         MATCH (node:${SupportedLabel.Category} { id: '${id}' })
         DETACH DELETE node
       `,
-    });
-    this.logger.debug(`Deleted category - ${id}`);
+    })
+    this.logger.debug(`Deleted category - ${id}`)
     return {
-      message: `Deleted ${
-        result.summary.counters.updates().nodesDeleted || 0
-      } record(s)`,
-    };
+      message: `Deleted ${result.summary.counters.updates().nodesDeleted || 0} record(s)`,
+    }
   }
 
   /**
@@ -233,10 +218,8 @@ export class CategoryService extends CommonAccountService
    * @returns {Promise<ICategory>}
    * @memberof CategoryService
    */
-  private async createTopLevelCategory(
-    request: ICreateCategory
-  ): Promise<ICategory> {
-    const key = 'node';
+  private async createTopLevelCategory(request: ICreateCategory): Promise<ICategory> {
+    const key = 'node'
     return await this.neo4jService
       .executeStatement({
         statement: `
@@ -251,12 +234,9 @@ export class CategoryService extends CommonAccountService
         },
       })
       .then((result) => {
-        const [category] = this.neo4jService.flattenStatementResult<ICategory>(
-          result,
-          key
-        );
-        return category;
-      });
+        const [category] = this.neo4jService.flattenStatementResult<ICategory>(result, key)
+        return category
+      })
   }
 
   /**
@@ -268,11 +248,9 @@ export class CategoryService extends CommonAccountService
    * @returns {Promise<ICategory>}
    * @memberof CategoryService
    */
-  private async createChildCategory(
-    request: ICreateCategory
-  ): Promise<ICategory> {
-    const childNode = 'childCategory';
-    const parentCategory = 'parentCategory';
+  private async createChildCategory(request: ICreateCategory): Promise<ICategory> {
+    const childNode = 'childCategory'
+    const parentCategory = 'parentCategory'
     return await this.neo4jService
       .executeStatement({
         statement: `
@@ -288,11 +266,12 @@ export class CategoryService extends CommonAccountService
         },
       })
       .then((result) => {
-        const [childCategory] = this.neo4jService.flattenStatementResult<
-          ICategory
-        >(result, childNode);
-        return childCategory;
-      });
+        const [childCategory] = this.neo4jService.flattenStatementResult<ICategory>(
+          result,
+          childNode
+        )
+        return childCategory
+      })
   }
 
   /**
@@ -305,10 +284,7 @@ export class CategoryService extends CommonAccountService
    * @returns {Promise<ICategory>}
    * @memberof CategoryService
    */
-  private async getCategoryById(
-    id: string,
-    budgetId: string
-  ): Promise<ICategory> {
+  private async getCategoryById(id: string, budgetId: string): Promise<ICategory> {
     return await this.neo4jService
       .executeStatement({
         statement: `
@@ -321,12 +297,9 @@ export class CategoryService extends CommonAccountService
         },
       })
       .then((result) => {
-        const [category] = this.neo4jService.flattenStatementResult<ICategory>(
-          result,
-          'category'
-        );
-        return category;
-      });
+        const [category] = this.neo4jService.flattenStatementResult<ICategory>(result, 'category')
+        return category
+      })
   }
 
   /**
@@ -346,7 +319,7 @@ export class CategoryService extends CommonAccountService
       label: SupportedLabel.Category,
       budgetId: transaction.budgetId,
       amount: transactionAmount,
-    };
+    }
   }
 
   /**
@@ -374,7 +347,7 @@ export class CategoryService extends CommonAccountService
       chargeAmount: updatedTransactionRequestAmount,
       refundAmount: -currentTransactionAmount,
       budgetId: currentTransaction.budgetId,
-    };
+    }
 
     return {
       storedTransactionDetails: {
@@ -396,6 +369,6 @@ export class CategoryService extends CommonAccountService
         label: SupportedLabel.Category,
         budgetId: transactionUpdateRequest.budgetId,
       },
-    };
+    }
   }
 }

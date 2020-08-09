@@ -1,4 +1,4 @@
-import { IBudget, IDeleteResponse } from '@mammoth/api-interfaces';
+import { IBudget, IDeleteResponse } from '@mammoth/api-interfaces'
 import {
   BadRequestException,
   Body,
@@ -8,12 +8,12 @@ import {
   Param,
   Post,
   UseGuards,
-} from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Observable } from 'rxjs';
-import { BudgetService } from './budget.service';
-import { Budget, BudgetQuery, UpdateBudget } from './dto';
+} from '@nestjs/common'
+import { AuthGuard } from '@nestjs/passport'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Observable } from 'rxjs'
+import { BudgetService } from './budget.service'
+import { Budget, BudgetQuery, UpdateBudget } from './dto'
 
 @Controller('budget')
 @ApiTags('budget')
@@ -34,7 +34,7 @@ export class BudgetController {
   })
   @UseGuards(AuthGuard('jwt'))
   public createNewBudget(@Body() budgetRequest: Budget): Observable<IBudget> {
-    return this.budgetService.createBudget(budgetRequest);
+    return this.budgetService.createBudget(budgetRequest)
   }
 
   @Get()
@@ -47,8 +47,8 @@ export class BudgetController {
     description: 'A list of all budgets and their properties and labels.',
   })
   @UseGuards(AuthGuard('jwt'))
-  public queryBudgets(@Body() query?: BudgetQuery): Observable<IBudget[]> {
-    return this.budgetService.queryBudgets(query);
+  public queryBudgets(@Body() query: BudgetQuery): Observable<IBudget[]> {
+    return this.budgetService.queryBudgets(query)
   }
 
   @Get(':id')
@@ -62,7 +62,7 @@ export class BudgetController {
   })
   @UseGuards(AuthGuard('jwt'))
   public getBudget(@Param('id') id: string): Observable<IBudget> {
-    return this.budgetService.getBudget(id);
+    return this.budgetService.getBudget(id)
   }
 
   @Post(':id')
@@ -76,9 +76,9 @@ export class BudgetController {
     @Body() request: UpdateBudget
   ): Observable<IBudget> {
     if (budgetId !== request.id) {
-      throw new BadRequestException();
+      throw new BadRequestException()
     }
-    return this.budgetService.saveBudget(request);
+    return this.budgetService.saveBudget(request)
   }
 
   @ApiOperation({
@@ -95,6 +95,6 @@ export class BudgetController {
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
   public removeBudgetById(@Param('id') id: string): Observable<IDeleteResponse> {
-    return this.budgetService.deleteBudget(id);
+    return this.budgetService.deleteBudget(id)
   }
 }
