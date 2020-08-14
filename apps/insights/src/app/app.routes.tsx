@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
-import { DashboardRoutes, LandingPage } from './pages'
+import { ProtectedRoutes } from './protected'
+import { LandingPage } from './public'
 import { RoutePaths } from './routes'
 
 export const AppRoutes: React.FC<{}> = (): JSX.Element => {
@@ -8,7 +9,7 @@ export const AppRoutes: React.FC<{}> = (): JSX.Element => {
     <BrowserRouter>
       <Switch>
         <Route exact path={RoutePaths.Default} component={LandingPage} />
-        <Route exact path={RoutePaths.App} component={DashboardRoutes} />
+        <Route exact path={RoutePaths.App} component={ProtectedRoutes} />
       </Switch>
     </BrowserRouter>
   )

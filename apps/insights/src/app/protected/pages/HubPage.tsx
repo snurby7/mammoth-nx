@@ -1,7 +1,8 @@
 import { Button } from '@mammoth/insights-ui'
 import React from 'react'
 import { budgetApi } from '../../api'
-export const Hub: React.FC = ({}): JSX.Element => {
+
+export const HubPage = (): JSX.Element => {
   const onClick = async () => {
     const budgets = await budgetApi.getBudgets()
     console.log(budgets)
