@@ -3,8 +3,8 @@ import styled from '@emotion/styled'
 import { Header, MammothIcon } from '@mammoth/insights-ui'
 import React from 'react'
 import { useHistory } from 'react-router-dom'
+import { AuthButton } from '../../common'
 import { RoutePaths } from '../../routes'
-import { AuthButton } from '../common'
 
 const StyledMammothIcon = styled(MammothIcon)`
   align-self: flex-start;
