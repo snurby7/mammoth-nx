@@ -1,15 +1,17 @@
 import { Button } from '@mammoth/insights-ui'
 import React from 'react'
-import { budgetApi } from '../../api'
+import { BudgetList } from '../components'
+import { useBudgetStore } from '../hooks'
 
 export const HubPage = (): JSX.Element => {
-  const onClick = async () => {
-    const budgets = await budgetApi.getBudgets()
-    console.log(budgets)
+  const budgetStore = useBudgetStore()
+  const onClick = () => {
+    budgetStore.loadBudgets()
   }
   return (
     <div>
       <Button onClick={onClick}>Click this to get budgets</Button>
+      <BudgetList budgets={budgetStore.budgets} />
     </div>
   )
 }
