@@ -9,7 +9,7 @@ export const AppRoutes: React.FC<{}> = (): JSX.Element => {
     <BrowserRouter>
       <Switch>
         <Route exact path={RoutePaths.Default} component={LandingPage} />
-        <Route exact path={RoutePaths.App} component={ProtectedRoutes} />
+        <Route path={RoutePaths.App} component={ProtectedRoutes} />
       </Switch>
     </BrowserRouter>
   )

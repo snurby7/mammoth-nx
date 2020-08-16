@@ -1,4 +1,3 @@
-import { LocationDescriptorObject } from 'history'
 import queryString from 'query-string'
 import { useMemo } from 'react'
 import { useHistory, useLocation, useParams, useRouteMatch } from 'react-router-dom'
@@ -14,26 +13,8 @@ export const useRouter = <TState extends any>() => {
   const match = useRouteMatch()
 
   return useMemo(() => {
-    const pushRoute = (toPath: string) => {
-      const pushArgs: { pathname: string; search?: string } = {
-        pathname: toPath,
-      }
-
-      // Maintain query params
-      if (window.location.search) {
-        pushArgs.search = window.location.search
-      }
-
-      history.push(pushArgs)
-    }
-
-    const pushDescriptor = (descriptor: LocationDescriptorObject<TState>) => {
-      history.push(descriptor)
-    }
-
     return {
-      pushRoute,
-      pushDescriptor,
+      push: history.push,
       replace: history.replace,
       pathname: location.pathname,
       query: {
