@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react'
 import React from 'react'
 import { IBudgetSnap } from '../../models'
+import { BudgetListItem } from './BudgetListItem'
 interface IBudgetListProps {
   budgets: IBudgetSnap[]
 }
@@ -9,9 +10,7 @@ export const BudgetList = observer(
     return (
       <div>
         {budgets.map((budget) => (
-          <div key={budget.id}>
-            This is budget {budget.name} created on {budget.createdDate} with ID {budget.id}{' '}
-          </div>
+          <BudgetListItem key={budget.id} budget={budget} />
         ))}
       </div>
     )
