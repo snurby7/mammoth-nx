@@ -1,11 +1,11 @@
 import { IBudget } from '@mammoth/api-interfaces'
-import { flow, SnapshotIn, types } from 'mobx-state-tree'
+import { flow, SnapshotIn, SnapshotOrInstance, types } from 'mobx-state-tree'
 import { budgetApi } from '../api'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let key: keyof IBudget
 export const Budget = types
-  .model({
+  .model('Budget', {
     [(key = 'id')]: types.identifier,
     [(key = 'name')]: types.string,
     [(key = 'createdDate')]: types.string,
@@ -38,7 +38,7 @@ export const BudgetStore = types
       }
     })
 
-    const setBudget = (budget: IBudgetSnap): void => {
+    const setBudget = (budget: SnapshotOrInstance<BudgetType>): void => {
       self.selectedBudget = budget
     }
 
