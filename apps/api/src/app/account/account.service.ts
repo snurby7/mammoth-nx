@@ -4,28 +4,27 @@ import {
   ICreateAccount,
   IDeleteResponse,
   ITransaction,
-} from '@mammoth/api-interfaces';
-import { Injectable, Logger } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { map, materialize, toArray } from 'rxjs/operators';
-import { SupportedLabel } from '../constants';
+} from '@mammoth/api-interfaces'
+import { Injectable, Logger } from '@nestjs/common'
+import { Observable } from 'rxjs'
+import { map, materialize, toArray } from 'rxjs/operators'
+import { SupportedLabel } from '../constants'
 import {
   CommonAccountService,
   IAccountBalanceRequest,
   IAccountLinkedNodeMeta,
   IAccountLinkRequest,
   ICommonAccountConverter,
-  RxResultWrapper,
-} from '../extensions';
-import { getRecordsByKey, getRecordsByKeyNotification, Neo4jService } from '../neo4j';
-import { accountQueries } from './queries';
+} from '../extensions'
+import { getRecordsByKey, getRecordsByKeyNotification, Neo4jService } from '../neo4j'
+import { accountQueries } from './queries'
 
 @Injectable()
 export class AccountService extends CommonAccountService implements ICommonAccountConverter {
-  protected readonly logger = new Logger(AccountService.name);
+  protected readonly logger = new Logger(AccountService.name)
 
   constructor(protected neo4jService: Neo4jService) {
-    super(neo4jService);
+    super(neo4jService)
   }
 
   /**
@@ -36,12 +35,12 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @memberof AccountService
    */
   public createAccount(request: ICreateAccount): Observable<IAccount> {
-    this.logger.log('Creating an account');
-    const resultKey = 'account';
-    const { statement, props } = accountQueries.createAccount(resultKey, request);
+    this.logger.log('Creating an account')
+    const resultKey = 'account'
+    const { statement, props } = accountQueries.createAccount(resultKey, request)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
       trx.run(statement, props).records().pipe(getRecordsByKey<IAccount>(resultKey))
-    );
+    )
   }
 
   /**
@@ -52,16 +51,16 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @memberof AccountService
    */
   public findAccounts(query: IAccountQuery): Observable<IAccount[]> {
-    this.logger.log(`Finding accounts with budgetId - ${query.budgetId}`);
-    const resultKey = 'accounts';
-    const { statement, props } = accountQueries.findAccounts(resultKey, query);
+    this.logger.log(`Finding accounts with budgetId - ${query.budgetId}`)
+    const resultKey = 'accounts'
+    const { statement, props } = accountQueries.findAccounts(resultKey, query)
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx.run(statement, props).records().pipe(
         materialize(), // gather all the notifications from the stream
         toArray(), // turn them all into an array
         getRecordsByKeyNotification(resultKey) // * Grab results
       )
-    );
+    )
   }
 
   /**
@@ -73,14 +72,14 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @memberof AccountService
    */
   public findAccount(budgetId: string, accountId: string): Observable<IAccount> {
-    this.logger.log(`Finding account with ${accountId}`);
-    const resultKey = 'account';
-    const { statement, props } = accountQueries.getAccountById(resultKey, budgetId, accountId);
+    this.logger.log(`Finding account with ${accountId}`)
+    const resultKey = 'account'
+    const { statement, props } = accountQueries.getAccountById(resultKey, budgetId, accountId)
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx.run(statement, props).records().pipe(
         getRecordsByKey<IAccount>(resultKey) // this knowingly only grabs the first record, only one should be emitted here
       )
-    );
+    )
   }
 
   /**
@@ -91,12 +90,12 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @memberof AccountService
    */
   public updateAccountDetails(request: IAccount): Observable<IAccount> {
-    this.logger.log(`Updating an account with ${request.id}`);
-    const resultKey = 'account';
-    const { statement, props } = accountQueries.updateExistingAccount(resultKey, request);
+    this.logger.log(`Updating an account with ${request.id}`)
+    const resultKey = 'account'
+    const { statement, props } = accountQueries.updateExistingAccount(resultKey, request)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
       trx.run(statement, props).records().pipe(getRecordsByKey<IAccount>(resultKey))
-    );
+    )
   }
 
   /**
@@ -107,18 +106,21 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @memberof AccountService
    */
   public deleteAccount(budgetId: string, accountId: string): Observable<IDeleteResponse> {
-    this.logger.debug(`Deleting account - ${accountId}`);
-    const resultKey = 'deletedAccount';
-    const { statement, props } = accountQueries.deleteAccountById(resultKey, budgetId, accountId);
+    this.logger.debug(`Deleting account - ${accountId}`)
+    const resultKey = 'deletedAccount'
+    const { statement, props } = accountQueries.deleteAccountById(resultKey, budgetId, accountId)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      (trx.run(statement, props) as RxResultWrapper).consume().pipe(
-        map((result) => ({
-          message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
-          id: accountId,
-          isDeleted: true,
-        }))
-      )
-    );
+      trx
+        .run(statement, props)
+        .summary()
+        .pipe(
+          map((result) => ({
+            message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
+            id: accountId,
+            isDeleted: true,
+          }))
+        )
+    )
   }
 
   /**
@@ -138,7 +140,7 @@ export class AccountService extends CommonAccountService implements ICommonAccou
       label: SupportedLabel.Account,
       budgetId: transaction.budgetId,
       amount: transactionAmount,
-    };
+    }
   }
 
   /**
@@ -168,7 +170,7 @@ export class AccountService extends CommonAccountService implements ICommonAccou
       chargeAmount: updatedTransactionRequestAmount,
       refundAmount: -currentTransactionAmount,
       budgetId: currentTransaction.budgetId,
-    };
+    }
 
     return {
       storedTransactionDetails: {
@@ -190,6 +192,6 @@ export class AccountService extends CommonAccountService implements ICommonAccou
         label: SupportedLabel.Account,
         budgetId: transactionUpdateRequest.budgetId,
       },
-    };
+    }
   }
 }

@@ -6,6 +6,5 @@ export {
   IAccountLinkedNodeMeta,
   IAccountLinkRequest,
   IAccountLinkResponse,
-} from './account';
-export { ICommonAccountConverter } from './converters';
-export * from './types';
+} from './account'
+export { ICommonAccountConverter } from './converters'

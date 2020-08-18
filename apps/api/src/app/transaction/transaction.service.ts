@@ -10,7 +10,7 @@ import { catchError, flatMap, map, materialize, switchMap, tap, toArray } from '
 import { AccountService } from '../account'
 import { CategoryService } from '../category'
 import { SupportedLabel } from '../constants'
-import { IAccountLinkBreak, IAccountLinkResponse, RxResultWrapper } from '../extensions'
+import { IAccountLinkBreak, IAccountLinkResponse } from '../extensions'
 import { getRecordsByKey, getRecordsByKeyNotification, Neo4jService } from '../neo4j'
 import { PayeeService } from '../payee'
 import {
@@ -326,8 +326,9 @@ export class TransactionService {
       budgetId
     )
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      (trx.run(statement, props) as RxResultWrapper)
-        .consume() // TODO: This is currently missing on the types neo4j-exports should be able to remove on next update (I hope)
+      trx
+        .run(statement, props)
+        .summary()
         .pipe(
           map((result) => ({
             message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,

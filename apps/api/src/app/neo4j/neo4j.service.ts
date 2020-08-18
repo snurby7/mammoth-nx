@@ -1,17 +1,16 @@
-import { IDeleteResponse } from '@mammoth/api-interfaces';
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { Driver, QueryResult } from 'neo4j-driver';
-import RxSession from 'neo4j-driver/types/session-rx';
-import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { RxResultWrapper } from '../extensions';
-import { ExecuteStatement, IMammothCoreNode } from './interface';
-import { Neo4jCommonQueries } from './queries';
-import { getRecordsByKey } from './rxjs';
+import { IDeleteResponse } from '@mammoth/api-interfaces'
+import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Driver, QueryResult } from 'neo4j-driver'
+import RxSession from 'neo4j-driver/types/session-rx'
+import { Observable, throwError } from 'rxjs'
+import { catchError, map } from 'rxjs/operators'
+import { ExecuteStatement, IMammothCoreNode } from './interface'
+import { Neo4jCommonQueries } from './queries'
+import { getRecordsByKey } from './rxjs'
 
 @Injectable()
 export class Neo4jService {
-  private readonly logger = new Logger(Neo4jService.name);
+  private readonly logger = new Logger(Neo4jService.name)
 
   constructor(@Inject('Neo4j') private readonly neo4jDriver: Driver) {}
 
@@ -28,7 +27,7 @@ export class Neo4jService {
    * @memberof Neo4jService
    */
   get rxSession(): RxSession {
-    return this.neo4jDriver.rxSession();
+    return this.neo4jDriver.rxSession()
   }
 
   /**
@@ -42,13 +41,13 @@ export class Neo4jService {
    * @memberof Neo4jService
    */
   public async executeStatement(statementProps: ExecuteStatement): Promise<QueryResult> {
-    const { statement, props } = statementProps;
-    this.logger.log(`Executing the following statement - ${statement}`);
-    const session = this.neo4jDriver.session();
-    const result = await session.run(statement, { ...props } ?? {});
-    session.close();
+    const { statement, props } = statementProps
+    this.logger.log(`Executing the following statement - ${statement}`)
+    const session = this.neo4jDriver.session()
+    const result = await session.run(statement, { ...props } ?? {})
+    session.close()
 
-    return result;
+    return result
   }
 
   /**
@@ -67,26 +66,24 @@ export class Neo4jService {
   public flattenStatementResult<TResponse>(queryResult: QueryResult, key: string): TResponse[] {
     // TODO Throw if no results - https://3.basecamp.com/4326074/buckets/14452756/todos/2328314149
     if (queryResult.records.length === 0) {
-      this.logger.warn('No results matched the given query.');
-      return [];
+      this.logger.warn('No results matched the given query.')
+      return []
     }
     return queryResult.records.map<TResponse>((record) => {
-      const { properties } = record.get(key);
+      const { properties } = record.get(key)
       if (!properties) {
-        this.logger.warn(`There are results here, but no result is matched by ${key}`);
-        return {};
+        this.logger.warn(`There are results here, but no result is matched by ${key}`)
+        return {}
       }
       // * There is an identity property here which I haven't quite figured out yet.
       return {
         ...properties,
-      };
-    });
+      }
+    })
   }
 
   /**
    * Flattens an optional match but is currently only used by the categoryService
-   *
-   * TODO: https://3.basecamp.com/4326074/buckets/14452756/todos/2229355841
    *
    * @template TResponse Expected response type
    * @param {QueryResult} statementResult The result to loop over
@@ -94,10 +91,10 @@ export class Neo4jService {
    * @memberof Neo4jService
    */
   public flattenOptionalMatch<TResponse = any>(statementResult: QueryResult): TResponse[] {
-    const response: TResponse[] = [];
+    const response: TResponse[] = []
     statementResult.records.map((record) => {
       record.keys.map((key) => {
-        const { parentNode, children } = record.get(key) as any;
+        const { parentNode, children } = record.get(key) as any
         // this needs to be cleaned up with the above TODO
         response.push(({
           name: parentNode.properties.name,
@@ -106,10 +103,10 @@ export class Neo4jService {
           children: children.details?.map((detail) => ({
             ...detail.properties,
           })),
-        } as unknown) as TResponse);
-      });
-    });
-    return response;
+        } as unknown) as TResponse)
+      })
+    })
+    return response
   }
 
   /**
@@ -139,9 +136,9 @@ export class Neo4jService {
     }).then((result) => {
       this.logger.verbose(
         `Deleted ${result.summary.counters.updates().relationshipsDeleted} relationship(s)`
-      );
-      return result;
-    });
+      )
+      return result
+    })
   }
 
   /**
@@ -163,10 +160,11 @@ export class Neo4jService {
     const statement = `
       MATCH (:${label} {id: $id})-[r:${relationship}]-()
       DELETE r
-    `;
+    `
     return this.rxSession.writeTransaction((trx) =>
-      (trx.run(statement, { id }) as RxResultWrapper)
-        .consume() // TODO: This is currently missing on the types neo4j-exports should be able to remove on next update (I hope)
+      trx
+        .run(statement, { id })
+        .summary()
         .pipe(
           map((result) => ({
             message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
@@ -175,7 +173,7 @@ export class Neo4jService {
           })),
           catchError((err) => throwError(err))
         )
-    );
+    )
   }
 
   /**
@@ -193,11 +191,11 @@ export class Neo4jService {
     toNode: IMammothCoreNode,
     relationship: string
   ): Promise<QueryResult> {
-    const { label: toLabel, budgetId: toBudgetId, ...toNodeProps } = toNode;
-    const { label: fromLabel, budgetId: fromBudgetId, ...fromNodeProps } = fromNode;
+    const { label: toLabel, budgetId: toBudgetId, ...toNodeProps } = toNode
+    const { label: fromLabel, budgetId: fromBudgetId, ...fromNodeProps } = fromNode
     // throw an error if both the budgetIds do not match. Not going to use them though, they're not needed if they're both the same
     if (toBudgetId !== fromBudgetId) {
-      throw new Error('Error - Budget Id on the two nodes must match.');
+      throw new Error('Error - Budget Id on the two nodes must match.')
     }
     return await this.executeStatement({
       statement: `
@@ -210,7 +208,7 @@ export class Neo4jService {
         toNodeProps,
         fromNodeProps,
       },
-    });
+    })
   }
 
   /**
@@ -227,13 +225,13 @@ export class Neo4jService {
     relationship: string,
     toNode: IMammothCoreNode
   ): Observable<QueryResult> {
-    const relationshipKey = 'relationshipKey';
+    const relationshipKey = 'relationshipKey'
     const { statement, props } = Neo4jCommonQueries.createRelationship(
       relationshipKey,
       fromNode,
       relationship,
       toNode
-    );
+    )
     return this.rxSession.writeTransaction((trx) =>
       trx
         .run(statement, props)
@@ -242,6 +240,6 @@ export class Neo4jService {
           getRecordsByKey<QueryResult>(relationshipKey),
           catchError((err) => throwError(err))
         )
-    );
+    )
   }
 }
