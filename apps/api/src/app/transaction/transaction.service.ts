@@ -265,8 +265,13 @@ export class TransactionService {
    * @memberof TransactionService
    */
   private removeLinkWithRefund$(currentTransaction: ITransaction): Observable<any> {
+    const refundAmount = currentTransaction.inflow
+      ? -currentTransaction.inflow
+      : currentTransaction.outflow
+      ? -currentTransaction.outflow
+      : 0
     const commonRequest: Partial<IAccountLinkBreak> = {
-      refundAmount: -currentTransaction.inflow ?? -currentTransaction.outflow ?? 0,
+      refundAmount,
       budgetId: currentTransaction.budgetId,
       transaction: {
         id: currentTransaction.id,

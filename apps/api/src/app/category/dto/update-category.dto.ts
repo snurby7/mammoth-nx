@@ -1,18 +1,18 @@
-import { ICategoryUpdate } from '@mammoth/api-interfaces';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
+import { ICategoryUpdate } from '@mammoth/api-interfaces'
+import { ApiProperty } from '@nestjs/swagger'
+import { IsNotEmpty, IsOptional, IsUUID } from 'class-validator'
 
 export class UpdateCategory implements ICategoryUpdate {
   @IsNotEmpty()
   @IsUUID()
-  id: string;
+  id: string
 
   @IsUUID()
   @IsNotEmpty()
-  budgetId: string;
+  budgetId: string
 
   @IsNotEmpty()
-  name: string;
+  name: string
 
   @ApiProperty({
     description: 'Parent category Id to link to',
@@ -20,5 +20,5 @@ export class UpdateCategory implements ICategoryUpdate {
   })
   @IsOptional()
   @IsUUID()
-  parentId?: string;
+  parentId: string
 }
