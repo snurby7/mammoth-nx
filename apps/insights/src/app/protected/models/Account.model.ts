@@ -43,8 +43,8 @@ export const AccountStore = types
       }
     })
 
-    const setAccount = (Account: IAccountSnap): void => {
-      // self.selectedAccount = Account
+    const setAccount = (account: Instance<AccountType>): void => {
+      self.selectedAccount = account
     }
 
     return {

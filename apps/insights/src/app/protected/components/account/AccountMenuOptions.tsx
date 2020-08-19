@@ -7,6 +7,7 @@ export const AccountMenuOptions = (): JSX.Element => {
   useEffect(() => {
     store.loadAccounts()
   }, [store])
+  console.log(store.selectedAccount)
   return (
     <div>
       <AccountMenuList accounts={store.accounts} />
