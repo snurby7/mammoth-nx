@@ -1,5 +1,5 @@
 import { IBudget } from '@mammoth/api-interfaces'
-import { flow, SnapshotIn, SnapshotOrInstance, types } from 'mobx-state-tree'
+import { flow, Instance, SnapshotIn, SnapshotOrInstance, types } from 'mobx-state-tree'
 import { budgetApi } from '../api'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -13,6 +13,7 @@ export const Budget = types
   .actions((self) => ({}))
 
 type BudgetType = typeof Budget
+export interface IBudgetInstance extends Instance<BudgetType> {}
 export interface IBudgetSnap extends SnapshotIn<BudgetType> {}
 export interface IBudgetReference {}
 
