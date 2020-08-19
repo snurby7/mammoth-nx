@@ -1,13 +1,13 @@
 import { IBudget } from '@mammoth/api-interfaces'
-import { BaseApi } from './base.api'
+import { axiosInstance } from '../../utils'
 
 enum ApiRoute {
   LoadBudgetsV1 = 'api/v1/budget',
 }
 
-class BudgetApi extends BaseApi {
+class BudgetApi {
   public async loadBudgets(): Promise<IBudget[]> {
-    const response = await this.axios.get<IBudget[]>(ApiRoute.LoadBudgetsV1)
+    const response = await axiosInstance.get<IBudget[]>(ApiRoute.LoadBudgetsV1)
     return response.data
   }
 }

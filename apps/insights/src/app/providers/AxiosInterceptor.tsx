@@ -1,27 +1,33 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
+import { axiosInstance } from '../utils'
+
 export const AxiosInterceptor: React.FC = ({ children }): JSX.Element => {
   const { user, getAccessTokenSilently } = useAuth0()
   const [accessToken, setAccessToken] = useState<string | null>(null)
   const [isFetchingToken, setIsFetchingToken] = useState(false)
-  if (user && !accessToken && !isFetchingToken) {
-    setIsFetchingToken(true)
-    getAccessTokenSilently().then((token) => {
-      setAccessToken(token)
-      setIsFetchingToken(false)
-    })
-  }
+
   useEffect(() => {
-    const axiosInterceptor = axios.interceptors.request.use((request) => {
-      if (accessToken) {
-        request.headers['Authorization'] = `Bearer ${accessToken}`
-      }
-      return request
-    })
-    return () => {
-      return axios.interceptors.request.eject(axiosInterceptor)
+    let axiosInterceptor
+    if (user && !isFetchingToken) {
+      setIsFetchingToken(true)
+      getAccessTokenSilently().then((token) => {
+        setAccessToken(token)
+        axiosInstance.interceptors.request.use((request) => {
+          if (token) {
+            request.headers['Authorization'] = `Bearer ${token}`
+          }
+          return request
+        })
+        setIsFetchingToken(false)
+      })
     }
-  }, [accessToken])
-  return <div>{children}</div>
+
+    return () => {
+      if (axiosInterceptor) {
+        return axiosInstance.interceptors.request.eject(axiosInterceptor)
+      }
+    }
+  }, [getAccessTokenSilently, isFetchingToken, user])
+  return <div>{!accessToken ? <div>Loading...</div> : children}</div>
 }

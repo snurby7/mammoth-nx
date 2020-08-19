@@ -1,6 +1,5 @@
 import styled from '@emotion/styled'
 import React from 'react'
-import { useRouter } from '../../hooks'
 import { BudgetMenuOptions } from '../components'
 import { AccountMenuOptions } from '../components/account'
 import {
@@ -35,8 +34,6 @@ const GridCoordinate: React.FC<IGridBlockProps> = ({ children, ...props }): JSX.
 }
 
 export const HubPage = (): JSX.Element => {
-  const router = useRouter()
-  console.log(router.query)
   return (
     <div>
       <h2>Static Bar</h2>
