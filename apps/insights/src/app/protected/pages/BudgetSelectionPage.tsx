@@ -1,17 +1,26 @@
-import { Button } from '@mammoth/insights-ui'
-import React from 'react'
+import styled from '@emotion/styled'
+import React, { useEffect } from 'react'
 import { BudgetList } from '../components'
 import { useBudgetStore } from '../hooks'
 
+const BudgetSelectionWrapper = styled.div`
+  padding: 1rem;
+`
+
+const BudgetSelectionHeader = styled.h2`
+  margin-top: 0;
+`
+
 export const BudgetSelectionPage = (): JSX.Element => {
   const budgetStore = useBudgetStore()
-  const onClick = () => {
+  useEffect(() => {
     budgetStore.loadBudgets()
-  }
+  }, [budgetStore])
+
   return (
-    <div>
-      <Button onClick={onClick}>Click this to get budgets</Button>
+    <BudgetSelectionWrapper>
+      <BudgetSelectionHeader>Select a budget!</BudgetSelectionHeader>
       <BudgetList budgets={budgetStore.budgets} />
-    </div>
+    </BudgetSelectionWrapper>
   )
 }

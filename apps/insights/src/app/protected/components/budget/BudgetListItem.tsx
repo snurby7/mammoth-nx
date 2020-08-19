@@ -1,3 +1,4 @@
+import styled from '@emotion/styled'
 import { Button } from '@mammoth/insights-ui'
 import React from 'react'
 import { useRouter } from '../../../hooks'
@@ -6,9 +7,22 @@ import { replaceKeyPlaceholders } from '../../../utils'
 import { useBudgetStore } from '../../hooks'
 import { IBudgetSnap } from '../../models'
 
+const BudgetItemWrapper = styled.div`
+  display: inline-block;
+  background-color: lightgrey;
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 1rem;
+`
+
+const BudgetHeader = styled.h2`
+  margin-top: 0;
+`
+
 interface IBudgetListItemProps {
   budget: IBudgetSnap
 }
+
 export const BudgetListItem = ({ budget }: IBudgetListItemProps): JSX.Element => {
   const budgetStore = useBudgetStore()
   const router = useRouter()
@@ -21,12 +35,10 @@ export const BudgetListItem = ({ budget }: IBudgetListItemProps): JSX.Element =>
     )
   }
   return (
-    <div>
-      <h2>{budget.name}</h2>
+    <BudgetItemWrapper>
+      <BudgetHeader>{budget.name}</BudgetHeader>
       <div>{budget.createdDate}</div>
-      <div>
-        <Button onClick={onSelectBudget}>Select</Button>
-      </div>
-    </div>
+      <Button onClick={onSelectBudget}>Select</Button>
+    </BudgetItemWrapper>
   )
 }
