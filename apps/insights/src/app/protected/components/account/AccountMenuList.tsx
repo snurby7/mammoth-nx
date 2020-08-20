@@ -1,4 +1,5 @@
-import { Button } from '@mammoth/insights-ui'
+import { List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core'
+import { AccountBalanceOutlined } from '@material-ui/icons'
 import { observer } from 'mobx-react'
 import React from 'react'
 import { useRouter } from '../../../hooks'
@@ -20,17 +21,24 @@ export const AccountMenuItem = ({ account }: { account: IAccountSnap }): JSX.Ele
       })
     )
   }
-  return <Button onClick={onAccountClick}>{account.name}</Button>
+  return (
+    <ListItem button onClick={onAccountClick}>
+      <ListItemIcon>
+        <AccountBalanceOutlined />
+      </ListItemIcon>
+      <ListItemText primary={account.name} />
+    </ListItem>
+  )
 }
 
 export const AccountMenuList = observer(
   ({ accounts }: { accounts: IAccountSnap[] }): JSX.Element => {
     return (
-      <div>
+      <List>
         {accounts.map((account) => (
           <AccountMenuItem key={account.id} account={account} />
         ))}
-      </div>
+      </List>
     )
   }
 )

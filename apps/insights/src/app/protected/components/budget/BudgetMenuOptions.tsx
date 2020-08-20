@@ -1,4 +1,5 @@
 import styled from '@emotion/styled'
+import { List } from '@material-ui/core'
 import React from 'react'
 import { useBudgetStore } from '../../hooks'
 import { ViewAllAccounts } from '../account'
@@ -16,10 +17,12 @@ export const BudgetMenuOptions = (): JSX.Element => {
   const budgetStore = useBudgetStore()
   return (
     <FlexColumnWrapper>
-      <BudgetSettingsItem selectedBudget={budgetStore.selectedBudget} />
-      <BudgetViewRoute selectedBudget={budgetStore.selectedBudget} />
-      <BudgetReportsItems selectedBudget={budgetStore.selectedBudget} />
-      <ViewAllAccounts />
+      <List>
+        <BudgetSettingsItem selectedBudget={budgetStore.selectedBudget} />
+        <BudgetViewRoute selectedBudget={budgetStore.selectedBudget} />
+        <BudgetReportsItems selectedBudget={budgetStore.selectedBudget} />
+        <ViewAllAccounts />
+      </List>
     </FlexColumnWrapper>
   )
 }
