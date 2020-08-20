@@ -144,7 +144,7 @@ export const PageLayout = ({ accountListConfig, content, budgetListConfig }: IPa
         <Divider />
         {accountListConfig}
       </Drawer>
-      <section className={classes.content}>{content}</section>
+      <article className={classes.content}>{content}</article>
     </div>
   )
 }

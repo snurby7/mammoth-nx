@@ -1,5 +1,5 @@
 import { ListItem, ListItemIcon, ListItemText } from '@material-ui/core'
-import { HomeOutlined } from '@material-ui/icons'
+import { AssessmentOutlined } from '@material-ui/icons'
 import { observer } from 'mobx-react'
 import React from 'react'
 import { IBudgetInstance } from '../../models'
@@ -20,7 +20,7 @@ export const BudgetViewRoute = observer(({ selectedBudget }: IBudgetViewRoutePro
   return (
     <ListItem button key={'View Budget'} onClick={onClick}>
       <ListItemIcon>
-        <HomeOutlined />
+        <AssessmentOutlined />
       </ListItemIcon>
       <ListItemText primary="View Budget" />
     </ListItem>

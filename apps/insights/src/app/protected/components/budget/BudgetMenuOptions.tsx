@@ -1,6 +1,10 @@
 import styled from '@emotion/styled'
-import { List } from '@material-ui/core'
+import { List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core'
+import { HomeOutlined } from '@material-ui/icons'
 import React from 'react'
+import { useRouter } from '../../../hooks'
+import { RoutePaths } from '../../../routes'
+import { replaceKeyPlaceholders } from '../../../utils'
 import { useBudgetStore } from '../../hooks'
 import { ViewAllAccounts } from '../account'
 import { BudgetReportsItems } from './BudgetReportsItem'
@@ -15,10 +19,27 @@ const FlexColumnWrapper = styled.div`
 
 export const BudgetMenuOptions = (): JSX.Element => {
   const budgetStore = useBudgetStore()
+  const router = useRouter()
   return (
     <FlexColumnWrapper>
       <List>
         <BudgetSettingsItem selectedBudget={budgetStore.selectedBudget} />
+        <ListItem
+          button
+          key={'Home'}
+          onClick={() =>
+            router.push(
+              replaceKeyPlaceholders(RoutePaths.BudgetHub, {
+                budgetId: budgetStore.selectedBudget?.id,
+              })
+            )
+          }
+        >
+          <ListItemIcon>
+            <HomeOutlined />
+          </ListItemIcon>
+          <ListItemText primary="Home" />
+        </ListItem>
         <BudgetViewRoute selectedBudget={budgetStore.selectedBudget} />
         <BudgetReportsItems selectedBudget={budgetStore.selectedBudget} />
         <ViewAllAccounts />
