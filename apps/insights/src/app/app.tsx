@@ -6,13 +6,11 @@ import { ThemeProvider } from './providers'
 export const App = () => {
   return (
     <InsightUiProvider>
-      <div>
-        <main>
-          <ThemeProvider>
-            <AppRoutes />
-          </ThemeProvider>
-        </main>
-      </div>
+      <main>
+        <ThemeProvider>
+          <AppRoutes />
+        </ThemeProvider>
+      </main>
     </InsightUiProvider>
   )
 }

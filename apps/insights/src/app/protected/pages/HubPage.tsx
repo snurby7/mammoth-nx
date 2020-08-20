@@ -8,7 +8,7 @@ import {
   UpcomingExpenseView,
 } from '../views'
 
-const GridLayout = styled.div<{ columns: number; rows: number }>`
+const GridLayout = styled.section<{ columns: number; rows: number }>`
   display: grid;
   grid-template-columns: repeat(${({ columns }) => columns}, 1fr);
   grid-template-rows: repeat(${({ rows }) => rows}, 1fr);

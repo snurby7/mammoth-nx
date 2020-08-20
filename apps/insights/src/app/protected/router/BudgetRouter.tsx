@@ -6,17 +6,15 @@ import { AccountPage, HubPage } from '../pages'
 
 export const BudgetRouter = () => {
   return (
-    <div>
-      <PageLayout
-        budgetListConfig={<BudgetMenuOptions />}
-        accountListConfig={<AccountMenuOptions />}
-        content={
-          <Switch>
-            <Route exact path={RoutePaths.BudgetHub} component={HubPage} />
-            <Route path={RoutePaths.AccountPage} component={AccountPage} />
-          </Switch>
-        }
-      />
-    </div>
+    <PageLayout
+      budgetListConfig={<BudgetMenuOptions />}
+      accountListConfig={<AccountMenuOptions />}
+      content={
+        <Switch>
+          <Route exact path={RoutePaths.BudgetHub} component={HubPage} />
+          <Route path={RoutePaths.AccountPage} component={AccountPage} />
+        </Switch>
+      }
+    />
   )
 }

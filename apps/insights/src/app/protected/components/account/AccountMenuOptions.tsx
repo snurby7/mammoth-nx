@@ -8,9 +8,5 @@ export const AccountMenuOptions = (): JSX.Element => {
     store.loadAccounts()
   }, [store])
   console.log(store.selectedAccount)
-  return (
-    <div>
-      <AccountMenuList accounts={store.accounts} />
-    </div>
-  )
+  return <AccountMenuList accounts={store.accounts} />
 }

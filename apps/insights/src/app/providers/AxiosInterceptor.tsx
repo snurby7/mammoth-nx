@@ -29,5 +29,5 @@ export const AxiosInterceptor: React.FC = ({ children }): JSX.Element => {
       }
     }
   }, [getAccessTokenSilently, isFetchingToken, user])
-  return <div>{!accessToken ? <div>Loading...</div> : children}</div>
+  return <div>{!accessToken ? 'Loading...' : children}</div>
 }
