@@ -19,8 +19,8 @@ export const useRouter = <TState extends any>() => {
       pathname: location.pathname,
       query: {
         ...queryString.parse(location.search), // Convert string to object
-        ...params,
       },
+      params,
       match,
       location,
       history,

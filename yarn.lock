@@ -1987,6 +1987,39 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
+"@devexpress/dx-core@2.7.0":
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/@devexpress/dx-core/-/dx-core-2.7.0.tgz#fe90fb64d174443d0679841559bd8199b1da6e4c"
+  integrity sha512-IeZ55qlUEnQY/tnIaUxnfyeE6xkEnQQw8fqJTPuGKrOaj2BM/X+lebdX9tkF3970tr5BfD22uj0weom8DUbfHw==
+
+"@devexpress/dx-grid-core@2.7.0":
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/@devexpress/dx-grid-core/-/dx-grid-core-2.7.0.tgz#2603882262d4f9802df8d7702990ca145ae74120"
+  integrity sha512-/fZGyA2Kij55ZPEtQVeLZ/cjp9ocE1MHFVnDsB/qx0fKN+RDted/hMW48AS62KgfJFE+5PwOJ8+NPD2Pe8dl1g==
+
+"@devexpress/dx-react-core@^2.7.0":
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/@devexpress/dx-react-core/-/dx-react-core-2.7.0.tgz#9b12f1477c97093f623b5b17d9a3e10c336560ba"
+  integrity sha512-1p+Hf222iolZGKMxmqJgmDxZSAi4UIRLg1qHIzbGyAnrPxkvRL+kVszp6S++m9oDsCPMuwqNaPO63xUc+jlhlQ==
+  dependencies:
+    "@devexpress/dx-core" "2.7.0"
+    prop-types "^15.7.2"
+
+"@devexpress/dx-react-grid-material-ui@^2.7.0":
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/@devexpress/dx-react-grid-material-ui/-/dx-react-grid-material-ui-2.7.0.tgz#12ce0d886659e81559e1fe0643649a5acb781511"
+  integrity sha512-y7yLZwL4IPjmBtDTkg1HU7xw/RKbVM1Xmc91WLyZo+fPQhFm5fpZmlzDlNR0SDizkZjT5ru5//u0vGOp5m2QEw==
+  dependencies:
+    clsx "^1.0.4"
+    prop-types "^15.7.2"
+
+"@devexpress/dx-react-grid@^2.7.0":
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/@devexpress/dx-react-grid/-/dx-react-grid-2.7.0.tgz#53d96ab34985de07e699859b362e441cd55f8173"
+  integrity sha512-woVO2tNn9fKGiwvrISen7a26oF2D7mgFIRLbfSisBkG2vQcZ9LjRCqhfqn48d/TXrm55nXKRbwcMKKoNWfN7MA==
+  dependencies:
+    "@devexpress/dx-grid-core" "2.7.0"
+
 "@dsherret/to-absolute-glob@^2.0.2":
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@dsherret/to-absolute-glob/-/to-absolute-glob-2.0.2.tgz#1f6475dc8bd974cea07a2daf3864b317b1dd332c"
