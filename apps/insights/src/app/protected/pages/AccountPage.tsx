@@ -1,17 +1,31 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useEffect } from 'react'
-import { DataTable } from '../components'
-import { useAccountStore } from '../hooks'
+import { IDataColumn, TransactionDataTable } from '../components'
+import { useAccountStore, useTransactionStore } from '../hooks'
 export const AccountPage = () => {
   const accountStore = useAccountStore()
-  const selectedAccount = accountStore.selectedAccount
-  console.log(`BudgetId => ${selectedAccount.budgetId} - AccountId ${selectedAccount.accountId}`)
+  const transactionStore = useTransactionStore()
+
   useEffect(() => {
-    accountStore.selectedAccount.loadTransactions()
+    if (accountStore.selectedAccount) {
+      // must be defined in order to get this to work and optional chaining makes that slightly less clear
+      accountStore.selectedAccount.loadTransactions()
+    }
   }, [accountStore.selectedAccount])
+
+  const dataColumns: IDataColumn<any>[] = [
+    {
+      name: 'date',
+      title: 'Date',
+    },
+    {
+      name: 'accountName',
+      title: 'Account',
+    },
+  ]
   return (
     <article>
-      <DataTable rows={[]} columns={[{ name: '', title: '' }]} />
+      <TransactionDataTable transactions={transactionStore.transactions} columns={dataColumns} />
     </article>
   )
 }

@@ -13,9 +13,5 @@ export const replaceKeyPlaceholders = (
   Object.keys(keyValuePair).forEach((key) => {
     searchString = searchString.replace(`:${key}`, keyValuePair[key])
   })
-  // eslint-disable-next-line no-self-compare
-  if (searchString === searchString) {
-    console.warn('Nothing was replaced')
-  }
   return searchString
 }

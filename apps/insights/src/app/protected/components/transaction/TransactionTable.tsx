@@ -1,4 +1,4 @@
-import { EditingState } from '@devexpress/dx-react-grid'
+import { Column, EditingState } from '@devexpress/dx-react-grid'
 import {
   Grid,
   Table,
@@ -7,36 +7,33 @@ import {
   TableHeaderRow,
 } from '@devexpress/dx-react-grid-material-ui'
 import Paper from '@material-ui/core/Paper'
-import React, { useState } from 'react'
-import { defaultColumnValues, generateRows } from './temp/generator'
+import { keys } from 'mobx'
+import { observer } from 'mobx-react'
+import { SnapshotIn } from 'mobx-state-tree'
+import React from 'react'
+import { ITransactionInstance, Transaction } from '../../models'
 
-const getRowId = (row) => row.id
+const getRowId = (row) => {
+  console.log(row) // TODO this should be a Transaction Id
+  return row.id
+}
 
-interface IDataColumn<T> {
+export interface IDataColumn<T> {
   name: keyof T
   title: string
+  formatter?: (value: SnapshotIn<typeof Transaction>) => string
 }
 
-interface IDataTable<TData> {
+export interface IDataTable<TData> {
   columns: IDataColumn<TData>[]
-  rows: TData[]
+  transactions: Map<string, ITransactionInstance> // ! This is some special mobx!
 }
 
-export const DataTable = (props: IDataTable<any>) => {
-  // TODO: Going to bust this apart and make it more configurable.
-  const [columns] = useState([
-    { name: 'name', title: 'Name' },
-    { name: 'gender', title: 'Gender' },
-    { name: 'city', title: 'City' },
-    { name: 'car', title: 'Car' },
-  ])
-  const [rows, setRows] = useState<any>(
-    generateRows({
-      columnValues: { ...defaultColumnValues, id: ({ index }: { index: number }) => index },
-      length: 8,
-    })
-  )
-  console.log(rows)
+export const TransactionDataTable = observer(({ transactions, columns }: IDataTable<any>) => {
+  // TODO: Still more to bust to make this more configurable.
+  const rows = keys(transactions).map((key) => {
+    return transactions.get(key as string)?.formattedValue ?? {}
+  })
 
   const commitChanges = ({ added, changed, deleted }) => {
     let changedRows
@@ -57,12 +54,11 @@ export const DataTable = (props: IDataTable<any>) => {
       const deletedSet = new Set(deleted)
       changedRows = rows.filter((row) => !deletedSet.has(row.id))
     }
-    setRows(changedRows)
   }
 
   return (
     <Paper>
-      <Grid rows={rows} columns={columns} getRowId={getRowId}>
+      <Grid rows={rows} columns={columns as Column[]} getRowId={getRowId}>
         <EditingState onCommitChanges={commitChanges} />
         <Table />
         <TableHeaderRow />
@@ -71,4 +67,4 @@ export const DataTable = (props: IDataTable<any>) => {
       </Grid>
     </Paper>
   )
-}
+})

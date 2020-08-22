@@ -6,9 +6,9 @@ import { useRouter } from '../../../hooks'
 import { RoutePaths } from '../../../routes'
 import { replaceKeyPlaceholders } from '../../../utils'
 import { useAccountStore, useBudgetStore } from '../../hooks'
-import { IAccountInstance, IAccountSnap } from '../../models'
+import { IAccountInstance } from '../../models'
 
-export const AccountMenuItem = ({ account }: { account: IAccountSnap }): JSX.Element => {
+export const AccountMenuItem = ({ account }: { account: IAccountInstance }): JSX.Element => {
   const accountStore = useAccountStore()
   const budgetStore = useBudgetStore()
   const router = useRouter()

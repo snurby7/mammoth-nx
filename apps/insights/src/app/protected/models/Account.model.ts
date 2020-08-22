@@ -1,8 +1,8 @@
 import { IAccount, SupportedAccountType } from '@mammoth/api-interfaces'
-import { flow, getParent, Instance, SnapshotIn, types } from 'mobx-state-tree'
+import { flow, getParent, getRoot, Instance, SnapshotIn, types } from 'mobx-state-tree'
 import { accountApi } from '../api/account.api'
 import { transactionApi } from '../api/transaction.api'
-import { RootModel } from '../providers'
+import { RootModel } from './Root.model'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let key: keyof IAccount
 export const Account = types
@@ -21,7 +21,7 @@ export const Account = types
       // setLoading(true)
       try {
         const transactions = yield transactionApi.loadTransactionsByAccount(self.budgetId, self.id)
-        console.log('---->', transactions)
+        getRoot<typeof RootModel>(self).transactionStore.addTransactions(transactions)
       } catch (err) {
         console.error('Failed to load transaction', err)
       }
@@ -43,7 +43,7 @@ export const AccountStore = types
   })
   .actions((self) => {
     const getParentInstance = (): Instance<typeof RootModel> => {
-      return getParent<Instance<typeof RootModel>>(self) as Instance<typeof RootModel>
+      return getParent<Instance<typeof RootModel>>(self)
     }
 
     const setLoading = (loading: boolean): void => {

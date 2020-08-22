@@ -1,6 +1,7 @@
 import { Instance } from 'mobx-state-tree'
 import { useContext } from 'react'
-import { RootModel, RootStoreContext } from '../providers'
+import { RootModel } from '../models'
+import { RootStoreContext } from '../providers'
 
 export const useRootStore = (): Instance<typeof RootModel> => {
   const rootStore = useContext(RootStoreContext)
