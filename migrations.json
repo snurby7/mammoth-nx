@@ -1,32 +1,25 @@
 {
   "migrations": [
     {
-      "version": "9.4.0-beta.1",
-      "description": "Remove config builder option when using eslint to enable automatic detection",
-      "factory": "./src/migrations/update-9-4-0/update-eslint-config",
+      "version": "10.1.0-beta.0",
+      "description": "Migrate .eslintrc files to use tsconfig with a wildcard",
+      "factory": "./src/migrations/update-10-1-0/migrate-eslintrc-tsconfig-wildcard",
       "package": "@nrwl/workspace",
-      "name": "update-eslint-config"
+      "name": "migrate-eslintrc-tsconfig-wildcard"
     },
     {
-      "version": "9.4.0-beta.1",
-      "description": "Fix exclude patterns in tslint and eslint to ensure it does not break linting when a files option is defined",
-      "factory": "./src/migrations/update-9-4-0/update-linters-exclude",
-      "package": "@nrwl/workspace",
-      "name": "update-linters-exclude"
+      "version": "10.1.0-beta.4",
+      "description": "Update jest to v26",
+      "factory": "./src/migrations/update-10-1-0/update-10-1-0",
+      "package": "@nrwl/jest",
+      "name": "update-10.1.0"
     },
     {
-      "version": "9.4.0-beta.1",
-      "description": "Decorate cli to enable computation caching",
-      "factory": "./src/migrations/update-9-4-0/add-decorate-cli",
-      "package": "@nrwl/workspace",
-      "name": "add-decorate-cli"
-    },
-    {
-      "version": "9.4.0-beta.1",
-      "description": "Add Cypress ESLint plugin",
-      "factory": "./src/migrations/update-9-4-0/add-cypress-eslint-plugin-9-4-0",
-      "package": "@nrwl/cypress",
-      "name": "add-cypress-eslint-plugin-9.4.0"
+      "version": "10.1.0-beta.1",
+      "description": "Removes rootDir from node libs' tsconfig",
+      "factory": "./src/migrations/update-10-1-0/remove-root-dir",
+      "package": "@nrwl/node",
+      "name": "remove-root-dir"
     }
   ]
 }
