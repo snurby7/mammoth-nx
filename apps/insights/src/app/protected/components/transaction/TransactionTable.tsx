@@ -32,6 +32,7 @@ export interface IDataTable<TData> {
 export const TransactionDataTable = observer(({ transactions, columns }: IDataTable<any>) => {
   // TODO: Still more to bust to make this more configurable.
   const rows = keys(transactions).map((key) => {
+    // TODO: Need to make this smarter so that when there are many transactions it only shows what's necessary.
     return transactions.get(key as string)?.formattedValue ?? {}
   })
 
