@@ -15,7 +15,7 @@ import {
   ICommonAccountConverter,
 } from '../extensions'
 import { IMammothCoreNode, Neo4jService } from '../neo4j'
-import { CategoryQuery, CreateCategory, UpdateCategory } from './dto'
+import { CreateCategory, UpdateCategory } from './dto'
 
 /**
  * Category service is for handling all things category related.
@@ -50,11 +50,11 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
   /**
    * This goes to Neo4J and matches all the nodes that match the following labels
    *   - Category
-   * @param {CategoryQuery} query
+   * @param {string} BudgetId
    * @returns {Promise<ICategorySearchResponse[]>}
    * @memberof CategoryService
    */
-  public async findCategories(query: CategoryQuery): Promise<ICategorySearchResponse[]> {
+  public async findCategories(budgetId: string): Promise<ICategorySearchResponse[]> {
     const statementResult = await this.neo4jService.executeStatement({
       statement: `
         MATCH (parent:${SupportedLabel.Category} {budgetId: $budgetId})
@@ -63,10 +63,9 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
           parentNode: parent,
           children: {details :collect(child)}
         }
-        ${query.limit && query.limit >= 0 ? `LIMIT ${query.limit}` : ''}
         `,
       props: {
-        budgetId: query.budgetId,
+        budgetId,
       },
     })
     return this.neo4jService

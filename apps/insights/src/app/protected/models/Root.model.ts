@@ -1,12 +1,16 @@
 import { applySnapshot, ModelSnapshotType, onSnapshot, types } from 'mobx-state-tree'
 import { AccountStore } from './Account.model'
 import { BudgetStore } from './Budget.model'
+import { CategoryStore } from './Category.model'
+import { PayeeStore } from './Payee.model'
 import { TransactionStore } from './Transaction.model'
 
 export const RootModel = types.model({
   budgetStore: BudgetStore,
   accountStore: AccountStore,
   transactionStore: TransactionStore,
+  categoryStore: CategoryStore,
+  payeeStore: PayeeStore,
 })
 
 export const rootStore = RootModel.create({
@@ -20,6 +24,14 @@ export const rootStore = RootModel.create({
   },
   transactionStore: {
     transactions: {},
+  },
+  categoryStore: {
+    categories: {},
+    isLoading: false,
+  },
+  payeeStore: {
+    payee: {},
+    isLoading: false,
   },
 })
 

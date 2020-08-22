@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react'
 import { IDataColumn, TransactionDataTable } from '../components'
 import { useAccountStore, useTransactionStore } from '../hooks'
+import { ITransactionDisplayRecord } from '../interface'
 export const AccountPage = () => {
   const accountStore = useAccountStore()
   const transactionStore = useTransactionStore()
@@ -13,15 +14,14 @@ export const AccountPage = () => {
     }
   }, [accountStore.selectedAccount])
 
-  const dataColumns: IDataColumn<any>[] = [
-    {
-      name: 'date',
-      title: 'Date',
-    },
-    {
-      name: 'accountName',
-      title: 'Account',
-    },
+  const dataColumns: IDataColumn<ITransactionDisplayRecord>[] = [
+    { name: 'date', title: 'Date' },
+    { name: 'accountName', title: 'Account' },
+    { name: 'payeeName', title: 'Payee' },
+    { name: 'categoryName', title: 'Category' },
+    { name: 'memo', title: 'Memo' },
+    { name: 'inflow', title: 'Inflow' },
+    { name: 'outflow', title: 'Outflow' },
   ]
   return (
     <article>

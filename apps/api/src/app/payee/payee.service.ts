@@ -1,24 +1,23 @@
-import { IPayee, ITransaction } from '@mammoth/api-interfaces';
-import { Injectable, Logger } from '@nestjs/common';
-import * as uuid from 'uuid/v4';
-import { NodeRelationship, SupportedLabel } from '../constants';
+import { IPayee, ITransaction } from '@mammoth/api-interfaces'
+import { Injectable, Logger } from '@nestjs/common'
+import * as uuid from 'uuid/v4'
+import { NodeRelationship, SupportedLabel } from '../constants'
 import {
   CommonAccountService,
   IAccountBalanceRequest,
   IAccountLinkedNodeMeta,
   IAccountLinkRequest,
   ICommonAccountConverter,
-} from '../extensions';
-import { Neo4jService } from '../neo4j';
-import { CreatePayee, PayeeQuery } from './dto';
+} from '../extensions'
+import { Neo4jService } from '../neo4j'
+import { CreatePayee } from './dto'
 
 @Injectable()
-export class PayeeService extends CommonAccountService
-  implements ICommonAccountConverter {
-  protected readonly logger = new Logger(PayeeService.name);
+export class PayeeService extends CommonAccountService implements ICommonAccountConverter {
+  protected readonly logger = new Logger(PayeeService.name)
 
   constructor(protected neo4jService: Neo4jService) {
-    super(neo4jService);
+    super(neo4jService)
   }
 
   /**
@@ -29,8 +28,8 @@ export class PayeeService extends CommonAccountService
    * @memberof PayeeService
    */
   public async createPayee(createRequest: CreatePayee): Promise<IPayee> {
-    this.logger.log(`Creating a payee with name ${createRequest.name}`);
-    const payee = 'node';
+    this.logger.log(`Creating a payee with name ${createRequest.name}`)
+    const payee = 'node'
     const statementResult = await this.neo4jService.executeStatement({
       statement: `
         MATCH (budget:Budget {id: $budgetId})
@@ -46,39 +45,30 @@ export class PayeeService extends CommonAccountService
           id: uuid(),
         },
       },
-    });
-    return this.neo4jService.flattenStatementResult<IPayee>(
-      statementResult,
-      payee
-    )[0];
+    })
+    return this.neo4jService.flattenStatementResult<IPayee>(statementResult, payee)[0]
   }
 
   /**
-   * Get all the payees that match the query
+   * Get all the payees for a given budget
    *
-   * @param {PayeeQuery} query
+   * @param {string} budgetId
    * @returns {Promise<IPayee[]>}
    * @memberof PayeeService
    */
-  public async getAllPayees(query: PayeeQuery): Promise<IPayee[]> {
-    this.logger.log(
-      `Getting all the payees that match budgetId - ${query.budgetId}`
-    );
-    const nodes = 'payees';
+  public async getAllPayees(budgetId: string): Promise<IPayee[]> {
+    this.logger.log(`Getting all the payees that match budgetId - ${budgetId}`)
+    const nodes = 'payees'
     const statementResult = await this.neo4jService.executeStatement({
       statement: `
         MATCH (${nodes}:${SupportedLabel.Payee} { budgetId: $budgetId })
         RETURN ${nodes}
-        ${query.limit ? `LIMIT ${query.limit}` : ''}
       `,
       props: {
-        budgetId: query.budgetId,
+        budgetId,
       },
-    });
-    return this.neo4jService.flattenStatementResult<IPayee>(
-      statementResult,
-      nodes
-    );
+    })
+    return this.neo4jService.flattenStatementResult<IPayee>(statementResult, nodes)
   }
 
   /**
@@ -98,7 +88,7 @@ export class PayeeService extends CommonAccountService
       label: SupportedLabel.Payee,
       budgetId: transaction.budgetId,
       amount: transactionAmount,
-    };
+    }
   }
 
   /**
@@ -126,7 +116,7 @@ export class PayeeService extends CommonAccountService
       chargeAmount: updatedTransactionRequestAmount,
       refundAmount: -currentTransactionAmount,
       budgetId: currentTransaction.budgetId,
-    };
+    }
 
     return {
       storedTransactionDetails: {
@@ -148,6 +138,6 @@ export class PayeeService extends CommonAccountService
         label: SupportedLabel.Payee,
         budgetId: transactionUpdateRequest.budgetId,
       },
-    };
+    }
   }
 }
