@@ -31,9 +31,9 @@ export const Account = types
     }
   })
 
-type AccountType = typeof Account
+export type AccountType = typeof Account
+export interface IAccountInstance extends Instance<AccountType> {}
 export interface IAccountSnap extends SnapshotIn<AccountType> {}
-export interface IAccountReference {}
 
 export const AccountStore = types
   .model({

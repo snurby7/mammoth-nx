@@ -19,9 +19,11 @@
             "libs/components": true,
         },
         "cSpell.words": [
+            "Devtools",
             "antd",
             "devexpress",
             "localstorage",
+            "middlewares",
             "theming"
         ]
     },

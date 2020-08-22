@@ -4,7 +4,6 @@ import { useHistory, useLocation, useParams, useRouteMatch } from 'react-router-
 
 /**
  * useRouter is a wrapper around methods that are exposed by `react-router-dom` to allow for a one stop shop of data grabbing
- * - `push` is a custom method you can use to handle routing.
  */
 export const useRouter = <TState extends any>() => {
   const params = useParams()

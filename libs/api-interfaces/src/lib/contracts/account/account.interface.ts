@@ -1,4 +1,4 @@
-import { ICoreNode } from '@mammoth/api-core';
+import { ICoreNode } from '@mammoth/api-core'
 
 /**
  * A base account with a running balance
@@ -10,10 +10,10 @@ export interface IAccount extends ICoreNode {
   /**
    * The type of the given account
    *
-   * @type {number}
+   * @type {string}
    * @memberof IAccount
    */
-  type: number;
+  type: string
 
   /**
    * Friendly name for the account
@@ -23,7 +23,7 @@ export interface IAccount extends ICoreNode {
    * @type {string}
    * @memberof IAccount
    */
-  name: string;
+  name: string
 
   /**
    * The running balance of the account, this is really a collection of the transactions linked to it.
@@ -31,5 +31,5 @@ export interface IAccount extends ICoreNode {
    * @type {number}
    * @memberof IAccount
    */
-  balance: number;
+  balance: number
 }

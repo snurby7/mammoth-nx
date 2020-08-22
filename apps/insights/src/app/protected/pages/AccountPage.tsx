@@ -4,8 +4,8 @@ import { DataTable } from '../components'
 import { useAccountStore } from '../hooks'
 export const AccountPage = () => {
   const accountStore = useAccountStore()
-  const seletedAccount = accountStore.selectedAccount
-  console.log(`BudgetId => ${seletedAccount.budgetId} - AccountId ${seletedAccount.accountId}`)
+  const selectedAccount = accountStore.selectedAccount
+  console.log(`BudgetId => ${selectedAccount.budgetId} - AccountId ${selectedAccount.accountId}`)
   useEffect(() => {
     accountStore.selectedAccount.loadTransactions()
   }, [accountStore.selectedAccount])

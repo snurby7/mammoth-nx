@@ -6,7 +6,7 @@ import { useRouter } from '../../../hooks'
 import { RoutePaths } from '../../../routes'
 import { replaceKeyPlaceholders } from '../../../utils'
 import { useAccountStore, useBudgetStore } from '../../hooks'
-import { IAccountSnap } from '../../models'
+import { IAccountInstance, IAccountSnap } from '../../models'
 
 export const AccountMenuItem = ({ account }: { account: IAccountSnap }): JSX.Element => {
   const accountStore = useAccountStore()
@@ -32,7 +32,7 @@ export const AccountMenuItem = ({ account }: { account: IAccountSnap }): JSX.Ele
 }
 
 export const AccountMenuList = observer(
-  ({ accounts }: { accounts: IAccountSnap[] }): JSX.Element => {
+  ({ accounts }: { accounts: IAccountInstance[] }): JSX.Element => {
     return (
       <List>
         {accounts.map((account) => (
