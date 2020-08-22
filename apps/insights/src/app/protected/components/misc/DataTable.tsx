@@ -12,7 +12,17 @@ import { defaultColumnValues, generateRows } from './temp/generator'
 
 const getRowId = (row) => row.id
 
-export const DataTable = () => {
+interface IDataColumn<T> {
+  name: keyof T
+  title: string
+}
+
+interface IDataTable<TData> {
+  columns: IDataColumn<TData>[]
+  rows: TData[]
+}
+
+export const DataTable = (props: IDataTable<any>) => {
   // TODO: Going to bust this apart and make it more configurable.
   const [columns] = useState([
     { name: 'name', title: 'Name' },
@@ -26,6 +36,7 @@ export const DataTable = () => {
       length: 8,
     })
   )
+  console.log(rows)
 
   const commitChanges = ({ added, changed, deleted }) => {
     let changedRows

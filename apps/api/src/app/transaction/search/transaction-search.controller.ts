@@ -1,9 +1,9 @@
-import { ITransactionDetail } from '@mammoth/api-interfaces';
-import { Controller, Param, Post, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Observable } from 'rxjs';
-import { TransactionSearchService } from './transaction-search.service';
+import { ITransactionDetail } from '@mammoth/api-interfaces'
+import { Controller, Get, Param, UseGuards } from '@nestjs/common'
+import { AuthGuard } from '@nestjs/passport'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Observable } from 'rxjs'
+import { TransactionSearchService } from './transaction-search.service'
 
 @Controller('transaction')
 @ApiTags('transaction-search')
@@ -18,16 +18,13 @@ export class TransactionSearchController {
     status: 201,
     description: 'Transactions that are linked to the accountId',
   })
-  @Post(':budgetId/account/:accountId')
+  @Get(':budgetId/account/:accountId')
   @UseGuards(AuthGuard('jwt'))
   public getTransactionsForAccount(
     @Param('budgetId') budgetId: string,
     @Param('accountId') accountId: string
   ): Observable<ITransactionDetail[]> {
-    return this.transactionSearchService.getTransactionsByAccount(
-      budgetId,
-      accountId
-    );
+    return this.transactionSearchService.getTransactionsByAccount(budgetId, accountId)
   }
 
   @ApiOperation({
@@ -38,16 +35,13 @@ export class TransactionSearchController {
     status: 201,
     description: 'Transactions that are linked to the payeeId',
   })
-  @Post(':budgetId/payee/:payeeId')
+  @Get(':budgetId/payee/:payeeId')
   @UseGuards(AuthGuard('jwt'))
   public getTransactionsForPayee(
     @Param('budgetId') budgetId: string,
     @Param('payeeId') payeeId: string
   ): Observable<ITransactionDetail[]> {
-    return this.transactionSearchService.getTransactionsByPayee(
-      budgetId,
-      payeeId
-    );
+    return this.transactionSearchService.getTransactionsByPayee(budgetId, payeeId)
   }
 
   @ApiOperation({
@@ -58,15 +52,12 @@ export class TransactionSearchController {
     status: 201,
     description: 'Transactions that are linked to the categoryId',
   })
-  @Post(':budgetId/category/:categoryId')
+  @Get(':budgetId/category/:categoryId')
   @UseGuards(AuthGuard('jwt'))
   public getTransactionsForCategory(
     @Param('budgetId') budgetId: string,
     @Param('categoryId') categoryId: string
   ): Observable<ITransactionDetail[]> {
-    return this.transactionSearchService.getTransactionByCategory(
-      budgetId,
-      categoryId
-    );
+    return this.transactionSearchService.getTransactionByCategory(budgetId, categoryId)
   }
 }

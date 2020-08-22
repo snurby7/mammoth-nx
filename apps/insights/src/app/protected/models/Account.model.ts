@@ -1,6 +1,7 @@
-import { IAccount } from '@mammoth/api-interfaces'
+import { IAccount, SupportedAccountType } from '@mammoth/api-interfaces'
 import { flow, getParent, Instance, SnapshotIn, types } from 'mobx-state-tree'
 import { accountApi } from '../api/account.api'
+import { transactionApi } from '../api/transaction.api'
 import { RootModel } from '../providers'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let key: keyof IAccount
@@ -8,8 +9,27 @@ export const Account = types
   .model({
     [(key = 'id')]: types.identifier,
     [(key = 'name')]: types.string,
+    [(key = 'budgetId')]: types.string,
+    [(key = 'balance')]: types.number,
+    [(key = 'type')]: types.enumeration<SupportedAccountType>(
+      'SupportedAccountType',
+      Object.values(SupportedAccountType)
+    ),
   })
-  .actions((self) => ({}))
+  .actions((self) => {
+    const loadTransactions = flow(function* loadTransactions() {
+      // setLoading(true)
+      try {
+        const transactions = yield transactionApi.loadTransactionsByAccount(self.budgetId, self.id)
+        console.log('---->', transactions)
+      } catch (err) {
+        console.error('Failed to load transaction', err)
+      }
+    })
+    return {
+      loadTransactions,
+    }
+  })
 
 type AccountType = typeof Account
 export interface IAccountSnap extends SnapshotIn<AccountType> {}

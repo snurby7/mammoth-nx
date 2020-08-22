@@ -2,11 +2,11 @@
 // ! from that package to this package that caused it to not allow me import it here, but in hindsight it would make sense for this package
 // ! to export out it's types that it supports.
 export enum SupportedAccountType {
-  Checking,
-  Savings,
-  Cash,
-  CreditCard,
-  LineOfCredit,
-  Asset, // Investments, etc.
-  Liability, // Mortgage, etc.
+  Checking = 'Checking',
+  Savings = 'Savings',
+  Cash = 'Cash',
+  CreditCard = 'Credit Card',
+  LineOfCredit = 'Line of Credit',
+  Asset = 'Asset', // Investments, etc.
+  Liability = 'Liability', // Mortgage, etc.
 }

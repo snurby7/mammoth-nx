@@ -1,23 +1,17 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React from 'react'
-import { useRouter } from '../../hooks'
+import React, { useEffect } from 'react'
 import { DataTable } from '../components'
-import { useAccountStore, useBudgetStore } from '../hooks'
+import { useAccountStore } from '../hooks'
 export const AccountPage = () => {
-  const { params } = useRouter()
-  console.log('------> ', params)
   const accountStore = useAccountStore()
-  const budgetStore = useBudgetStore()
-  if (!accountStore.selectedAccount || !budgetStore.selectedBudget) {
-    console.log('no budget selected or no account selected')
-    return null
-  }
-  const { id: budgetId } = budgetStore.selectedBudget
-  const { id: accountId } = accountStore.selectedAccount
-  console.log(`BudgetId => ${budgetId} - AccountId ${accountId}`)
+  const seletedAccount = accountStore.selectedAccount
+  console.log(`BudgetId => ${seletedAccount.budgetId} - AccountId ${seletedAccount.accountId}`)
+  useEffect(() => {
+    accountStore.selectedAccount.loadTransactions()
+  }, [accountStore.selectedAccount])
   return (
     <article>
-      <DataTable />
+      <DataTable rows={[]} columns={[{ name: '', title: '' }]} />
     </article>
   )
 }
