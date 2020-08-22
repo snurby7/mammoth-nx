@@ -26,7 +26,7 @@ export interface IDataColumn<T> {
 
 export interface IDataTable<TData> {
   columns: IDataColumn<TData>[]
-  transactions: Map<string, ITransactionInstance> // ! This is some special mobx!
+  transactions: Map<string, ITransactionInstance>
 }
 
 export const TransactionDataTable = observer(({ transactions, columns }: IDataTable<any>) => {
