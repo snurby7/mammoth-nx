@@ -62,7 +62,7 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
       }
     }
 
-    // TODO: still need a data field provider.
+    // TODO: still need a date field provider.
     return (
       <Paper>
         <Grid rows={rows} columns={columns as Column[]} getRowId={getRowId}>
