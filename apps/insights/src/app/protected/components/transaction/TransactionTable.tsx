@@ -62,10 +62,10 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
       }
     }
 
+    // TODO: still need a data field provider.
     return (
       <Paper>
         <Grid rows={rows} columns={columns as Column[]} getRowId={getRowId}>
-          // TODO: still need a data field provider.
           <AccountCellTypeProvider />
           <PayeeCellTypeProvider />
           <CategoryCellTypeProvider />
