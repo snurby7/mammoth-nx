@@ -9,7 +9,7 @@ const CategoryCellFormatter = ({ value: node }: { value: IFormattedNode }) => {
   return <span>{node.value}</span>
 }
 const CategoryCellEditor = ({ value, onValueChange }) => {
-  const node: IFormattedNode = value
+  const node: IFormattedNode = value ?? { id: '', value: '' } // when it's add mode this is undefined
   const { categories } = useCategoryStore()
   return (
     <Select

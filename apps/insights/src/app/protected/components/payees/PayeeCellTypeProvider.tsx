@@ -8,7 +8,7 @@ const PayeeCellFormatter = ({ value: node }: { value: IFormattedNode }) => {
   return <span>{node.value}</span>
 }
 const PayeeCellEditor = ({ value, onValueChange }) => {
-  const node: IFormattedNode = value
+  const node: IFormattedNode = value ?? { id: '', value: '' } // when it's add mode this is undefined
   const { payees } = usePayeeStore()
   return (
     <Select
