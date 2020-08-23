@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useEffect } from 'react'
+import { ITransactionDetail } from '@mammoth/api-interfaces'
+import React, { useCallback, useEffect } from 'react'
 import { IDataColumn, TransactionDataTable } from '../components'
 import { useAccountStore, useTransactionStore } from '../hooks'
-import { ITransactionDisplayRecord } from '../interface'
+import { ITransactionInstance } from '../models'
 export const AccountPage = () => {
   const accountStore = useAccountStore()
   const transactionStore = useTransactionStore()
@@ -14,18 +15,29 @@ export const AccountPage = () => {
     }
   }, [accountStore.selectedAccount])
 
-  const dataColumns: IDataColumn<ITransactionDisplayRecord>[] = [
+  const dataColumns: IDataColumn<ITransactionDetail>[] = [
     { name: 'date', title: 'Date' },
-    { name: 'accountName', title: 'Account' },
-    { name: 'payeeName', title: 'Payee' },
-    { name: 'categoryName', title: 'Category' },
+    { name: 'account', title: 'Account' },
+    { name: 'payee', title: 'Payee' },
+    { name: 'category', title: 'Category' },
     { name: 'memo', title: 'Memo' },
     { name: 'inflow', title: 'Inflow' },
     { name: 'outflow', title: 'Outflow' },
   ]
+
+  const dataFilter = useCallback(
+    (record: ITransactionInstance) => {
+      return record.accountId.id === accountStore.selectedAccount.id
+    },
+    [accountStore.selectedAccount]
+  )
   return (
     <article>
-      <TransactionDataTable transactions={transactionStore.transactions} columns={dataColumns} />
+      <TransactionDataTable
+        transactions={transactionStore.transactions}
+        columns={dataColumns}
+        filter={dataFilter}
+      />
     </article>
   )
 }

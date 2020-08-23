@@ -1,4 +1,4 @@
-import { IPayee } from '@mammoth/api-interfaces'
+import { IFormattedNode, IPayee } from '@mammoth/api-interfaces'
 import { flow, getParent, Instance, SnapshotIn, types } from 'mobx-state-tree'
 import { payeeApi } from '../api'
 import { RootModel } from './Root.model'
@@ -11,6 +11,14 @@ export const Payee = types
     [(key = 'budgetId')]: types.string,
   })
   .actions((self) => ({}))
+  .views((self) => ({
+    get formattedNode(): IFormattedNode {
+      return {
+        id: self.id,
+        value: self.name,
+      }
+    },
+  }))
 
 export type PayeeType = typeof Payee
 export interface IPayeeInstance extends Instance<PayeeType> {}

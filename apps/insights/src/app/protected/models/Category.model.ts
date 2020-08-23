@@ -1,4 +1,4 @@
-import { ICategory } from '@mammoth/api-interfaces'
+import { ICategory, IFormattedNode } from '@mammoth/api-interfaces'
 import { flow, getParent, Instance, SnapshotIn, types } from 'mobx-state-tree'
 import { RootModel } from '.'
 import { categoryApi } from '../api'
@@ -13,7 +13,14 @@ export const Category = types
     [(key = 'parentId')]: types.maybe(types.reference(types.late(() => Category))),
   })
   .actions((self) => ({}))
-  .views((self) => ({}))
+  .views((self) => ({
+    get formattedNode(): IFormattedNode {
+      return {
+        id: self.id,
+        value: self.name,
+      }
+    },
+  }))
 
 export type CategoryType = typeof Category
 export interface ICategoryInstance extends Instance<CategoryType> {}

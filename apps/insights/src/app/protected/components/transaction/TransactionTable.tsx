@@ -6,19 +6,18 @@ import {
   TableEditRow,
   TableHeaderRow,
 } from '@devexpress/dx-react-grid-material-ui'
+import { ITransactionDetail } from '@mammoth/api-interfaces'
 import Paper from '@material-ui/core/Paper'
 import { keys } from 'mobx'
 import { observer } from 'mobx-react'
 import { SnapshotIn } from 'mobx-state-tree'
 import React from 'react'
-import { ITransactionDisplayRecord } from '../../interface'
 import { ITransactionInstance, Transaction } from '../../models'
+import { AccountCellTypeProvider } from '../account'
+import { CategoryCellTypeProvider } from '../category'
+import { PayeeCellTypeProvider } from '../payees'
 
-const getRowId = (row: ITransactionDisplayRecord) => {
-  return row.id
-}
-
-export interface ITransactionTableRecord {}
+const getRowId = (row: ITransactionDetail): string => row.id
 
 export interface IDataColumn<T> {
   name: keyof T
@@ -32,9 +31,9 @@ export interface IDataTable<TData> {
   filter?: (item: ITransactionInstance) => boolean
 }
 
-export const TransactionDataTable = observer(
-  ({ transactions, columns, filter }: IDataTable<any>) => {
-    const rows: ITransactionDisplayRecord[] = []
+export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
+  ({ transactions, columns, filter, children }) => {
+    const rows: ITransactionDetail[] = []
     keys(transactions).forEach((key) => {
       const transaction = transactions.get(key as string)
       if (transaction && (filter?.(transaction) ?? true)) {
@@ -66,6 +65,9 @@ export const TransactionDataTable = observer(
     return (
       <Paper>
         <Grid rows={rows} columns={columns as Column[]} getRowId={getRowId}>
+          <AccountCellTypeProvider />
+          <PayeeCellTypeProvider />
+          <CategoryCellTypeProvider />
           <EditingState onCommitChanges={commitChanges} />
           <Table />
           <TableHeaderRow />

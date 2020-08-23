@@ -1,6 +1,5 @@
-import { ITransaction } from '@mammoth/api-interfaces'
+import { ITransaction, ITransactionDetail } from '@mammoth/api-interfaces'
 import { Instance, types } from 'mobx-state-tree'
-import { ITransactionDisplayRecord } from '../interface'
 import { Account } from './Account.model'
 import { Category } from './Category.model'
 import { Payee } from './Payee.model'
@@ -20,14 +19,17 @@ export const Transaction = types
   })
   .actions((self) => ({}))
   .views((self) => ({
-    get formattedValue(): ITransactionDisplayRecord {
+    get formattedValue(): ITransactionDetail {
       return {
         id: self.id,
         date: self.date,
-        accountName: self.accountId.name,
+        accountId: self.accountId.id,
+        account: self.accountId.formattedNode,
+        category: self.categoryId.formattedNode,
+        categoryId: self.categoryId.id,
+        payee: self.payeeId.formattedNode,
+        payeeId: self.payeeId.id,
         budgetId: self.budgetId,
-        payeeName: self.payeeId.name,
-        categoryName: self.categoryId.name,
         inflow: self.inflow,
         outflow: self.outflow,
         memo: self.memo,

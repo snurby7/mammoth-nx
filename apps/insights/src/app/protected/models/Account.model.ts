@@ -1,4 +1,4 @@
-import { IAccount, SupportedAccountType } from '@mammoth/api-interfaces'
+import { IAccount, IFormattedNode, SupportedAccountType } from '@mammoth/api-interfaces'
 import { flow, getParent, getRoot, Instance, SnapshotIn, types } from 'mobx-state-tree'
 import { accountApi } from '../api/account.api'
 import { transactionApi } from '../api/transaction.api'
@@ -30,6 +30,14 @@ export const Account = types
       loadTransactions,
     }
   })
+  .views((self) => ({
+    get formattedNode(): IFormattedNode {
+      return {
+        id: self.id,
+        value: self.name,
+      }
+    },
+  }))
 
 export type AccountType = typeof Account
 export interface IAccountInstance extends Instance<AccountType> {}
