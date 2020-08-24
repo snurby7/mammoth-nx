@@ -1,25 +1,32 @@
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import { ITransactionDetail } from '@mammoth/api-interfaces'
 import { TextField } from '@material-ui/core'
-import { DatePicker, LocalizationProvider } from '@material-ui/pickers'
+import { LocalizationProvider, MobileDatePicker } from '@material-ui/pickers'
 import MomentAdapter from '@material-ui/pickers/adapter/moment'
 import moment from 'moment'
-import React from 'react'
-import { formatter } from '../../../utils'
+import React, { useState } from 'react'
+import { formatter, parser } from '../../../utils'
 
 const DateCellFormatter = ({ value }) => {
   return <span>{formatter.date(value)}</span>
 }
 const DateCellEditor = ({ value: cellValue, onValueChange }) => {
-  // const [date, setDate] = useState(new Date(value ?? ''))
-  const [value, setValue] = React.useState<Date | null>(new Date(cellValue ?? ''))
+  const [value, setValue] = useState<Date | null>(parser.date(cellValue))
+
+  const onChange = (newValue: Date | null) => {
+    if (!newValue) {
+      setValue(null)
+      return
+    }
+    onValueChange(formatter.utcFormat(newValue))
+    setValue(newValue)
+  }
 
   return (
     <LocalizationProvider dateLibInstance={moment} dateAdapter={MomentAdapter} locale={'us'}>
-      <DatePicker
-        label="Basic example"
+      <MobileDatePicker
         value={value}
-        onChange={(newValue) => setValue(newValue)}
+        onChange={onChange}
         renderInput={(props) => <TextField {...props} />}
       />
     </LocalizationProvider>
