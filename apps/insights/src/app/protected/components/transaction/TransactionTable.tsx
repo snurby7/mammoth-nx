@@ -15,6 +15,7 @@ import React from 'react'
 import { ITransactionInstance, Transaction } from '../../models'
 import { AccountCellTypeProvider } from '../account'
 import { CategoryCellTypeProvider } from '../category'
+import { DateCellTypeProvider } from '../misc'
 import { PayeeCellTypeProvider } from '../payees'
 
 const getRowId = (row: ITransactionDetail): string => row.id
@@ -69,6 +70,7 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
           <AccountCellTypeProvider />
           <PayeeCellTypeProvider />
           <CategoryCellTypeProvider />
+          <DateCellTypeProvider />
           <EditingState onCommitChanges={commitChanges} />
           <Table />
           <TableHeaderRow />
