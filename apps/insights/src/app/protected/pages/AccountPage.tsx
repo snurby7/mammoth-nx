@@ -17,8 +17,8 @@ export const AccountPage = () => {
 
   const dataColumns: IDataColumn<ITransactionDetail>[] = [
     { name: 'date', title: 'Date' },
-    { name: 'account', title: 'Account' },
     { name: 'payee', title: 'Payee' },
+    { name: 'account', title: 'Account' },
     { name: 'category', title: 'Category' },
     { name: 'memo', title: 'Memo' },
     { name: 'inflow', title: 'Inflow' },

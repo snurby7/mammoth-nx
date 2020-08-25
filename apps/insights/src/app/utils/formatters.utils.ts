@@ -9,4 +9,7 @@ export const formatter = {
   utcFormat(date: Date = new Date()): string {
     return moment.parseZone(date.toString()).utc().format()
   },
+  currency(value: number): string {
+    return `$${value.toFixed(2)}`
+  },
 }

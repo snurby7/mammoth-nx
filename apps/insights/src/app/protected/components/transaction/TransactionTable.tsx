@@ -15,7 +15,7 @@ import React from 'react'
 import { ITransactionInstance, Transaction } from '../../models'
 import { AccountCellTypeProvider } from '../account'
 import { CategoryCellTypeProvider } from '../category'
-import { DateCellTypeProvider } from '../misc'
+import { CurrencyCellTypeProvider, DateCellTypeProvider } from '../misc'
 import { PayeeCellTypeProvider } from '../payees'
 
 const getRowId = (row: ITransactionDetail): string => row.id
@@ -63,14 +63,16 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
       }
     }
 
-    // TODO: still need a date field provider.
     return (
       <Paper>
         <Grid rows={rows} columns={columns as Column[]} getRowId={getRowId}>
+          {/* Custom Cells */}
           <AccountCellTypeProvider />
           <PayeeCellTypeProvider />
           <CategoryCellTypeProvider />
           <DateCellTypeProvider />
+          <CurrencyCellTypeProvider />
+          {/* End custom cells */}
           <EditingState onCommitChanges={commitChanges} />
           <Table />
           <TableHeaderRow />
