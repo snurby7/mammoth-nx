@@ -33,7 +33,7 @@ export interface IDataTable<TData> {
 }
 
 export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
-  ({ transactions, columns, filter, children }) => {
+  ({ transactions, columns, filter }) => {
     const rows: ITransactionDetail[] = []
     keys(transactions).forEach((key) => {
       const transaction = transactions.get(key as string)
@@ -66,7 +66,7 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
     return (
       <Paper>
         <Grid rows={rows} columns={columns as Column[]} getRowId={getRowId}>
-          {/* Custom Cells */}
+          {/* Custom Cells these could probably be abstracted to {children} later */}
           <AccountCellTypeProvider />
           <PayeeCellTypeProvider />
           <CategoryCellTypeProvider />
