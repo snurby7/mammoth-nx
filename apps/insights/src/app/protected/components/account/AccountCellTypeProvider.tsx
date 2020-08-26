@@ -1,7 +1,7 @@
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import { IFormattedNode, ITransactionDetail } from '@mammoth/api-interfaces'
 import { Input, MenuItem, Select } from '@material-ui/core'
-import React from 'react'
+import React, { useState } from 'react'
 import { useAccountStore } from '../../hooks'
 
 const AccountCellFormatter = ({ value: node }: { value: IFormattedNode }) => {
@@ -9,12 +9,24 @@ const AccountCellFormatter = ({ value: node }: { value: IFormattedNode }) => {
 }
 const AccountCellEditor = ({ value, onValueChange }) => {
   const node: IFormattedNode = value ?? { id: '', value: '' } // when it's add mode this is undefined
+  const [selectedAccountId, setSelectedAccountId] = useState(node.id)
   const { accounts } = useAccountStore()
+  const onChange = (
+    event: React.ChangeEvent<{
+      name?: string | undefined
+      value: unknown
+    }>
+  ) => {
+    const value = event.target.value as string
+    setSelectedAccountId(value)
+    onValueChange(value)
+  }
+
   return (
     <Select
       input={<Input />}
-      value={node.id}
-      onChange={(event) => onValueChange(event.target.value)}
+      value={selectedAccountId}
+      onChange={onChange}
       style={{ width: '100%' }}
     >
       {accounts.map((account) => (

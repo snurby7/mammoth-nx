@@ -1,7 +1,6 @@
 import { IAccount, IFormattedNode, SupportedAccountType } from '@mammoth/api-interfaces'
 import { flow, getParent, getRoot, Instance, SnapshotIn, types } from 'mobx-state-tree'
-import { accountApi } from '../api/account.api'
-import { transactionApi } from '../api/transaction.api'
+import { accountApi, transactionApi } from '../api'
 import { RootModel } from './Root.model'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let key: keyof IAccount

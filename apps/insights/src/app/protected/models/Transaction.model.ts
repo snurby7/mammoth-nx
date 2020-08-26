@@ -49,4 +49,13 @@ export const TransactionStore = types
         self.transactions.put(transaction)
       })
     },
+    createTransactions(transactionDetails: ITransactionDetail[]): void {
+      // use the create method on the TransactionApi
+    },
+    deleteTransactions(transactionIdentifiers: string[]): void {
+      // use the delete method on the TransactionApi
+    },
+    updateTransactions(transactionDetails: ITransactionDetail[]): void {
+      // use the update method on the TransactionApi
+    },
   }))

@@ -1,7 +1,7 @@
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import { IFormattedNode, ITransactionDetail } from '@mammoth/api-interfaces'
 import { Input, MenuItem, Select } from '@material-ui/core'
-import React from 'react'
+import React, { useState } from 'react'
 import { useCategoryStore } from '../../hooks'
 import { ICategoryInstance } from '../../models'
 
@@ -11,11 +11,22 @@ const CategoryCellFormatter = ({ value: node }: { value: IFormattedNode }) => {
 const CategoryCellEditor = ({ value, onValueChange }) => {
   const node: IFormattedNode = value ?? { id: '', value: '' } // when it's add mode this is undefined
   const { categories } = useCategoryStore()
+  const [selectedCategoryId, setSelectedCategoryId] = useState(node.id)
+  const onChange = (
+    event: React.ChangeEvent<{
+      name?: string | undefined
+      value: unknown
+    }>
+  ) => {
+    const value = event.target.value as string
+    setSelectedCategoryId(value)
+    onValueChange(value)
+  }
   return (
     <Select
       input={<Input />}
-      value={node.id}
-      onChange={(event) => onValueChange(event.target.value)}
+      value={selectedCategoryId}
+      onChange={onChange}
       style={{ width: '100%' }}
     >
       {Array.from(categories.values()).map((category: ICategoryInstance) => (

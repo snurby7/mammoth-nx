@@ -1,4 +1,4 @@
-import { Column, EditingState } from '@devexpress/dx-react-grid'
+import { ChangeSet, Column, EditingState } from '@devexpress/dx-react-grid'
 import {
   Grid,
   Table,
@@ -8,10 +8,10 @@ import {
 } from '@devexpress/dx-react-grid-material-ui'
 import { ITransactionDetail } from '@mammoth/api-interfaces'
 import Paper from '@material-ui/core/Paper'
-import { keys } from 'mobx'
 import { observer } from 'mobx-react'
 import { SnapshotIn } from 'mobx-state-tree'
 import React from 'react'
+import { useTransactionStore } from '../../hooks'
 import { ITransactionInstance, Transaction } from '../../models'
 import { AccountCellTypeProvider } from '../account'
 import { CategoryCellTypeProvider } from '../category'
@@ -34,32 +34,27 @@ export interface IDataTable<TData> {
 
 export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
   ({ transactions, columns, filter }) => {
+    const transactionStore = useTransactionStore()
     const rows: ITransactionDetail[] = []
-    keys(transactions).forEach((key) => {
-      const transaction = transactions.get(key as string)
-      if (transaction && (filter?.(transaction) ?? true)) {
-        rows.push(transaction.formattedValue)
+    Array.from(transactions.values()).forEach((transaction) => {
+      const formattedValue = transaction.formattedValue
+      // TODO: Give this a good hard stare, this seems like it could be easier
+      if (!filter) {
+        rows.push(formattedValue)
+      } else if (filter(transaction)) {
+        rows.push(formattedValue)
       }
     })
 
-    const commitChanges = ({ added, changed, deleted }) => {
-      let changedRows
+    const commitChanges = ({ added, changed, deleted }: ChangeSet) => {
       if (added) {
-        const startingAddedId = rows.length > 0 ? rows[rows.length - 1].id + 1 : 0
-        changedRows = [
-          ...rows,
-          ...added.map((row, index) => ({
-            id: startingAddedId + index,
-            ...row,
-          })),
-        ]
+        transactionStore.createTransactions(added as ITransactionDetail[])
       }
       if (changed) {
-        changedRows = rows.map((row) => (changed[row.id] ? { ...row, ...changed[row.id] } : row))
+        transactionStore.updateTransactions(changed as ITransactionDetail[])
       }
       if (deleted) {
-        const deletedSet = new Set(deleted)
-        changedRows = rows.filter((row) => !deletedSet.has(row.id))
+        transactionStore.deleteTransactions(deleted as string[])
       }
     }
 
