@@ -51,7 +51,7 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
         transactionStore.createTransactions(added as ITransactionDetail[])
       }
       if (changed) {
-        transactionStore.updateTransactions(changed as ITransactionDetail[])
+        transactionStore.updateTransactions(changed as Record<string, ITransactionDetail>)
       }
       if (deleted) {
         transactionStore.deleteTransactions(deleted as string[])

@@ -1,5 +1,7 @@
 import { ITransaction, ITransactionDetail } from '@mammoth/api-interfaces'
-import { Instance, types } from 'mobx-state-tree'
+import { flow, Instance, types } from 'mobx-state-tree'
+import { transactionFormatter } from '../../utils'
+import { transactionApi } from '../api'
 import { Account } from './Account.model'
 import { Category } from './Category.model'
 import { Payee } from './Payee.model'
@@ -35,6 +37,19 @@ export const Transaction = types
         memo: self.memo,
       }
     },
+    get transactionRequest(): ITransaction {
+      return {
+        id: self.id,
+        payeeId: self.payeeId.id,
+        categoryId: self.categoryId.id,
+        budgetId: self.budgetId,
+        outflow: self.outflow,
+        inflow: self.inflow,
+        memo: self.memo,
+        accountId: self.accountId.id,
+        date: self.date,
+      }
+    },
   }))
 
 export interface ITransactionInstance extends Instance<typeof Transaction> {}
@@ -42,20 +57,61 @@ export interface ITransactionInstance extends Instance<typeof Transaction> {}
 export const TransactionStore = types
   .model({
     transactions: types.map(Transaction),
+    isLoading: types.optional(types.boolean, false),
   })
-  .actions((self) => ({
-    addTransactions(transactions: ITransactionInstance[]): void {
+  .actions((self) => {
+    const setLoading = (loading: boolean): void => {
+      self.isLoading = loading
+    }
+
+    const addTransactions = (transactions: ITransactionInstance[]): void => {
       transactions.forEach((transaction) => {
         self.transactions.put(transaction)
       })
-    },
-    createTransactions(transactionDetails: ITransactionDetail[]): void {
+    }
+    const createTransactions = (transactionDetails: ITransactionDetail[]): void => {
       // use the create method on the TransactionApi
-    },
-    deleteTransactions(transactionIdentifiers: string[]): void {
+    }
+    const deleteTransactions = (transactionIdentifiers: string[]): void => {
       // use the delete method on the TransactionApi
-    },
-    updateTransactions(transactionDetails: ITransactionDetail[]): void {
+    }
+
+    const updateTransactions = flow(function* updateTransactions(
+      transactionDetails: Record<string, ITransactionDetail>
+    ) {
+      setLoading(true)
+      const promises: Promise<ITransaction>[] = []
+      console.log(Object.keys(transactionDetails))
+      Object.keys(transactionDetails).forEach((transactionId) => {
+        const existingTransaction = self.transactions.get(transactionId)
+        console.log('here it is', transactionId, existingTransaction?.formattedValue)
+        if (existingTransaction) {
+          const payload: ITransaction = {
+            ...existingTransaction.transactionRequest,
+            ...transactionFormatter.toTransaction(transactionDetails[transactionId]),
+          }
+          promises.push(transactionApi.updateTransaction(existingTransaction.budgetId, payload))
+        } else {
+          console.log('Transaction does not exist')
+        }
+      })
       // use the update method on the TransactionApi
-    },
-  }))
+      try {
+        const transactions: any[] = yield Promise.all(promises)
+        transactions.forEach((transaction) => {
+          self.transactions.put(transaction)
+        })
+      } catch (err) {
+        console.error('Failed to update transaction', err)
+      } finally {
+        setLoading(false)
+      }
+    })
+
+    return {
+      addTransactions,
+      createTransactions,
+      deleteTransactions,
+      updateTransactions,
+    }
+  })
