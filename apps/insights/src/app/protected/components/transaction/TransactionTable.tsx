@@ -10,7 +10,7 @@ import { ITransactionDetail } from '@mammoth/api-interfaces'
 import Paper from '@material-ui/core/Paper'
 import { observer } from 'mobx-react'
 import { SnapshotIn } from 'mobx-state-tree'
-import React from 'react'
+import React, { useState } from 'react'
 import { useTransactionStore } from '../../hooks'
 import { ITransactionInstance, Transaction } from '../../models'
 import { AccountCellTypeProvider } from '../account'
@@ -20,9 +20,26 @@ import { PayeeCellTypeProvider } from '../payees'
 
 const getRowId = (row: ITransactionDetail): string => row.id
 
+const EditCell = ({ errors, ...props }) => {
+  const { children } = props
+  const anyProps: any = props
+  return (
+    <TableEditColumn.Cell {...anyProps}>
+      {React.Children.map(children, (child) =>
+        child?.props.id === 'commit'
+          ? React.cloneElement(child, {
+              disabled: errors[props.tableRow.rowId],
+            })
+          : child
+      )}
+    </TableEditColumn.Cell>
+  )
+}
+
 export interface IDataColumn<T> {
   name: keyof T
   title: string
+  isRequired: boolean
   formatter?: (value: SnapshotIn<typeof Transaction>) => string
 }
 
@@ -35,6 +52,8 @@ export interface IDataTable<TData> {
 export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
   ({ transactions, columns, filter }) => {
     const transactionStore = useTransactionStore()
+    const [errors, setErrors] = useState<Record<string, any>>({})
+
     const rows: ITransactionDetail[] = []
     Array.from(transactions.values()).forEach((transaction) => {
       const formattedValue = transaction.formattedValue
@@ -58,6 +77,20 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
       }
     }
 
+    const validate = (rows: ITransactionDetail[], columns: IDataColumn<any>[]) => {
+      console.log('rows', rows)
+      console.log('columns', columns)
+      return Object.entries(rows).reduce(
+        (acc, [rowId, row]) => ({
+          ...acc,
+          [rowId]: columns.some((column) => column.isRequired && row[column.name] === ''),
+        }),
+        {}
+      )
+    }
+
+    const onEdited = (edited) => setErrors(validate(edited, columns))
+
     return (
       <Paper>
         <Grid rows={rows} columns={columns as Column[]} getRowId={getRowId}>
@@ -68,7 +101,8 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
           <DateCellTypeProvider />
           <CurrencyCellTypeProvider />
           {/* End custom cells */}
-          <EditingState onCommitChanges={commitChanges} />
+          <EditingState onRowChangesChange={onEdited} onCommitChanges={commitChanges} />
+
           <Table />
           <TableHeaderRow />
           <TableEditRow />
@@ -78,6 +112,7 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
             showAddCommand
             showEditCommand
             showDeleteCommand
+            cellComponent={(props) => <EditCell {...props} errors={errors} />}
           />
         </Grid>
       </Paper>

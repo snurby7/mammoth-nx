@@ -84,7 +84,6 @@ export const TransactionStore = types
       console.log(Object.keys(transactionDetails))
       Object.keys(transactionDetails).forEach((transactionId) => {
         const existingTransaction = self.transactions.get(transactionId)
-        console.log('here it is', transactionId, existingTransaction?.formattedValue)
         if (existingTransaction) {
           const payload: ITransaction = {
             ...existingTransaction.transactionRequest,

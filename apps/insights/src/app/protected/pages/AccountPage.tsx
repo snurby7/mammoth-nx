@@ -16,13 +16,15 @@ export const AccountPage = () => {
   }, [accountStore.selectedAccount])
 
   const dataColumns: IDataColumn<ITransactionDetail>[] = [
-    { name: 'date', title: 'Date' },
-    { name: 'payee', title: 'Payee' },
-    { name: 'account', title: 'Account' },
-    { name: 'category', title: 'Category' },
-    { name: 'memo', title: 'Memo' },
-    { name: 'inflow', title: 'Inflow' },
-    { name: 'outflow', title: 'Outflow' },
+    { name: 'date', title: 'Date', isRequired: true },
+    { name: 'payee', title: 'Payee', isRequired: true },
+    { name: 'account', title: 'Account', isRequired: true },
+    { name: 'category', title: 'Category', isRequired: true },
+    { name: 'memo', title: 'Memo', isRequired: false },
+    // the server is smart enough to know how to handle the case where either
+    // inflow or outflow must be present and will reject if neither is there.
+    { name: 'inflow', title: 'Inflow', isRequired: false },
+    { name: 'outflow', title: 'Outflow', isRequired: false },
   ]
 
   const dataFilter = useCallback(
