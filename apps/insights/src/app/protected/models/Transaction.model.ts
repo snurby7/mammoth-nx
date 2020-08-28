@@ -1,5 +1,6 @@
 import { ITransaction, ITransactionDetail } from '@mammoth/api-interfaces'
 import { flow, Instance, types } from 'mobx-state-tree'
+import { ITransactionGridRow } from '../../interface'
 import { transactionFormatter } from '../../utils'
 import { transactionApi } from '../api'
 import { Account } from './Account.model'
@@ -19,7 +20,11 @@ export const Transaction = types
     [(key = 'outflow')]: types.optional(types.number, 0),
     [(key = 'memo')]: types.string,
   })
-  .actions((self) => ({}))
+  .actions((self) => ({
+    deleteTransaction() {
+      // TODO: DELETE the transaction from here.
+    },
+  }))
   .views((self) => ({
     get formattedValue(): ITransactionDetail {
       return {
@@ -69,11 +74,38 @@ export const TransactionStore = types
         self.transactions.put(transaction)
       })
     }
-    const createTransactions = (transactionDetails: ITransactionDetail[]): void => {
+    const createTransactions = flow(function* (
+      budgetId: string,
+      transactionRows: ITransactionGridRow[]
+    ) {
       // use the create method on the TransactionApi
-    }
+      setLoading(true)
+      const createTransactionPromises: Promise<ITransaction>[] = []
+      transactionRows.forEach((transactionRow) => {
+        createTransactionPromises.push(
+          transactionApi.createTransaction(
+            budgetId,
+            transactionFormatter.toCreateTransaction({ ...transactionRow, budgetId })
+          )
+        )
+      })
+      // TODO: Figure out a way to correctly type these generators
+      try {
+        const transactions: any[] = yield Promise.all(createTransactionPromises)
+        // TODO Figure out why this is adding and saving correctly but not showing up in the grid like I would expect.
+        transactions.forEach((transaction) => {
+          self.transactions.put(transaction)
+        })
+      } catch (err) {
+        console.error('Failed to update transaction', err)
+      } finally {
+        setLoading(false)
+      }
+    })
+
     const deleteTransactions = (transactionIdentifiers: string[]): void => {
       // use the delete method on the TransactionApi
+      // TODO: Get the transaction by the identifier and call the delete method on the instance
     }
 
     const updateTransactions = flow(function* updateTransactions(
@@ -81,20 +113,18 @@ export const TransactionStore = types
     ) {
       setLoading(true)
       const promises: Promise<ITransaction>[] = []
-      console.log(Object.keys(transactionDetails))
       Object.keys(transactionDetails).forEach((transactionId) => {
         const existingTransaction = self.transactions.get(transactionId)
         if (existingTransaction) {
           const payload: ITransaction = {
             ...existingTransaction.transactionRequest,
-            ...transactionFormatter.toTransaction(transactionDetails[transactionId]),
+            ...transactionFormatter.toPartialTransaction(transactionDetails[transactionId]),
           }
           promises.push(transactionApi.updateTransaction(existingTransaction.budgetId, payload))
         } else {
           console.log('Transaction does not exist')
         }
       })
-      // use the update method on the TransactionApi
       try {
         const transactions: any[] = yield Promise.all(promises)
         transactions.forEach((transaction) => {

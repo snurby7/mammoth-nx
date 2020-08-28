@@ -29,6 +29,7 @@ export const AccountPage = () => {
 
   const dataFilter = useCallback(
     (record: ITransactionInstance) => {
+      console.log(record.accountId.name, record.memo)
       return record.accountId.id === accountStore.selectedAccount.id
     },
     [accountStore.selectedAccount]

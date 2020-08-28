@@ -11,7 +11,8 @@ import Paper from '@material-ui/core/Paper'
 import { observer } from 'mobx-react'
 import { SnapshotIn } from 'mobx-state-tree'
 import React, { useState } from 'react'
-import { useTransactionStore } from '../../hooks'
+import { ITransactionGridRow } from '../../../interface'
+import { useBudgetStore, useTransactionStore } from '../../hooks'
 import { ITransactionInstance, Transaction } from '../../models'
 import { AccountCellTypeProvider } from '../account'
 import { CategoryCellTypeProvider } from '../category'
@@ -62,8 +63,15 @@ export interface IDataTable<TData> {
 
 export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
   ({ transactions, columns, filter }) => {
-    const transactionStore = useTransactionStore()
     const [errors, setErrors] = useState<Record<string, any>>({})
+    const transactionStore = useTransactionStore()
+    const budgetStore = useBudgetStore()
+    const selectedBudget = budgetStore.selectedBudget
+
+    if (!selectedBudget) {
+      return <div>There is no selected budget! Sorry!</div>
+    }
+
     const requiredColumnKeys: string[] = columns.reduce((accumulator, item) => {
       if (item.isRequired) {
         accumulator.push(item.name as string)
@@ -83,7 +91,7 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
 
     const commitChanges = ({ added, changed, deleted }: ChangeSet) => {
       if (added) {
-        transactionStore.createTransactions(added as ITransactionDetail[])
+        transactionStore.createTransactions(selectedBudget.id, added as ITransactionGridRow[])
       }
       if (changed) {
         transactionStore.updateTransactions(changed as Record<string, ITransactionDetail>)

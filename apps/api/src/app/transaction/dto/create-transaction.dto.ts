@@ -1,5 +1,5 @@
-import { ICreateTransaction } from '@mammoth/api-interfaces';
-import { ApiProperty } from '@nestjs/swagger';
+import { ICreateTransaction } from '@mammoth/api-interfaces'
+import { ApiProperty } from '@nestjs/swagger'
 import {
   IsDateString,
   IsNotEmpty,
@@ -10,18 +10,17 @@ import {
   Max,
   Min,
   ValidateIf,
-} from 'class-validator';
+} from 'class-validator'
 
 export class TransactionCreateDto implements ICreateTransaction {
   @ApiProperty({
-    description:
-      'The date of the transaction, this can be updated, must be an ISO String',
+    description: 'The date of the transaction, this can be updated, must be an ISO String',
     example: '2020-01-25T14:16:18.362Z',
     required: true,
   })
   @IsNotEmpty()
   @IsDateString()
-  date: string;
+  date: string
 
   @ApiProperty({
     description: 'Account id to link',
@@ -30,7 +29,7 @@ export class TransactionCreateDto implements ICreateTransaction {
   })
   @IsNotEmpty()
   @IsUUID()
-  accountId: string;
+  accountId: string
 
   @ApiProperty({
     description: 'Payee id to link',
@@ -39,7 +38,7 @@ export class TransactionCreateDto implements ICreateTransaction {
   })
   @IsNotEmpty()
   @IsUUID()
-  payeeId: string;
+  payeeId: string
 
   @ApiProperty({
     description: 'Category id to link',
@@ -48,7 +47,7 @@ export class TransactionCreateDto implements ICreateTransaction {
   })
   @IsNotEmpty()
   @IsUUID()
-  categoryId: string;
+  categoryId: string
 
   @ApiProperty({
     description: 'Budget Id that has all the Id properties above',
@@ -57,7 +56,7 @@ export class TransactionCreateDto implements ICreateTransaction {
   })
   @IsNotEmpty()
   @IsUUID()
-  budgetId: string;
+  budgetId: string
 
   @ApiProperty({
     description: 'Total inflow from the transaction',
@@ -66,7 +65,7 @@ export class TransactionCreateDto implements ICreateTransaction {
   @ValidateIf((prop) => !prop.outflow && prop.outflow !== 0)
   @IsNumber()
   @Min(0)
-  inflow?: number;
+  inflow?: number
 
   @ApiProperty({
     description: 'Total outflow from the transaction',
@@ -75,7 +74,7 @@ export class TransactionCreateDto implements ICreateTransaction {
   @ValidateIf((prop) => !prop.inflow && prop.inflow !== 0)
   @IsNumber()
   @Max(0)
-  outflow?: number;
+  outflow?: number
 
   @ApiProperty({
     description: 'Just a little description on the transaction',
@@ -84,5 +83,5 @@ export class TransactionCreateDto implements ICreateTransaction {
   })
   @IsOptional()
   @IsString()
-  memo?: string;
+  memo?: string
 }

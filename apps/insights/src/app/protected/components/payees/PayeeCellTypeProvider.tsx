@@ -7,6 +7,9 @@ import { usePayeeStore } from '../../hooks'
 const PayeeCellFormatter = ({ value: node }: { value: IFormattedNode }) => {
   return <span>{node.value}</span>
 }
+
+// TODO: Need to be able to create AND save a payee from the list (in case I don't have it in the budget)
+
 const PayeeCellEditor = ({ value, onValueChange }) => {
   const node: IFormattedNode = value ?? { id: '', value: '' } // when it's add mode this is undefined
   const { payees } = usePayeeStore()
