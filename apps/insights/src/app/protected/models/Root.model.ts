@@ -41,8 +41,9 @@ let currentFrame = -1
 onSnapshot(rootStore, (snapshot: any) => {
   if (currentFrame === states.length - 1) {
     currentFrame++
-    console.log('new snapshot ----->', snapshot)
-    states.push(snapshot)
+    // disabling for a cleaner log
+    // console.log('new snapshot ----->', snapshot)
+    // states.push(snapshot)
     sessionStorage.setItem('mammoth-snapshot', JSON.stringify(snapshot))
   }
 })

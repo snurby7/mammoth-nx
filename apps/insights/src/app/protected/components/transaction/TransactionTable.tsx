@@ -20,18 +20,29 @@ import { PayeeCellTypeProvider } from '../payees'
 
 const getRowId = (row: ITransactionDetail): string => row.id
 
-const EditCell = ({ errors, ...props }) => {
+const EditCell = ({ errors, requiredTransactionFields, ...props }) => {
   const { children } = props
   const anyProps: any = props
+  const rowDataKeys = Object.keys(props.tableRow.row)
+  const canCreateNewRecord = !requiredTransactionFields.every((requiredTransactionField) =>
+    rowDataKeys.some((key) => key === requiredTransactionField)
+  )
+
   return (
     <TableEditColumn.Cell {...anyProps}>
-      {React.Children.map(children, (child) =>
-        child?.props.id === 'commit'
+      {React.Children.map(children, (child) => {
+        let disabled = errors[props.tableRow.rowId]
+        // * A little weird here, but it's a step and it makes the required things be filled in.
+        // * Will eventually format the cell to make it show as red or something
+        if (child?.props.id === 'commit' && child?.props.text === 'Save') {
+          disabled = canCreateNewRecord
+        }
+        return child?.props.id === 'commit'
           ? React.cloneElement(child, {
-              disabled: errors[props.tableRow.rowId],
+              disabled,
             })
           : child
-      )}
+      })}
     </TableEditColumn.Cell>
   )
 }
@@ -53,7 +64,12 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
   ({ transactions, columns, filter }) => {
     const transactionStore = useTransactionStore()
     const [errors, setErrors] = useState<Record<string, any>>({})
-
+    const requiredColumnKeys: string[] = columns.reduce((accumulator, item) => {
+      if (item.isRequired) {
+        accumulator.push(item.name as string)
+      }
+      return accumulator
+    }, [] as string[])
     const rows: ITransactionDetail[] = []
     Array.from(transactions.values()).forEach((transaction) => {
       const formattedValue = transaction.formattedValue
@@ -78,8 +94,6 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
     }
 
     const validate = (rows: ITransactionDetail[], columns: IDataColumn<any>[]) => {
-      console.log('rows', rows)
-      console.log('columns', columns)
       return Object.entries(rows).reduce(
         (acc, [rowId, row]) => ({
           ...acc,
@@ -112,7 +126,9 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
             showAddCommand
             showEditCommand
             showDeleteCommand
-            cellComponent={(props) => <EditCell {...props} errors={errors} />}
+            cellComponent={(props) => (
+              <EditCell {...props} errors={errors} requiredTransactionFields={requiredColumnKeys} />
+            )}
           />
         </Grid>
       </Paper>
