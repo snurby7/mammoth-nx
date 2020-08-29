@@ -1,4 +1,4 @@
-import { IDeleteResponse, ITransaction } from '@mammoth/api-interfaces';
+import { IDeleteResponse, ITransaction } from '@mammoth/api-interfaces'
 import {
   BadRequestException,
   Body,
@@ -7,16 +7,12 @@ import {
   Param,
   Post,
   UseGuards,
-} from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Observable } from 'rxjs';
-import {
-  TransactionCreateDto,
-  TransactionDto,
-  TransactionQueryDto,
-} from './dto';
-import { TransactionService } from './transaction.service';
+} from '@nestjs/common'
+import { AuthGuard } from '@nestjs/passport'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Observable } from 'rxjs'
+import { TransactionCreateDto, TransactionDto, TransactionQueryDto } from './dto'
+import { TransactionService } from './transaction.service'
 
 @Controller('transaction')
 @ApiTags('transaction')
@@ -41,9 +37,10 @@ export class TransactionController {
     @Body() request: TransactionCreateDto
   ): Observable<ITransaction> {
     if (budgetId !== request.budgetId) {
-      throw new BadRequestException();
+      throw new BadRequestException()
     }
-    return this.transactionService.createTransaction(request);
+    console.log(request, '<---- here is the input')
+    return this.transactionService.createTransaction(request)
   }
 
   @ApiOperation({
@@ -60,7 +57,7 @@ export class TransactionController {
     @Param('budgetId') budgetId: string,
     @Body() query: TransactionQueryDto
   ): Observable<ITransaction[]> {
-    return this.transactionService.getTransactionsByQuery(query);
+    return this.transactionService.getTransactionsByQuery(query)
   }
 
   @ApiOperation({
@@ -81,13 +78,10 @@ export class TransactionController {
     @Param('transactionId') transactionId: string,
     @Body() transactionData: TransactionDto
   ): Observable<ITransaction> {
-    if (
-      transactionData.budgetId !== budgetId ||
-      transactionData.id !== transactionId
-    ) {
-      throw new BadRequestException();
+    if (transactionData.budgetId !== budgetId || transactionData.id !== transactionId) {
+      throw new BadRequestException()
     }
-    return this.transactionService.updateTransaction$(transactionData);
+    return this.transactionService.updateTransaction$(transactionData)
   }
 
   @ApiOperation({
@@ -108,6 +102,6 @@ export class TransactionController {
     @Param('budgetId') budgetId: string,
     @Param('transactionId') transactionId: string
   ): Observable<IDeleteResponse> {
-    return this.transactionService.deleteTransaction$(budgetId, transactionId);
+    return this.transactionService.deleteTransaction$(budgetId, transactionId)
   }
 }
