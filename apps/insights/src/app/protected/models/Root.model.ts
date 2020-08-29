@@ -19,7 +19,7 @@ export const rootStore = RootModel.create({
     isLoading: false,
   },
   accountStore: {
-    accounts: [],
+    accounts: {},
     isLoading: false,
   },
   transactionStore: {

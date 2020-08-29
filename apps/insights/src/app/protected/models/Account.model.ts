@@ -44,7 +44,7 @@ export interface IAccountSnap extends SnapshotIn<AccountType> {}
 
 export const AccountStore = types
   .model({
-    accounts: types.optional(types.array(Account), []),
+    accounts: types.map(Account),
     selectedAccount: types.safeReference(Account),
     isLoading: types.boolean,
   })
@@ -62,7 +62,8 @@ export const AccountStore = types
       try {
         const parent = getParentInstance()
         // TODO: This typing is borked. Need to get this better
-        self.accounts = yield accountApi.loadAccounts(parent.budgetStore.selectedBudget.id)
+        const accounts: any[] = yield accountApi.loadAccounts(parent.budgetStore.selectedBudget.id)
+        accounts.forEach((account) => self.accounts.put(account))
       } catch (err) {
         console.error('Failed to load Accounts ', err)
       } finally {
