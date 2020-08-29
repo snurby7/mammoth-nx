@@ -1,11 +1,7 @@
-import {
-  IBudgetQuery,
-  ICreateBudget,
-  IUpdateBudget,
-} from '@mammoth/api-interfaces';
-import * as uuid from 'uuid/v4';
-import { SupportedLabel } from '../../constants';
-import { ExecuteStatement } from '../../neo4j';
+import { IBudgetQuery, ICreateBudget, IUpdateBudget } from '@mammoth/api-interfaces'
+import { v4 as uuid } from 'uuid'
+import { SupportedLabel } from '../../constants'
+import { ExecuteStatement } from '../../neo4j'
 
 /**
  * Returns back a formatted query and it's statement properties to easily reuse queries
@@ -30,7 +26,7 @@ export const getCreateBudgetStatement = (
       id: uuid(),
     },
   },
-});
+})
 
 /**
  * Returns back the query needed to retrieve all budgets that match the given query
@@ -38,16 +34,13 @@ export const getCreateBudgetStatement = (
  * @param request The request to retrieve/fill slots in the query with.
  * @returns {ExecuteStatement}
  */
-export const getBudgetsByQuery = (
-  resultKey: string,
-  request: IBudgetQuery
-): ExecuteStatement => ({
+export const getBudgetsByQuery = (resultKey: string, request: IBudgetQuery): ExecuteStatement => ({
   statement: `
     MATCH (${resultKey}:${SupportedLabel.Budget})
     RETURN ${resultKey}
     ${request.limit ? `LIMIT ${request.limit}` : ''}
   `,
-});
+})
 
 /**
  * Returns a query that targets only the id property on a given budget node
@@ -56,10 +49,7 @@ export const getBudgetsByQuery = (
  * @param {string} id Budget Id to match
  * @returns {ExecuteStatement}
  */
-export const getBudgetById = (
-  resultKey: string,
-  id: string
-): ExecuteStatement => ({
+export const getBudgetById = (resultKey: string, id: string): ExecuteStatement => ({
   statement: `
     MATCH (${resultKey}:${SupportedLabel.Budget})
     WHERE ${resultKey}.id = $id
@@ -68,7 +58,7 @@ export const getBudgetById = (
   props: {
     id,
   },
-});
+})
 
 /**
  * Deletes a given budget by it's Id and should also delete all associated nodes with it.
@@ -91,7 +81,7 @@ export const deleteBudgetById = (id: string): ExecuteStatement => ({
   props: {
     id,
   },
-});
+})
 
 /**
  * Updates a budget based on the query sent to it and returns the updated record
@@ -116,4 +106,4 @@ export const updateBudgetRequest = (
     name: request.name,
     id: request.id,
   },
-});
+})

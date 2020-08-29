@@ -1,24 +1,17 @@
-import {
-  IAccount,
-  IAccountQuery,
-  ICreateAccount,
-} from '@mammoth/api-interfaces';
-import * as uuid from 'uuid/v4';
-import { NodeRelationship, SupportedLabel } from '../../constants';
-import { ExecuteStatement } from '../../neo4j';
+import { IAccount, IAccountQuery, ICreateAccount } from '@mammoth/api-interfaces'
+import { v4 as uuid } from 'uuid'
+import { NodeRelationship, SupportedLabel } from '../../constants'
+import { ExecuteStatement } from '../../neo4j'
 
 /**
  * Account queries for handling the cypher queries.
  */
 export const accountQueries = {
-  createAccount: (
-    resultKey: string,
-    request: ICreateAccount
-  ): ExecuteStatement => ({
+  createAccount: (resultKey: string, request: ICreateAccount): ExecuteStatement => ({
     statement: `
-        MATCH (${resultKey}:${SupportedLabel.Budget} {id: $budgetId})
+        MATCH (budget:${SupportedLabel.Budget} {id: $budgetId})
         CREATE (${resultKey}:${SupportedLabel.Account} $nodeProps)
-        MERGE (${resultKey})-[r:${NodeRelationship.AccountOf}]->(${resultKey})
+        MERGE (${resultKey})-[r:${NodeRelationship.AccountOf}]->(budget)
         RETURN ${resultKey}
       `,
     props: {
@@ -31,10 +24,7 @@ export const accountQueries = {
     },
   }),
 
-  findAccounts: (
-    resultKey: string,
-    request: IAccountQuery
-  ): ExecuteStatement => ({
+  findAccounts: (resultKey: string, request: IAccountQuery): ExecuteStatement => ({
     statement: `
         MATCH (${resultKey}:${SupportedLabel.Account} {budgetId: $budgetId})
         RETURN ${resultKey}
@@ -44,11 +34,7 @@ export const accountQueries = {
       budgetId: request.budgetId,
     },
   }),
-  getAccountById: (
-    resultKey: string,
-    budgetId: string,
-    accountId: string
-  ): ExecuteStatement => ({
+  getAccountById: (resultKey: string, budgetId: string, accountId: string): ExecuteStatement => ({
     statement: `
         MATCH (${resultKey}:${SupportedLabel.Account} {id: $accountId, budgetId: $budgetId})
         RETURN ${resultKey}
@@ -58,10 +44,7 @@ export const accountQueries = {
       budgetId,
     },
   }),
-  updateExistingAccount: (
-    resultKey: string,
-    request: IAccount
-  ): ExecuteStatement => ({
+  updateExistingAccount: (resultKey: string, request: IAccount): ExecuteStatement => ({
     statement: `
         MATCH (${resultKey}:${SupportedLabel.Account} {id: $accountId, budgetId: $budgetId})
         SET ${resultKey} += {name: $updatedName, balance: $updatedBalance}
@@ -88,4 +71,4 @@ export const accountQueries = {
       budgetId,
     },
   }),
-};
+}
