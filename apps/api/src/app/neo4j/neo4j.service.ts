@@ -42,7 +42,6 @@ export class Neo4jService {
    */
   public async executeStatement(statementProps: ExecuteStatement): Promise<QueryResult> {
     const { statement, props } = statementProps
-    this.logger.log(`Executing the following statement - ${statement}`)
     const session = this.neo4jDriver.session()
     const result = await session.run(statement, { ...props } ?? {})
     session.close()

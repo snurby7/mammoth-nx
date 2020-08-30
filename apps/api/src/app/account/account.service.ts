@@ -35,7 +35,6 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @memberof AccountService
    */
   public createAccount(request: ICreateAccount): Observable<IAccount> {
-    this.logger.log('Creating an account')
     const resultKey = 'account'
     const { statement, props } = accountQueries.createAccount(resultKey, request)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
@@ -51,7 +50,6 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @memberof AccountService
    */
   public findAccounts(query: IAccountQuery): Observable<IAccount[]> {
-    this.logger.log(`Finding accounts with budgetId - ${query.budgetId}`)
     const resultKey = 'accounts'
     const { statement, props } = accountQueries.findAccounts(resultKey, query)
     return this.neo4jService.rxSession.readTransaction((trx) =>
@@ -72,7 +70,6 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @memberof AccountService
    */
   public findAccount(budgetId: string, accountId: string): Observable<IAccount> {
-    this.logger.log(`Finding account with ${accountId}`)
     const resultKey = 'account'
     const { statement, props } = accountQueries.getAccountById(resultKey, budgetId, accountId)
     return this.neo4jService.rxSession.readTransaction((trx) =>
@@ -90,7 +87,6 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @memberof AccountService
    */
   public updateAccountDetails(request: IAccount): Observable<IAccount> {
-    this.logger.log(`Updating an account with ${request.id}`)
     const resultKey = 'account'
     const { statement, props } = accountQueries.updateExistingAccount(resultKey, request)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
@@ -106,7 +102,6 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    * @memberof AccountService
    */
   public deleteAccount(budgetId: string, accountId: string): Observable<IDeleteResponse> {
-    this.logger.debug(`Deleting account - ${accountId}`)
     const resultKey = 'deletedAccount'
     const { statement, props } = accountQueries.deleteAccountById(resultKey, budgetId, accountId)
     return this.neo4jService.rxSession.writeTransaction((trx) =>

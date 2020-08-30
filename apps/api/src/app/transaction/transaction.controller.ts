@@ -39,7 +39,6 @@ export class TransactionController {
     if (budgetId !== request.budgetId) {
       throw new BadRequestException()
     }
-    console.log(request, '<---- here is the input')
     return this.transactionService.createTransaction(request)
   }
 

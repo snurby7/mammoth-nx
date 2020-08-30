@@ -41,7 +41,6 @@ interface IAccountMenuList {
 
 export const AccountMenuList = observer(
   ({ accounts }: IAccountMenuList): JSX.Element => {
-    console.log(Array.from(accounts.values()))
     return (
       <List dense={true}>
         {Array.from(accounts.values()).map((account) => (
