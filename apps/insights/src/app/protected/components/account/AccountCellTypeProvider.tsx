@@ -3,7 +3,6 @@ import { IFormattedNode, ITransactionDetail } from '@mammoth/api-interfaces'
 import { Input, MenuItem, Select } from '@material-ui/core'
 import React, { useState } from 'react'
 import { useAccountStore } from '../../hooks'
-import { IAccountInstance } from '../../models'
 
 const AccountCellFormatter = ({ value: node }: { value: IFormattedNode }) => {
   return <span>{node.value}</span>
@@ -30,7 +29,7 @@ const AccountCellEditor = ({ value, onValueChange }) => {
       onChange={onChange}
       style={{ width: '100%' }}
     >
-      {Array.from(accounts.values()).map((account: IAccountInstance) => (
+      {accounts.map((account) => (
         <MenuItem key={account.id} value={account.id}>
           {account.name}
         </MenuItem>

@@ -12,7 +12,7 @@ const CurrencyCellEditor = ({ value: cellValue, onValueChange }) => {
 
   const onChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newValue = event.target.value
-    onValueChange(+newValue) // parseInt shorthand, somehow the server doesn't block this...
+    onValueChange(newValue)
     setValue(newValue)
   }
 
