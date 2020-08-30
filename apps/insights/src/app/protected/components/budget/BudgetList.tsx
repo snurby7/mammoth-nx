@@ -6,7 +6,7 @@ import { useRouter } from '../../../hooks'
 import { RoutePaths } from '../../../routes'
 import { replaceKeyPlaceholders } from '../../../utils'
 import { useBudgetStore } from '../../hooks'
-import { IBudgetSnap } from '../../models'
+import { IBudgetInstance } from '../../models'
 
 const BudgetItemWrapper = styled.div`
   display: inline-block;
@@ -21,7 +21,7 @@ const BudgetHeader = styled.h2`
 `
 
 interface IBudgetListItemProps {
-  budget: IBudgetSnap
+  budget: IBudgetInstance
 }
 
 const BudgetListItem = ({ budget }: IBudgetListItemProps): JSX.Element => {
@@ -45,13 +45,13 @@ const BudgetListItem = ({ budget }: IBudgetListItemProps): JSX.Element => {
 }
 
 interface IBudgetListProps {
-  budgets: IBudgetSnap[]
+  budgets: Map<string, IBudgetInstance>
 }
 export const BudgetList = observer(
   ({ budgets }: IBudgetListProps): JSX.Element => {
     return (
       <div>
-        {budgets.map((budget) => (
+        {Array.from(budgets.values()).map((budget) => (
           <BudgetListItem key={budget.id} budget={budget} />
         ))}
       </div>

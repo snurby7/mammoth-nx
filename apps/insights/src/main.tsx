@@ -1,5 +1,4 @@
 import { Auth0Provider } from '@auth0/auth0-react'
-import 'mobx-react-lite/batchingForReactDom' // https://github.com/mobxjs/mobx-react-lite/#observer-batching
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { App } from './app/app'

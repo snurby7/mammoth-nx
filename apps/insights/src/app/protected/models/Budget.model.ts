@@ -19,7 +19,7 @@ export interface IBudgetReference {}
 
 export const BudgetStore = types
   .model({
-    budgets: types.optional(types.array(Budget), []),
+    budgets: types.map(Budget),
     selectedBudget: types.safeReference(Budget),
     isLoading: types.boolean,
   })
@@ -31,7 +31,9 @@ export const BudgetStore = types
     const loadBudgets = flow(function* loadBudgets() {
       setLoading(true)
       try {
-        self.budgets = yield budgetApi.loadBudgets()
+        well
+        const budgets: any[] = yield budgetApi.loadBudgets()
+        budgets.forEach((budget) => self.budgets.put(budget))
       } catch (err) {
         console.error('Failed to load budgets ', err)
       } finally {
