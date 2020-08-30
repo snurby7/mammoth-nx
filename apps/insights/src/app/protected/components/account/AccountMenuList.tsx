@@ -1,7 +1,7 @@
 import { List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core'
 import { AccountBalanceOutlined } from '@material-ui/icons'
 import { observer } from 'mobx-react'
-import React from 'react'
+import React, { ReactNode } from 'react'
 import { useRouter } from '../../../hooks'
 import { RoutePaths } from '../../../routes'
 import { formatter, replaceKeyPlaceholders } from '../../../utils'
@@ -37,15 +37,17 @@ export const AccountMenuItem = observer(
 
 interface IAccountMenuList {
   accounts: Map<string, IAccountInstance>
+  children?: ReactNode
 }
 
 export const AccountMenuList = observer(
-  ({ accounts }: IAccountMenuList): JSX.Element => {
+  ({ accounts, children }: IAccountMenuList): JSX.Element => {
     return (
       <List dense={true}>
         {Array.from(accounts.values()).map((account) => (
           <AccountMenuItem key={account.id} account={account} />
         ))}
+        {children}
       </List>
     )
   }
