@@ -5,7 +5,7 @@ import {
   ITransaction,
 } from '@mammoth/api-interfaces'
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
-import * as uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import { NodeRelationship, SupportedLabel } from '../constants'
 import {
   CommonAccountService,

@@ -1,4 +1,4 @@
-import { IAccount, IDeleteResponse } from '@mammoth/api-interfaces';
+import { IAccount, IDeleteResponse } from '@mammoth/api-interfaces'
 import {
   Body,
   Controller,
@@ -9,12 +9,12 @@ import {
   Param,
   Post,
   UseGuards,
-} from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Observable } from 'rxjs';
-import { AccountService } from './account.service';
-import { CreateAccount, UpdateAccount } from './dto';
+} from '@nestjs/common'
+import { AuthGuard } from '@nestjs/passport'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Observable } from 'rxjs'
+import { AccountService } from './account.service'
+import { CreateAccount, UpdateAccount } from './dto'
 
 @Controller('accounts')
 @ApiTags('account')
@@ -36,9 +36,9 @@ export class AccountController {
     @Body() accountRequest: CreateAccount
   ): Observable<IAccount> {
     if (!accountRequest.budgetId || accountRequest.budgetId !== budgetId) {
-      throw new HttpException('No budgetId found on request', HttpStatus.CONFLICT);
+      throw new HttpException('No budgetId found on request', HttpStatus.CONFLICT)
     }
-    return this.accountService.createAccount(accountRequest);
+    return this.accountService.createAccount(accountRequest)
   }
 
   @Get(':budgetId')
@@ -54,7 +54,7 @@ export class AccountController {
   public getAllAccountsForBudgetId(@Param('budgetId') budgetId: string): Observable<IAccount[]> {
     return this.accountService.findAccounts({
       budgetId,
-    });
+    })
   }
 
   @Get(':budgetId/detail/:accountId')
@@ -71,7 +71,7 @@ export class AccountController {
     @Param('budgetId') budgetId: string,
     @Param('accountId') id: string
   ): Observable<IAccount> {
-    return this.accountService.findAccount(budgetId, id);
+    return this.accountService.findAccount(budgetId, id)
   }
 
   @Post(':budgetId/detail/:accountId')
@@ -87,12 +87,9 @@ export class AccountController {
     @Body() updateAccount: UpdateAccount
   ): Observable<IAccount> {
     if (id !== updateAccount.id && budgetId !== updateAccount.budgetId) {
-      throw new HttpException(
-        'The parameter id and the body id do not match.',
-        HttpStatus.CONFLICT
-      );
+      throw new HttpException('The parameter id and the body id do not match.', HttpStatus.CONFLICT)
     }
-    return this.accountService.updateAccountDetails(updateAccount);
+    return this.accountService.updateAccountDetails(updateAccount)
   }
 
   @ApiOperation({
@@ -112,6 +109,6 @@ export class AccountController {
     @Param('budgetId') budgetId: string,
     @Param('accountId') accountId: string
   ): Observable<IDeleteResponse> {
-    return this.accountService.deleteAccount(budgetId, accountId);
+    return this.accountService.deleteAccount(budgetId, accountId)
   }
 }
