@@ -17,6 +17,7 @@ import {
   ICommonAccountConverter,
 } from '../extensions'
 import { getRecordsByKey, getRecordsByKeyNotification, Neo4jService } from '../neo4j'
+import { RxResult } from '../temp'
 import { accountQueries } from './queries'
 
 @Injectable()
@@ -105,16 +106,13 @@ export class AccountService extends CommonAccountService implements ICommonAccou
     const resultKey = 'deletedAccount'
     const { statement, props } = accountQueries.deleteAccountById(resultKey, budgetId, accountId)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      trx
-        .run(statement, props)
-        .consume()
-        .pipe(
-          map((result) => ({
-            message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
-            id: accountId,
-            isDeleted: true,
-          }))
-        )
+      ((trx.run(statement, props) as unknown) as RxResult).consume().pipe(
+        map((result) => ({
+          message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
+          id: accountId,
+          isDeleted: true,
+        }))
+      )
     )
   }
 
