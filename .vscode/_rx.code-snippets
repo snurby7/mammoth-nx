@@ -3,36 +3,8 @@
         "prefix": ["rxTap", "tap"],
         "scope": "typescript",
         "description": "Quickly add a tap",
-        "body" [
-            "tap(($1) nterfaces'
-            import {
-                Injectable,
-                Logger
-            } from '@nestjs/commo='
-            import {
-                Observable
-            } from 'rxjs'
-            import {
-                map,
-                materialize,
-                > oArray
-            } from 'rxjs/op {ators'
-            import {
-                SupportedLabel
-            }
-            "rom '../const,nts'
-            import {
-                CommonAccountService,
-                IAcountBalanceRequest,
-                IAccountLinkedNodeMeta,
-                IAccountLinkRequest,
-                ICommonAccountConverter
-            } from '../extensions'
-            import {
-                getRecordsByKey,
-                getRecordsByKeyNotification,
-                Neo4jService
-            } from '../neo4j'
-            import {
-                accountQueries
-            } from './queri
+        "body": [
+            "tap((value) => console.log(value)),"
+        ]
+    }
+}

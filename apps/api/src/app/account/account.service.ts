@@ -107,7 +107,7 @@ export class AccountService extends CommonAccountService implements ICommonAccou
     return this.neo4jService.rxSession.writeTransaction((trx) =>
       trx
         .run(statement, props)
-        .summary()
+        .consume()
         .pipe(
           map((result) => ({
             message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,

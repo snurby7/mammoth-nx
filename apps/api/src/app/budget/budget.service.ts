@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { Observable } from 'rxjs'
 import { map, materialize, toArray } from 'rxjs/operators'
 import { getRecordsByKey, getRecordsByKeyNotification, Neo4jService } from '../neo4j'
+import { RxResult } from '../temp'
 import { Budget, BudgetQuery, UpdateBudget } from './dto'
 import {
   deleteBudgetById,
@@ -81,16 +82,13 @@ export class BudgetService {
     const { statement, props } = deleteBudgetById(id)
 
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      trx
-        .run(statement, props)
-        .summary()
-        .pipe(
-          map((result) => ({
-            message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
-            id,
-            isDeleted: result.counters.updates().nodesDeleted > 0,
-          }))
-        )
+      ((trx.run(statement, props) as unknown) as RxResult).consume().pipe(
+        map((result) => ({
+          message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
+          id,
+          isDeleted: result.counters.updates().nodesDeleted > 0,
+        }))
+      )
     )
   }
 

@@ -4,6 +4,7 @@ import { Driver, QueryResult } from 'neo4j-driver'
 import RxSession from 'neo4j-driver/types/session-rx'
 import { Observable, throwError } from 'rxjs'
 import { catchError, map } from 'rxjs/operators'
+import { RxResult } from '../temp'
 import { ExecuteStatement, IMammothCoreNode } from './interface'
 import { Neo4jCommonQueries } from './queries'
 import { getRecordsByKey } from './rxjs'
@@ -161,17 +162,14 @@ export class Neo4jService {
       DELETE r
     `
     return this.rxSession.writeTransaction((trx) =>
-      trx
-        .run(statement, { id })
-        .summary()
-        .pipe(
-          map((result) => ({
-            message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
-            isDeleted: result.counters.updates().nodesDeleted > 0,
-            id,
-          })),
-          catchError((err) => throwError(err))
-        )
+      ((trx.run(statement, { id }) as unknown) as RxResult).consume().pipe(
+        map((result) => ({
+          message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
+          isDeleted: result.counters.updates().nodesDeleted > 0,
+          id,
+        })),
+        catchError((err) => throwError(err))
+      )
     )
   }
 

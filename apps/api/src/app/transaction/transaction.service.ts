@@ -13,6 +13,7 @@ import { SupportedLabel } from '../constants'
 import { IAccountLinkBreak, IAccountLinkResponse } from '../extensions'
 import { getRecordsByKey, getRecordsByKeyNotification, Neo4jService } from '../neo4j'
 import { PayeeService } from '../payee'
+import { RxResult } from '../temp'
 import {
   Transaction_UsedAccount,
   Transaction_UsedCategory,
@@ -318,16 +319,13 @@ export class TransactionService {
       budgetId
     )
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      trx
-        .run(statement, props)
-        .summary()
-        .pipe(
-          map((result) => ({
-            message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
-            isDeleted: true,
-            id: transactionId,
-          }))
-        )
+      ((trx.run(statement, props) as unknown) as RxResult).consume().pipe(
+        map((result) => ({
+          message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
+          isDeleted: true,
+          id: transactionId,
+        }))
+      )
     )
   }
 }
