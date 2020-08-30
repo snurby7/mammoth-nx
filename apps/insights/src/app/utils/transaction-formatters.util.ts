@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ICreateTransaction, ITransaction, ITransactionDetail } from '@mammoth/api-interfaces'
 import { ITransactionGridRow } from '../interface'
 import { parser } from './parser.util'
@@ -12,23 +11,22 @@ export const transactionFormatter = {
       payeeId: detail.payee?.id ?? detail.payeeId,
       accountId: detail.account?.id ?? detail.accountId,
       memo: detail.memo,
-      inflow: detail.inflow,
-      outflow: detail.outflow,
+      inflow: detail.inflow === undefined ? undefined : detail.inflow,
+      outflow: detail.outflow === undefined ? undefined : -detail.outflow,
       date: detail.date,
     }
     return parser.removeEmpty(response)
   },
   toCreateTransaction(detail: ITransactionGridRow): ICreateTransaction {
-    const response: ICreateTransaction = {
+    return {
       budgetId: detail.budgetId,
       date: detail.date,
       accountId: detail.account,
       payeeId: detail.payee,
       categoryId: detail.category,
       memo: detail.memo,
-      inflow: detail.inflow ?? 0,
-      outflow: detail.outflow ?? 0,
+      inflow: detail.inflow === undefined ? undefined : detail.inflow,
+      outflow: detail.outflow === undefined ? undefined : -detail.outflow,
     }
-    return response
   },
 }

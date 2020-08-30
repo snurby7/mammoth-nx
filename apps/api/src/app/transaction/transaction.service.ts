@@ -6,7 +6,7 @@ import {
 } from '@mammoth/api-interfaces'
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { forkJoin, Observable, throwError } from 'rxjs'
-import { catchError, flatMap, map, materialize, switchMap, tap, toArray } from 'rxjs/operators'
+import { catchError, flatMap, map, materialize, switchMap, toArray } from 'rxjs/operators'
 import { AccountService } from '../account'
 import { CategoryService } from '../category'
 import { SupportedLabel } from '../constants'
@@ -40,7 +40,6 @@ export class TransactionService {
    * @memberof TransactionService
    */
   public createTransaction(request: ICreateTransaction): Observable<ITransaction> {
-    this.logger.log('Creating a transaction')
     const resultKey = 'transactionResult'
     const { statement, props } = TransactionQueries.createNewTransaction(resultKey, request)
     const createTransaction$: Observable<ITransaction> = this.neo4jService.rxSession.writeTransaction(
@@ -85,12 +84,7 @@ export class TransactionService {
       trx
         .run(statement, props)
         .records()
-        .pipe(
-          tap(() => this.logger.log('Getting transactions that match the given query')),
-          materialize(),
-          toArray(),
-          getRecordsByKeyNotification<ITransaction>(resultKey)
-        )
+        .pipe(materialize(), toArray(), getRecordsByKeyNotification<ITransaction>(resultKey))
     )
   }
 
@@ -103,8 +97,6 @@ export class TransactionService {
    * @memberof TransactionService
    */
   public updateTransaction$(request: ITransaction): Observable<ITransaction> {
-    this.logger.log('Attempting to update the transaction')
-
     const findMatchingTransaction$ = this.getTransaction(request.id, request.budgetId).pipe(
       map((transaction) => {
         return transaction

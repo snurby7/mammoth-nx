@@ -1,5 +1,5 @@
 import { IBudget, IDeleteResponse } from '@mammoth/api-interfaces'
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Observable } from 'rxjs'
 import { map, materialize, toArray } from 'rxjs/operators'
 import { getRecordsByKey, getRecordsByKeyNotification, Neo4jService } from '../neo4j'
@@ -14,8 +14,6 @@ import {
 
 @Injectable()
 export class BudgetService {
-  private readonly logger = new Logger(BudgetService.name)
-
   constructor(private neo4jService: Neo4jService) {}
 
   /**
@@ -80,7 +78,6 @@ export class BudgetService {
    * @memberof BudgetService
    */
   public deleteBudget(id: string): Observable<IDeleteResponse> {
-    this.logger.debug(`Deleting budget - ${id}`)
     const { statement, props } = deleteBudgetById(id)
 
     return this.neo4jService.rxSession.writeTransaction((trx) =>

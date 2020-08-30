@@ -1,19 +1,19 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { forkJoin, Observable, of, throwError } from 'rxjs';
-import { catchError, first, flatMap, map, switchMap } from 'rxjs/operators';
-import { CommonQueries } from '../../common-queries';
-import { getRecordsByKey, Neo4jService, IMammothCoreNode } from '../../neo4j';
+import { Injectable, Logger } from '@nestjs/common'
+import { forkJoin, Observable, of, throwError } from 'rxjs'
+import { catchError, first, flatMap, map, switchMap } from 'rxjs/operators'
+import { CommonQueries } from '../../common-queries'
+import { getRecordsByKey, IMammothCoreNode, Neo4jService } from '../../neo4j'
 import {
   IAccountLinkBreak,
   IAccountLinkedNodeMeta,
   IAccountLinkRequest,
   IAccountLinkResponse,
-} from './contracts';
-import { updateLinkedNodeBalance } from './queries';
+} from './contracts'
+import { updateLinkedNodeBalance } from './queries'
 
 @Injectable()
 export class CommonAccountService {
-  protected readonly logger = new Logger(CommonAccountService.name);
+  protected readonly logger = new Logger(CommonAccountService.name)
 
   public constructor(protected neo4jService: Neo4jService) {}
 
@@ -26,18 +26,10 @@ export class CommonAccountService {
    * @param {IAccountLinkRequest} linkRequest
    * @memberof CommonAccountService
    */
-  public updateLink$(
-    linkRequest: IAccountLinkRequest
-  ): Observable<IAccountLinkResponse> {
-    this.logger.log('Updating Link Balance');
-    const {
-      currentTransactionLinkDetails,
-      storedTransactionDetails,
-      newLinkDetails,
-    } = linkRequest;
+  public updateLink$(linkRequest: IAccountLinkRequest): Observable<IAccountLinkResponse> {
+    const { currentTransactionLinkDetails, storedTransactionDetails, newLinkDetails } = linkRequest
 
     if (newLinkDetails.id !== currentTransactionLinkDetails.id) {
-      this.logger.debug('Transaction Details are different');
       return forkJoin([
         this.neo4jService.removeTargetedRelationshipFromNode$(
           storedTransactionDetails.id,
@@ -55,21 +47,19 @@ export class CommonAccountService {
           )
         ),
         map(() => ({ message: 'Successfully unlinked and relinked' }))
-      );
+      )
     } else if (storedTransactionDetails.balanceRequest.isBalanceDifferent) {
-      this.logger.debug('Balances are different');
       return this.updateLinkedNodeBalance$({
         label: storedTransactionDetails.balanceRequest.label,
         id: storedTransactionDetails.balanceRequest.id,
         amount: storedTransactionDetails.balanceRequest.chargeAmount,
         budgetId: newLinkDetails.budgetId,
         refund: storedTransactionDetails.balanceRequest.refundAmount,
-      }).pipe(map((_) => ({ message: 'Successfully updated balance' })));
+      }).pipe(map((_) => ({ message: 'Successfully updated balance' })))
     } else {
-      this.logger.debug('Nothing to update');
       return of({
         message: 'Nothing to update, the balances and links are the same',
-      });
+      })
     }
   }
 
@@ -83,12 +73,12 @@ export class CommonAccountService {
   public updateLinkedNodeBalance$<TResponse>(
     linkedAccountMeta: IAccountLinkedNodeMeta
   ): Observable<TResponse> {
-    const resultKey = 'matchedNode';
+    const resultKey = 'matchedNode'
     const { statement, props } = CommonQueries.getNodeStatement(resultKey, {
       id: linkedAccountMeta.id,
       label: linkedAccountMeta.label,
       budgetId: linkedAccountMeta.budgetId,
-    });
+    })
     return this.neo4jService.rxSession.writeTransaction(
       (txc) =>
         txc
@@ -96,20 +86,14 @@ export class CommonAccountService {
           .records()
           .pipe(
             first(),
-            getRecordsByKey<any, number>(
-              resultKey,
-              (record) => record.balance ?? 0
-            ),
+            getRecordsByKey<any, number>(resultKey, (record) => record.balance ?? 0),
             flatMap((balance) =>
-              this.setUpdatedBalanceOnNode$<TResponse>(
-                balance,
-                linkedAccountMeta
-              )
+              this.setUpdatedBalanceOnNode$<TResponse>(balance, linkedAccountMeta)
             ),
             catchError((err) => throwError(err))
           ),
       { timeout: 4000 }
-    );
+    )
   }
 
   /**
@@ -125,12 +109,8 @@ export class CommonAccountService {
     currentBalance: number,
     linkedNode: IAccountLinkedNodeMeta
   ): Observable<TResponse> {
-    const resultKey = 'linkedNode';
-    const { statement, props } = updateLinkedNodeBalance(
-      resultKey,
-      linkedNode,
-      currentBalance
-    );
+    const resultKey = 'linkedNode'
+    const { statement, props } = updateLinkedNodeBalance(resultKey, linkedNode, currentBalance)
     return this.neo4jService.rxSession.writeTransaction<TResponse>(
       (rxTransaction) =>
         rxTransaction
@@ -142,7 +122,7 @@ export class CommonAccountService {
             catchError((err) => of(err))
           ),
       { timeout: 3000 }
-    );
+    )
   }
 
   /**
@@ -154,16 +134,8 @@ export class CommonAccountService {
    * @returns {Promise<void>}
    * @memberof CommonAccountService
    */
-  public removeLinkWithRefund(
-    removeWithRefund: IAccountLinkBreak
-  ): Observable<any> {
-    const {
-      account,
-      transaction,
-      budgetId,
-      refundAmount,
-      relationship,
-    } = removeWithRefund;
+  public removeLinkWithRefund(removeWithRefund: IAccountLinkBreak): Observable<any> {
+    const { account, transaction, budgetId, refundAmount, relationship } = removeWithRefund
     return forkJoin([
       this.updateLinkedNodeBalance$({
         id: account.id,
@@ -176,7 +148,7 @@ export class CommonAccountService {
         transaction.label,
         relationship
       ),
-    ]);
+    ])
   }
 
   /**
@@ -193,8 +165,8 @@ export class CommonAccountService {
    * @memberof CommonAccountService
    */
   public async getNodeBalance(request: IMammothCoreNode): Promise<number> {
-    const { id, label, budgetId } = request;
-    const node = 'node';
+    const { id, label, budgetId } = request
+    const node = 'node'
     return await this.neo4jService
       .executeStatement({
         statement: `
@@ -207,12 +179,9 @@ export class CommonAccountService {
         },
       })
       .then((statementResult) => {
-        const [result] = this.neo4jService.flattenStatementResult<any>(
-          statementResult,
-          node
-        );
-        return result.balance || 0;
-      });
+        const [result] = this.neo4jService.flattenStatementResult<any>(statementResult, node)
+        return result.balance || 0
+      })
   }
 
   /**
@@ -222,9 +191,8 @@ export class CommonAccountService {
    * @param request The core node data to go retrieve
    */
   public getNodeBalance$(request: IMammothCoreNode): Observable<number> {
-    this.logger.log('getLinkedNode$ - Finding the node balance');
-    const node = 'node';
-    const { statement, props } = CommonQueries.getNodeStatement(node, request);
+    const node = 'node'
+    const { statement, props } = CommonQueries.getNodeStatement(node, request)
     return this.neo4jService.rxSession.writeTransaction<number>((trx) =>
       trx
         .run(statement, props)
@@ -233,6 +201,6 @@ export class CommonAccountService {
           first(),
           getRecordsByKey<any, number>(node, (record) => record.balance ?? 0)
         )
-    );
+    )
   }
 }

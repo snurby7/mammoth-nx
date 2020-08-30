@@ -62,7 +62,7 @@ export class TransactionCreateDto implements ICreateTransaction {
     description: 'Total inflow from the transaction',
     example: 16.39,
   })
-  @ValidateIf((prop) => !prop.outflow && prop.outflow !== 0)
+  @ValidateIf((prop) => !prop.outflow && prop.outflow < 0)
   @IsNumber()
   @Min(0)
   inflow?: number
@@ -71,7 +71,7 @@ export class TransactionCreateDto implements ICreateTransaction {
     description: 'Total outflow from the transaction',
     example: -16.39,
   })
-  @ValidateIf((prop) => !prop.inflow && prop.inflow !== 0)
+  @ValidateIf((prop) => !prop.inflow && prop.inflow > 0)
   @IsNumber()
   @Max(0)
   outflow?: number

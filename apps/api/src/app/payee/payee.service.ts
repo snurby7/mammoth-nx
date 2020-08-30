@@ -28,7 +28,6 @@ export class PayeeService extends CommonAccountService implements ICommonAccount
    * @memberof PayeeService
    */
   public async createPayee(createRequest: CreatePayee): Promise<IPayee> {
-    this.logger.log(`Creating a payee with name ${createRequest.name}`)
     const payee = 'node'
     const statementResult = await this.neo4jService.executeStatement({
       statement: `
@@ -57,7 +56,6 @@ export class PayeeService extends CommonAccountService implements ICommonAccount
    * @memberof PayeeService
    */
   public async getAllPayees(budgetId: string): Promise<IPayee[]> {
-    this.logger.log(`Getting all the payees that match budgetId - ${budgetId}`)
     const nodes = 'payees'
     const statementResult = await this.neo4jService.executeStatement({
       statement: `

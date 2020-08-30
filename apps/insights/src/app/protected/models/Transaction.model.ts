@@ -104,6 +104,7 @@ export const TransactionStore = types
     })
 
     const deleteTransactions = (transactionIdentifiers: string[]): void => {
+      console.log(transactionIdentifiers)
       // use the delete method on the TransactionApi
       // TODO: Get the transaction by the identifier and call the delete method on the instance
     }

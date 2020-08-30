@@ -196,14 +196,12 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
    * @memberof CategoryService
    */
   public async deleteCategory(id: string): Promise<{ message: string }> {
-    this.logger.debug(`Deleting category - ${id}`)
     const result = await this.neo4jService.executeStatement({
       statement: `
         MATCH (node:${SupportedLabel.Category} { id: '${id}' })
         DETACH DELETE node
       `,
     })
-    this.logger.debug(`Deleted category - ${id}`)
     return {
       message: `Deleted ${result.summary.counters.updates().nodesDeleted || 0} record(s)`,
     }
