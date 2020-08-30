@@ -1,4 +1,4 @@
-import { ITransaction, ITransactionDetail } from '@mammoth/api-interfaces'
+import { IDeleteResponse, ITransaction, ITransactionDetail } from '@mammoth/api-interfaces'
 import { flow, Instance, types } from 'mobx-state-tree'
 import { ITransactionGridRow } from '../../interface'
 import { transactionFormatter } from '../../utils'
@@ -92,7 +92,6 @@ export const TransactionStore = types
       // TODO: Figure out a way to correctly type these generators
       try {
         const transactions: any[] = yield Promise.all(createTransactionPromises)
-        // TODO Figure out why this is adding and saving correctly but not showing up in the grid like I would expect.
         transactions.forEach((transaction) => {
           self.transactions.put(transaction)
         })
@@ -103,11 +102,28 @@ export const TransactionStore = types
       }
     })
 
-    const deleteTransactions = (transactionIdentifiers: string[]): void => {
-      console.log(transactionIdentifiers)
+    const deleteTransactions = flow(function* (transactionIds: string[]) {
+      setLoading(true)
+      const deleteTransactions: Promise<IDeleteResponse>[] = []
+      transactionIds.forEach((id) => {
+        deleteTransactions.push(
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          transactionApi.deleteTransaction(self.transactions.get(id)!.budgetId, id)
+        )
+      })
+      // TODO: Figure out a way to correctly type these generators
+      try {
+        // TODO: Make this notify a ToastStore
+        yield Promise.all(deleteTransactions)
+        transactionIds.forEach((id) => self.transactions.delete(id))
+      } catch (err) {
+        console.error('Failed to update transaction', err)
+      } finally {
+        setLoading(false)
+      }
       // use the delete method on the TransactionApi
       // TODO: Get the transaction by the identifier and call the delete method on the instance
-    }
+    })
 
     const updateTransactions = flow(function* updateTransactions(
       transactionDetails: Record<string, ITransactionDetail>
