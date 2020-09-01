@@ -31,7 +31,6 @@ export const BudgetStore = types
     const loadBudgets = flow(function* loadBudgets() {
       setLoading(true)
       try {
-        well
         const budgets: any[] = yield budgetApi.loadBudgets()
         budgets.forEach((budget) => self.budgets.put(budget))
       } catch (err) {
