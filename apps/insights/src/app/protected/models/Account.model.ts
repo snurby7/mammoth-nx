@@ -1,4 +1,9 @@
-import { IAccount, IFormattedNode, SupportedAccountType } from '@mammoth/api-interfaces'
+import {
+  IAccount,
+  ICreateAccount,
+  IFormattedNode,
+  SupportedAccountType,
+} from '@mammoth/api-interfaces'
 import { flow, getParent, getRoot, Instance, SnapshotIn, types } from 'mobx-state-tree'
 import { accountApi, transactionApi } from '../api'
 import { RootModel } from './Root.model'
@@ -17,7 +22,6 @@ export const Account = types
   })
   .actions((self) => {
     const loadTransactions = flow(function* loadTransactions() {
-      // setLoading(true)
       try {
         const transactions = yield transactionApi.loadTransactionsByAccount(self.budgetId, self.id)
         getRoot<typeof RootModel>(self).transactionStore.addTransactions(transactions)
@@ -71,12 +75,24 @@ export const AccountStore = types
       }
     })
 
+    const createAccount = flow(function* createAccount(accountDetail: ICreateAccount) {
+      setLoading(true)
+      try {
+        const account: any = yield accountApi.createAccount(accountDetail)
+        self.accounts.put(account)
+      } catch (err) {
+        console.log('Create Account Error => ', err)
+      } finally {
+        setLoading(false)
+      }
+    })
+
     const setAccount = (account: Instance<AccountType>): void => {
       self.selectedAccount = account
     }
 
     return {
-      setLoading,
+      createAccount,
       loadAccounts,
       setAccount,
     }

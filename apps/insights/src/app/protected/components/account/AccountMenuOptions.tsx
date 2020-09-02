@@ -8,7 +8,7 @@ import { AddAccountDialog } from './AddAccountDialog'
 
 export const AccountMenuOptions = (): JSX.Element => {
   const [isOpen, setIsOpen] = useState(false)
-  const store = useAccountStore()
+  const accountStore = useAccountStore()
 
   const onAddClick = () => {
     setIsOpen(true)
@@ -16,13 +16,13 @@ export const AccountMenuOptions = (): JSX.Element => {
 
   const onAddDialogClose = (accountDetails: ICreateAccount | null) => {
     if (accountDetails) {
-      console.log('Going to save this account', accountDetails)
+      accountStore.createAccount(accountDetails)
     }
     setIsOpen(false)
   }
 
   return (
-    <AccountMenuList accounts={store.accounts}>
+    <AccountMenuList accounts={accountStore.accounts}>
       <ListItem alignItems="center" button onClick={onAddClick}>
         <ListItemIcon>
           <AddOutlined />
