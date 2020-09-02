@@ -12,11 +12,6 @@ export const Budget = types
   })
   .actions((self) => ({}))
 
-type BudgetType = typeof Budget
-export interface IBudgetInstance extends Instance<BudgetType> {}
-export interface IBudgetSnap extends SnapshotIn<BudgetType> {}
-export interface IBudgetReference {}
-
 export const BudgetStore = types
   .model({
     budgets: types.map(Budget),
@@ -50,3 +45,8 @@ export const BudgetStore = types
       setBudget,
     }
   })
+
+type BudgetType = typeof Budget
+export interface IBudgetInstance extends Instance<BudgetType> {}
+export interface IBudgetSnap extends SnapshotIn<BudgetType> {}
+export interface IBudgetReference {}

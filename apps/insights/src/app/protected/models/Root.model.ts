@@ -15,7 +15,11 @@ export const RootModel = types.model('RootStore', {
 
 // eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface IRootModelInstance extends Instance<typeof RootModel> {
+  accountStore: Instance<typeof AccountStore>
   budgetStore: Instance<typeof BudgetStore>
+  categoryStore: Instance<typeof CategoryStore>
+  payeeStore: Instance<typeof PayeeStore>
+  transactionStore: Instance<typeof TransactionStore>
 }
 
 export const rootStore = RootModel.create({
