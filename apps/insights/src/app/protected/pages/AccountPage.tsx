@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ITransactionDetail } from '@mammoth/api-interfaces'
 import React, { useCallback, useEffect } from 'react'
-import { IDataColumn, TransactionDataTable } from '../components'
+import { IColumnExtension, IDataColumn, TransactionDataTable } from '../components'
 import { useAccountStore, useTransactionStore } from '../hooks'
 import { ITransactionInstance } from '../models'
 export const AccountPage = () => {
@@ -27,17 +27,23 @@ export const AccountPage = () => {
     { name: 'outflow', title: 'Outflow', isRequired: false },
   ]
 
+  const columnExtensions: IColumnExtension<ITransactionDetail>[] = [
+    { columnName: 'payee', width: '200px' },
+  ]
+
   const dataFilter = useCallback(
     (record: ITransactionInstance) => {
       return record.accountId.id === accountStore.selectedAccount.id
     },
     [accountStore.selectedAccount]
   )
+
   return (
     <article>
       <TransactionDataTable
         transactions={transactionStore.transactions}
         columns={dataColumns}
+        columnExtensions={columnExtensions}
         filter={dataFilter}
       />
     </article>

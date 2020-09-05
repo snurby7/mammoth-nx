@@ -57,6 +57,7 @@ export const PayeeStore = types
       try {
         const payee: any = yield payeeApi.createPayee(request)
         self.payees.put(payee)
+        return payee
       } catch (err) {
         console.error('Failed to create payee ', err)
       } finally {

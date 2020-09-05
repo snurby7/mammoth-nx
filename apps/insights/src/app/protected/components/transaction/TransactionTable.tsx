@@ -55,14 +55,20 @@ export interface IDataColumn<T> {
   formatter?: (value: SnapshotIn<typeof Transaction>) => string
 }
 
+export interface IColumnExtension<TData> {
+  columnName: keyof TData
+  width: string | number
+}
+
 export interface IDataTable<TData> {
   columns: IDataColumn<TData>[]
+  columnExtensions?: IColumnExtension<TData>[]
   transactions: Map<string, ITransactionInstance>
   filter?: (item: ITransactionInstance) => boolean
 }
 
 export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
-  ({ transactions, columns, filter }) => {
+  ({ transactions, columns, columnExtensions, filter }) => {
     const [errors, setErrors] = useState<Record<string, any>>({})
     const transactionStore = useTransactionStore()
     const budgetStore = useBudgetStore()
@@ -125,7 +131,7 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
           {/* End custom cells */}
           <EditingState onRowChangesChange={onEdited} onCommitChanges={commitChanges} />
 
-          <Table />
+          <Table columnExtensions={columnExtensions ?? []} />
           <TableHeaderRow />
           <TableEditRow />
           <TableEditColumn
