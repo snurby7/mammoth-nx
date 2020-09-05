@@ -131,7 +131,14 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
           {/* End custom cells */}
           <EditingState onRowChangesChange={onEdited} onCommitChanges={commitChanges} />
 
-          <Table columnExtensions={columnExtensions ?? []} />
+          <Table
+            columnExtensions={
+              columnExtensions?.map(({ columnName, width }) => ({
+                columnName: columnName as string, // a little type manipulation.
+                width,
+              })) ?? []
+            }
+          />
           <TableHeaderRow />
           <TableEditRow />
           <TableEditColumn
