@@ -24,11 +24,9 @@ const getRowId = (row: ITransactionDetail): string => row.id
 const EditCell = ({ errors, requiredTransactionFields, ...props }) => {
   const { children } = props
   const anyProps: any = props
-  const rowDataKeys = Object.keys(props.tableRow.row)
-  console.log('props.tableRow', props.tableRow)
-  console.log('rowDataKeys', rowDataKeys, requiredTransactionFields)
-  const canCreateNewRecord = !requiredTransactionFields.every((requiredTransactionField) =>
-    rowDataKeys.some((key) => key === requiredTransactionField)
+  const rowData = props.tableRow.row
+  const hasAllRequiredFields = requiredTransactionFields.every(
+    (requiredField) => !!rowData[requiredField]
   )
 
   return (
@@ -38,7 +36,7 @@ const EditCell = ({ errors, requiredTransactionFields, ...props }) => {
         // * A little weird here, but it's a step and it makes the required things be filled in.
         // * Will eventually format the cell to make it show as red or something
         if (child?.props.id === 'commit' && child?.props.text === 'Save') {
-          disabled = canCreateNewRecord
+          disabled = !hasAllRequiredFields
         }
         return child?.props.id === 'commit'
           ? React.cloneElement(child, {
