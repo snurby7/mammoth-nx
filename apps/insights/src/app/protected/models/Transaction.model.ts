@@ -19,7 +19,7 @@ export const Transaction = types
     [(key = 'date')]: DateModel,
     [(key = 'inflow')]: types.optional(types.number, 0),
     [(key = 'outflow')]: types.optional(types.number, 0),
-    [(key = 'memo')]: types.string,
+    [(key = 'memo')]: types.maybe(types.string),
   })
   .actions((self) => ({
     deleteTransaction() {

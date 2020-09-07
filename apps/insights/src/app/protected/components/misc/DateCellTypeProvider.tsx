@@ -11,6 +11,7 @@ const DateCellFormatter = ({ value }) => {
   return <span>{formatter.date(value)}</span>
 }
 const DateCellEditor = ({ value: cellValue, onValueChange }) => {
+  console.log('cellValue', cellValue)
   const [value, setValue] = useState<Date | null>(parser.date(cellValue) || new Date())
   useEffect(() => {
     onValueChange(formatter.utcFormat(value ?? undefined))

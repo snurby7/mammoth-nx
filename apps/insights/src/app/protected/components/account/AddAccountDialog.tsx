@@ -72,7 +72,7 @@ export const AddAccountDialog: React.FC<IAddAccountDialogProps> = ({
           ))}
         </Select>
         <TextField
-          label={'Balance'}
+          label={'Starting Balance'}
           name={(key = 'balance')}
           type="number"
           value={details.balance}

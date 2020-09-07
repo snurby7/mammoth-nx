@@ -23,6 +23,7 @@ export const TransactionQueries = {
       MATCH (payee:Payee {id: $payeeId, budgetId: $budgetId})
       CREATE (${requestKey}:${SupportedLabel.Transaction} $nodeProps)
       SET ${requestKey}.createdDate = datetime("${new Date().toISOString()}")
+      SET ${requestKey}.date = datetime("${request.date}")
       MERGE (${requestKey})-[relatesToAccount:${NodeRelationship.UsedAccount}]->(account)
       MERGE (${requestKey})-[relatesToCategory:${NodeRelationship.UsedCategory}]->(category)
       MERGE (${requestKey})-[relatesToPayee:${NodeRelationship.UsedPayee}]->(payee)
@@ -96,11 +97,11 @@ export const TransactionQueries = {
   updateTransaction: (resultKey: string, request: ITransaction): ExecuteStatement => ({
     statement: `
     MATCH (${resultKey}:${SupportedLabel.Transaction} { id: $id})
-    SET ${resultKey} += {inflow: $inflow, outflow: $outflow, memo: $memo, date: $date, accountId: $accountId, payeeId: $payeeId, categoryId: $categoryId}
+    SET ${resultKey} += {inflow: $inflow, outflow: $outflow, memo: $memo, date: datetime($date), accountId: $accountId, payeeId: $payeeId, categoryId: $categoryId}
     RETURN ${resultKey}
   `,
     props: {
-      memo: request.memo,
+      memo: request.memo || nullE,
       inflow: request.inflow || null,
       outflow: request.outflow || null,
       date: request.date,

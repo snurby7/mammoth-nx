@@ -1,9 +1,9 @@
 import moment from 'moment'
 
 export const parser = {
-  date(value: string | null): Date {
-    if (value) {
-      return moment(value.replace(/[a-z]/gi, ' ').split(' ')[0]).toDate()
+  date(value: string | null | Date): Date {
+    if (typeof value === 'string') {
+      return moment(value).toDate()
     }
     return moment().toDate()
   },
