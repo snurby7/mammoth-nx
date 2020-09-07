@@ -5,6 +5,7 @@ import { transactionFormatter } from '../../utils'
 import { transactionApi } from '../api'
 import { Account } from './Account.model'
 import { Category } from './Category.model'
+import { DateModel } from './Date.model'
 import { Payee } from './Payee.model'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let key: keyof ITransaction
@@ -15,7 +16,7 @@ export const Transaction = types
     [(key = 'budgetId')]: types.string,
     [(key = 'categoryId')]: types.reference(Category),
     [(key = 'payeeId')]: types.reference(Payee),
-    [(key = 'date')]: types.string,
+    [(key = 'date')]: DateModel,
     [(key = 'inflow')]: types.optional(types.number, 0),
     [(key = 'outflow')]: types.optional(types.number, 0),
     [(key = 'memo')]: types.string,
@@ -29,7 +30,7 @@ export const Transaction = types
     get formattedValue(): ITransactionDetail {
       return {
         id: self.id,
-        date: self.date,
+        date: self.date.toDate(),
         accountId: self.accountId.id,
         account: self.accountId.formattedNode,
         category: self.categoryId.formattedNode,
@@ -52,7 +53,7 @@ export const Transaction = types
         inflow: self.inflow,
         memo: self.memo,
         accountId: self.accountId.id,
-        date: self.date,
+        date: self.date.toDate(),
       }
     },
   }))

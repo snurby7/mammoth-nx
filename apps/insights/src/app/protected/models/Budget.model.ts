@@ -1,5 +1,5 @@
 import { IBudget } from '@mammoth/api-interfaces'
-import { flow, Instance, SnapshotIn, SnapshotOrInstance, types } from 'mobx-state-tree'
+import { destroy, flow, Instance, SnapshotIn, SnapshotOrInstance, types } from 'mobx-state-tree'
 import { budgetApi } from '../api'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -35,12 +35,37 @@ export const BudgetStore = types
       }
     })
 
+    const createBudget = flow(function* createBudget(name: string) {
+      setLoading(true)
+      try {
+        const budget = yield budgetApi.createBudget(name)
+        self.budgets.put(budget)
+      } catch (err) {
+        console.log('Creating Budget Failure', err)
+      } finally {
+        setLoading(false)
+      }
+    })
+
+    const deleteBudget = flow(function* deleteBudget(budget: IBudgetInstance) {
+      setLoading(true)
+      try {
+        yield budgetApi.deleteBudget(budget.id)
+        destroy(budget)
+      } catch (err) {
+        console.log('Creating Budget Failure', err)
+      } finally {
+        setLoading(false)
+      }
+    })
+
     const setBudget = (budget: SnapshotOrInstance<BudgetType>): void => {
       self.selectedBudget = budget
     }
 
     return {
-      setLoading,
+      createBudget,
+      deleteBudget,
       loadBudgets,
       setBudget,
     }

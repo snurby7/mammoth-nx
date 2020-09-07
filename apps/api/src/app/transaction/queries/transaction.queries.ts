@@ -22,6 +22,7 @@ export const TransactionQueries = {
       MATCH (account:Account {id: $accountId, budgetId: $budgetId})
       MATCH (payee:Payee {id: $payeeId, budgetId: $budgetId})
       CREATE (${requestKey}:${SupportedLabel.Transaction} $nodeProps)
+      SET ${requestKey}.createdDate = datetime("${new Date().toISOString()}")
       MERGE (${requestKey})-[relatesToAccount:${NodeRelationship.UsedAccount}]->(account)
       MERGE (${requestKey})-[relatesToCategory:${NodeRelationship.UsedCategory}]->(category)
       MERGE (${requestKey})-[relatesToPayee:${NodeRelationship.UsedPayee}]->(payee)

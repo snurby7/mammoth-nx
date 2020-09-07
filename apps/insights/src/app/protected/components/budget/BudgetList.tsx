@@ -40,6 +40,9 @@ const BudgetListItem = ({ budget }: IBudgetListItemProps): JSX.Element => {
       <BudgetHeader>{budget.name}</BudgetHeader>
       <div>{budget.createdDate}</div>
       <Button onClick={onSelectBudget}>Select</Button>
+      <Button color="secondary" onClick={() => budgetStore.deleteBudget(budget)}>
+        Delete
+      </Button>
     </BudgetItemWrapper>
   )
 }
