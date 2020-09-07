@@ -25,6 +25,8 @@ const EditCell = ({ errors, requiredTransactionFields, ...props }) => {
   const { children } = props
   const anyProps: any = props
   const rowDataKeys = Object.keys(props.tableRow.row)
+  console.log('props.tableRow', props.tableRow)
+  console.log('rowDataKeys', rowDataKeys, requiredTransactionFields)
   const canCreateNewRecord = !requiredTransactionFields.every((requiredTransactionField) =>
     rowDataKeys.some((key) => key === requiredTransactionField)
   )

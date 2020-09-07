@@ -29,6 +29,7 @@ export const AccountPage = () => {
 
   const columnExtensions: IColumnExtension<ITransactionDetail>[] = [
     { columnName: 'payee', width: '200px' },
+    { columnName: 'category', width: '200px' },
   ]
 
   const dataFilter = useCallback(

@@ -1,4 +1,4 @@
-import { ICategory, IFormattedNode } from '@mammoth/api-interfaces'
+import { ICategory, ICreateCategory, IFormattedNode } from '@mammoth/api-interfaces'
 import { flow, getParent, Instance, SnapshotIn, types } from 'mobx-state-tree'
 import { RootModel } from '.'
 import { categoryApi } from '../api'
@@ -56,14 +56,23 @@ export const CategoryStore = types
       }
     })
 
-    const setCategory = (category: Instance<CategoryType>): void => {
-      self.selectedCategory = category
-    }
+    const createCategory = flow(function* createCategory(request: ICreateCategory) {
+      setLoading(true)
+      try {
+        const category = yield categoryApi.createCategory(request)
+        self.categories.put(category)
+        return category
+      } catch (err) {
+        console.log('Create Category Error => ', err)
+      } finally {
+        setLoading(false)
+      }
+    })
 
     return {
-      setLoading,
+      createCategory,
       loadCategories,
-      setCategory,
+      setLoading,
     }
   })
   .views((self) => ({}))

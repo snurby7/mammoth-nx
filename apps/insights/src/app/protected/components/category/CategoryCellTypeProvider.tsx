@@ -1,40 +1,82 @@
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import { IFormattedNode, ITransactionDetail } from '@mammoth/api-interfaces'
-import { Input, MenuItem, Select } from '@material-ui/core'
-import React, { useState } from 'react'
-import { useCategoryStore } from '../../hooks'
-import { ICategoryInstance } from '../../models'
+import { TextField } from '@material-ui/core'
+import { Autocomplete, createFilterOptions } from '@material-ui/lab'
+import React, { useCallback, useState } from 'react'
+import { useBudgetStore, useCategoryStore } from '../../hooks'
+import { ICategorySnap } from '../../models'
+
+const filter = createFilterOptions<ICategorySnap>()
 
 const CategoryCellFormatter = ({ value: node }: { value: IFormattedNode }) => {
   return <span>{node.value}</span>
 }
+
 const CategoryCellEditor = ({ value, onValueChange }) => {
   const node: IFormattedNode = value ?? { id: '', value: '' } // when it's add mode this is undefined
-  const { categories } = useCategoryStore()
-  const [selectedCategoryId, setSelectedCategoryId] = useState(node.id)
-  const onChange = (
-    event: React.ChangeEvent<{
-      name?: string | undefined
-      value: unknown
-    }>
-  ) => {
-    const value = event.target.value as string
-    setSelectedCategoryId(value)
-    onValueChange(value)
+  const categoryStore = useCategoryStore()
+  const categoryList: ICategorySnap[] = Array.from(categoryStore.categories.values())
+  const { selectedBudget } = useBudgetStore()
+  const [selectedCategory, setSelectedCategory] = useState<ICategorySnap | null>(
+    categoryList.find((category) => category.id === node.id) ?? null
+  )
+
+  const onChange = useCallback(
+    (category: ICategorySnap | null) => {
+      onValueChange(category?.id)
+      setSelectedCategory(category)
+    },
+    [onValueChange]
+  )
+
+  const onAutoCompleteSelection = (category: ICategorySnap | string) => {
+    if (typeof category === 'string' || category.id === '') {
+      // create the category and set the selectedCategory to the server category
+      const categoryName = typeof category === 'string' ? category : category.name
+      categoryStore
+        .createCategory({
+          name: categoryName.replace('Create "', '').slice(0, -1),
+          budgetId: selectedBudget!.id,
+        })
+        .then((category) => {
+          onChange(category)
+        })
+      // create this category
+    } else {
+      onChange(category)
+    }
   }
+
   return (
-    <Select
-      input={<Input />}
-      value={selectedCategoryId}
-      onChange={onChange}
-      style={{ width: '100%' }}
-    >
-      {Array.from(categories.values()).map((category: ICategoryInstance) => (
-        <MenuItem key={category.id} value={category.id}>
-          {category.name}
-        </MenuItem>
-      ))}
-    </Select>
+    <Autocomplete
+      id="category-cell"
+      value={selectedCategory}
+      options={categoryList}
+      getOptionLabel={(option: ICategorySnap) => option.name}
+      onChange={(_, newValue) => {
+        if (typeof newValue === 'string') {
+          onAutoCompleteSelection(newValue)
+        } else if (newValue && newValue.id === '') {
+          onAutoCompleteSelection(newValue)
+        } else {
+          onChange(newValue)
+        }
+      }}
+      filterOptions={(options, params) => {
+        const filtered = filter(options, params)
+        if (params.inputValue !== '') {
+          filtered.push({
+            id: '',
+            name: `Create "${params.inputValue}"`,
+            budgetId: '',
+          })
+        }
+        return filtered
+      }}
+      freeSolo
+      selectOnFocus
+      renderInput={(params) => <TextField {...params} variant="outlined" />}
+    />
   )
 }
 

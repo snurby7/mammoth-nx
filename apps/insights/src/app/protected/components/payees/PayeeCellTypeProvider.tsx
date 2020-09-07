@@ -2,7 +2,7 @@ import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import { IFormattedNode, ITransactionDetail } from '@mammoth/api-interfaces'
 import { TextField } from '@material-ui/core'
 import { Autocomplete, createFilterOptions } from '@material-ui/lab'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useBudgetStore, usePayeeStore } from '../../hooks'
 import { IPayeeSnap } from '../../models'
 
@@ -21,6 +21,14 @@ const PayeeCellEditor = ({ value, onValueChange }) => {
     payeeList.find((payee) => payee.id === node.id) ?? null
   )
 
+  const onChange = useCallback(
+    (payee: IPayeeSnap | null) => {
+      onValueChange(payee?.id)
+      setSelectedPayee(payee)
+    },
+    [onValueChange]
+  )
+
   const onAutoCompleteSelection = (payee: IPayeeSnap | string) => {
     if (typeof payee === 'string' || payee.id === '') {
       // create the payee and set the selectedPayee to the server payee
@@ -32,15 +40,10 @@ const PayeeCellEditor = ({ value, onValueChange }) => {
           budgetId: selectedBudget!.id,
         })
         .then((payee) => {
-          console.log('create payee', payee)
-          setSelectedPayee(payee)
-          onValueChange(payee.id)
+          onChange(payee)
         })
-
-      // create this payee
     } else {
-      setSelectedPayee(payee)
-      onValueChange(payee.id)
+      onChange(payee)
     }
   }
 
@@ -56,7 +59,7 @@ const PayeeCellEditor = ({ value, onValueChange }) => {
         } else if (newValue && newValue.id === '') {
           onAutoCompleteSelection(newValue)
         } else {
-          setSelectedPayee(newValue)
+          onChange(newValue)
         }
       }}
       filterOptions={(options, params) => {
