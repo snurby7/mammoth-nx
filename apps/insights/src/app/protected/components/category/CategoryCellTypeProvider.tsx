@@ -32,16 +32,20 @@ const CategoryCellEditor = ({ value, onValueChange }) => {
   const onAutoCompleteSelection = (category: ICategorySnap | string) => {
     if (typeof category === 'string' || category.id === '') {
       // create the category and set the selectedCategory to the server category
-      const categoryName = typeof category === 'string' ? category : category.name
+      let categoryName = typeof category === 'string' ? category : category.name
+      categoryName =
+        categoryName.charAt(categoryName.length - 1) === '"'
+          ? categoryName.slice(0, -1)
+          : categoryName
+      // * Two cases come in here one that looks like 'Create "Category A"' and one that looks like 'Category A'
       categoryStore
         .createCategory({
-          name: categoryName.replace('Create "', '').slice(0, -1),
+          name: categoryName.replace('Create "', ''),
           budgetId: selectedBudget!.id,
         })
         .then((category) => {
           onChange(category)
         })
-      // create this category
     } else {
       onChange(category)
     }

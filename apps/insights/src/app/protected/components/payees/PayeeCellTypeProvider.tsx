@@ -32,11 +32,14 @@ const PayeeCellEditor = ({ value, onValueChange }) => {
   const onAutoCompleteSelection = (payee: IPayeeSnap | string) => {
     if (typeof payee === 'string' || payee.id === '') {
       // create the payee and set the selectedPayee to the server payee
-      const payeeName = typeof payee === 'string' ? payee : payee.name
+      let payeeName = typeof payee === 'string' ? payee : payee.name
+      payeeName =
+        payeeName.charAt(payeeName.length - 1) === '"' ? payeeName.slice(0, -1) : payeeName
+      // * Two cases come in here one that looks like 'Create "Payee A"' and one that looks like 'Payee A'
+
       payeeStore
         .createPayee({
-          // remove the create part and remove the last quote.
-          name: payeeName.replace('Create "', '').slice(0, -1),
+          name: payeeName.replace('Create "', ''),
           budgetId: selectedBudget!.id,
         })
         .then((payee) => {
