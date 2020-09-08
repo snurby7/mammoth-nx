@@ -15,7 +15,6 @@ export const DateModel = types
       date.setFullYear(self.year)
       date.setMonth(self.month - 1)
       date.setDate(self.day)
-      console.log(self, date.toISOString())
       return date.toDateString()
     },
   }))

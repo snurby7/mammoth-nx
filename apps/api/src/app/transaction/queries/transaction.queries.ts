@@ -101,7 +101,7 @@ export const TransactionQueries = {
     RETURN ${resultKey}
   `,
     props: {
-      memo: request.memo || nullE,
+      memo: request.memo || null,
       inflow: request.inflow || null,
       outflow: request.outflow || null,
       date: request.date,

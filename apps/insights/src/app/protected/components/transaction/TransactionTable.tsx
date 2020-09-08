@@ -1,4 +1,11 @@
-import { ChangeSet, Column, EditingState } from '@devexpress/dx-react-grid'
+import {
+  ChangeSet,
+  Column,
+  EditingState,
+  IntegratedSorting,
+  Sorting,
+  SortingState,
+} from '@devexpress/dx-react-grid'
 import {
   Grid,
   Table,
@@ -74,6 +81,8 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
     const budgetStore = useBudgetStore()
     const selectedBudget = budgetStore.selectedBudget
 
+    const [sorting, setSorting] = useState<Sorting[]>([{ columnName: 'date', direction: 'desc' }])
+
     if (!selectedBudget) {
       return <div>There is no selected budget! Sorry!</div>
     }
@@ -122,6 +131,8 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
     return (
       <Paper>
         <Grid rows={rows} columns={columns as Column[]} getRowId={getRowId}>
+          <SortingState sorting={sorting} onSortingChange={setSorting} />
+          <IntegratedSorting />
           {/* Custom Cells these could probably be abstracted to {children} later */}
           <AccountCellTypeProvider />
           <PayeeCellTypeProvider />
@@ -130,7 +141,6 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
           <CurrencyCellTypeProvider />
           {/* End custom cells */}
           <EditingState onRowChangesChange={onEdited} onCommitChanges={commitChanges} />
-
           <Table
             columnExtensions={
               columnExtensions?.map(({ columnName, width }) => ({
@@ -139,7 +149,7 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
               })) ?? []
             }
           />
-          <TableHeaderRow />
+          <TableHeaderRow showSortingControls />
           <TableEditRow />
           <TableEditColumn
             // cellComponent={() => <div>this is the cell row button area</div>} // this will change the ADD/EDIT components look

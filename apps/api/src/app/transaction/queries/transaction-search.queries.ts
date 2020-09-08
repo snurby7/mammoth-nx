@@ -1,12 +1,12 @@
-import { ITransactionDetailLinks } from '@mammoth/api-interfaces';
-import { NodeRelationship, SupportedLabel } from '../../constants';
-import { ISearchQuery } from '../../contracts';
+import { ITransactionDetailLinks } from '@mammoth/api-interfaces'
+import { NodeRelationship, SupportedLabel } from '../../constants'
+import { ISearchQuery } from '../../contracts'
 
-const account = 'account';
-const budget = 'budget';
-const payee = 'payee';
-const category = 'category';
-const transaction = 'transaction';
+const account = 'account'
+const budget = 'budget'
+const payee = 'payee'
+const category = 'category'
+const transaction = 'transaction'
 
 export const searchQueries = {
   getTransactionByAccount: (
@@ -31,7 +31,7 @@ export const searchQueries = {
         [payee]: 'payee',
         [category]: 'category',
       },
-    };
+    }
   },
   getTransactionByPayee: (
     payeeId: string,
@@ -55,7 +55,7 @@ export const searchQueries = {
         [payee]: 'payee',
         [category]: 'category',
       },
-    };
+    }
   },
   getTransactionByCategory: (
     categoryId: string,
@@ -79,6 +79,17 @@ export const searchQueries = {
         [payee]: 'payee',
         [category]: 'category',
       },
-    };
+    }
   },
-};
+}
+
+/**
+ * How to do a bounded range for the datetime property on the transaction
+ *
+ * MATCH(t:Transaction)
+ * WHERE datetime({year: 2020, month: 10}) > t.date >= datetime({year: 2020, month: 9})
+ * RETURN t
+ *
+ *
+ *
+ */

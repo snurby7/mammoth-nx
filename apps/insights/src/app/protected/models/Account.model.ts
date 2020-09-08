@@ -24,7 +24,6 @@ export const Account = types
     const loadTransactions = flow(function* loadTransactions() {
       try {
         const transactions = yield transactionApi.loadTransactionsByAccount(self.budgetId, self.id)
-        console.log(transactions)
         getRoot<typeof RootModel>(self).transactionStore.addTransactions(transactions)
       } catch (err) {
         console.error('Failed to load transaction', err)
