@@ -1,4 +1,4 @@
-import { ITransactionDetailLinks } from '@mammoth/api-interfaces'
+import { IMonthBoundary, ITransactionDetailLinks } from '@mammoth/api-interfaces'
 import { NodeRelationship, SupportedLabel } from '../../constants'
 import { ISearchQuery } from '../../contracts'
 
@@ -81,13 +81,40 @@ export const searchQueries = {
       },
     }
   },
+  getTransactionsByRange: (
+    budgetId: string,
+    boundary: IMonthBoundary
+  ): ISearchQuery<ITransactionDetailLinks> => {
+    return {
+      statement: `
+        MATCH (${transaction}:Transaction {budgetId: $budgetId}),
+        (${transaction})-[${NodeRelationship.UsedCategory}]->(${category}:${SupportedLabel.Category})-[:${NodeRelationship.CategoryOf}]->(budget),
+        (${transaction})-[${NodeRelationship.UsedAccount}]->(${account}:${SupportedLabel.Account})-[:${NodeRelationship.AccountOf}]->(budget),
+        (${transaction})-[${NodeRelationship.UsedPayee}]->(${payee}:${SupportedLabel.Payee})-[:${NodeRelationship.PayeeOf}]->(budget)
+        WHERE datetime({year: $endYear, month: $endMonth}) > t.date >= datetime({year: $startYear, month: $startMonth})
+        RETURN ${transaction}, ${category}, ${account}, ${payee}
+      `,
+      props: {
+        budgetId,
+        endYear: boundary.end.year.toString(),
+        endMonth: boundary.end.month.toString(),
+        startYear: boundary.start.year.toString(),
+        startMonth: boundary.start.month.toString(),
+      },
+      recordBase: transaction,
+      formatKeyMap: {
+        account,
+        payee,
+        category,
+      },
+    }
+  },
 }
 
 /**
  * How to do a bounded range for the datetime property on the transaction
  *
  * MATCH(t:Transaction)
- * WHERE datetime({year: 2020, month: 10}) > t.date >= datetime({year: 2020, month: 9})
  * RETURN t
  *
  *

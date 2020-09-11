@@ -1,8 +1,8 @@
 import { ITransactionDetail } from '@mammoth/api-interfaces'
-import { Controller, Get, Param, UseGuards } from '@nestjs/common'
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { Observable } from 'rxjs'
+import { Observable, of } from 'rxjs'
 import { TransactionSearchService } from './transaction-search.service'
 
 @Controller('transaction')
@@ -59,5 +59,12 @@ export class TransactionSearchController {
     @Param('categoryId') categoryId: string
   ): Observable<ITransactionDetail[]> {
     return this.transactionSearchService.getTransactionByCategory(budgetId, categoryId)
+  }
+
+  @Get('search')
+  @UseGuards(AuthGuard('jwt'))
+  public getTransactionsByQuery(@Query() query): Observable<ITransactionDetail[]> {
+    console.log(query)
+    return of([])
   }
 }
