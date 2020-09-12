@@ -1,4 +1,4 @@
-import { ITransactionDetail } from '@mammoth/api-interfaces'
+import { IDateRangeSearchQuery, ITransactionDetail } from '@mammoth/api-interfaces'
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -61,9 +61,12 @@ export class TransactionSearchController {
     return this.transactionSearchService.getTransactionByCategory(budgetId, categoryId)
   }
 
-  @Get('search')
+  @Get(':budgetId/search')
   @UseGuards(AuthGuard('jwt'))
-  public getTransactionsByQuery(@Query() query): Observable<ITransactionDetail[]> {
+  public getTransactionsByQuery(
+    @Param('budgetId') budgetId: string,
+    @Query() query: IDateRangeSearchQuery
+  ): Observable<ITransactionDetail[]> {
     console.log(query)
     return of([])
   }
