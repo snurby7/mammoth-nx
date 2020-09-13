@@ -6,5 +6,6 @@ interface ICategoryBreakdownProps {
   transactions: ITransactionInstance[]
 }
 export const CategoryBreakdown = observer(({ transactions }: ICategoryBreakdownProps) => {
+  // TODO Break this down into a chart of some sort.
   return <div>Breakdown the transactions by category</div>
 })

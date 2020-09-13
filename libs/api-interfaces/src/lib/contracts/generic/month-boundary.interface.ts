@@ -1,4 +1,5 @@
 interface IMonthDetail {
+  day: number
   month: number
   year: number
 }

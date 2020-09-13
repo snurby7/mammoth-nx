@@ -85,21 +85,25 @@ export const searchQueries = {
     budgetId: string,
     boundary: IMonthBoundary
   ): ISearchQuery<ITransactionDetailLinks> => {
+    // * This is a little odd, but there's an odd issue with numbers being put into props object here, it yells about
+    // * DoubleValue when it expects an Integer or something like that.
+    const startDay = +boundary.start.day
+    const startMonth = +boundary.start.month
+    const startYear = +boundary.start.year
+    const endDay = +boundary.end.day
+    const endMonth = +boundary.end.month
+    const endYear = +boundary.end.year
     return {
       statement: `
         MATCH (${transaction}:Transaction {budgetId: $budgetId}),
         (${transaction})-[${NodeRelationship.UsedCategory}]->(${category}:${SupportedLabel.Category})-[:${NodeRelationship.CategoryOf}]->(budget),
         (${transaction})-[${NodeRelationship.UsedAccount}]->(${account}:${SupportedLabel.Account})-[:${NodeRelationship.AccountOf}]->(budget),
         (${transaction})-[${NodeRelationship.UsedPayee}]->(${payee}:${SupportedLabel.Payee})-[:${NodeRelationship.PayeeOf}]->(budget)
-        WHERE datetime({year: $endYear, month: $endMonth}) > t.date >= datetime({year: $startYear, month: $startMonth})
+        WHERE datetime({year: ${endYear}, month: ${endMonth} day: ${endDay}}) > transaction.date >= datetime({year: ${startYear}, month: ${startMonth}, day: ${startDay}})
         RETURN ${transaction}, ${category}, ${account}, ${payee}
       `,
       props: {
         budgetId,
-        endYear: boundary.end.year.toString(),
-        endMonth: boundary.end.month.toString(),
-        startYear: boundary.start.year.toString(),
-        startMonth: boundary.start.month.toString(),
       },
       recordBase: transaction,
       formatKeyMap: {
@@ -110,13 +114,3 @@ export const searchQueries = {
     }
   },
 }
-
-/**
- * How to do a bounded range for the datetime property on the transaction
- *
- * MATCH(t:Transaction)
- * RETURN t
- *
- *
- *
- */

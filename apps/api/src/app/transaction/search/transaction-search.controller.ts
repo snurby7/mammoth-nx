@@ -2,7 +2,8 @@ import { IDateRangeSearchQuery, ITransactionDetail } from '@mammoth/api-interfac
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { Observable, of } from 'rxjs'
+import { Observable } from 'rxjs'
+import { toMonthBoundary } from '../../utils'
 import { TransactionSearchService } from './transaction-search.service'
 
 @Controller('transaction')
@@ -68,6 +69,9 @@ export class TransactionSearchController {
     @Query() query: IDateRangeSearchQuery
   ): Observable<ITransactionDetail[]> {
     console.log(query)
-    return of([])
+    return this.transactionSearchService.getTransactionsByDateBoundary(
+      budgetId,
+      toMonthBoundary(query)
+    )
   }
 }

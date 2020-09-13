@@ -1,4 +1,5 @@
 export * from './account'
 export * from './budget'
+export { CategoryBreakdown } from './category'
 export * from './misc'
 export * from './transaction'
