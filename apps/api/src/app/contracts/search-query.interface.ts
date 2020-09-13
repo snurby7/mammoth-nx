@@ -1,6 +1,6 @@
 export interface ISearchQuery<T> {
-  statement: string;
-  props: Record<string, string>;
+  statement: string
+  props: Record<string, string | number>
 
   /**
    * The main record to get details
@@ -8,7 +8,7 @@ export interface ISearchQuery<T> {
    * @type {string}
    * @memberof ISearchQuery
    */
-  recordBase: string;
+  recordBase: string
 
   /**
    * This will take a key from a neo4j query and it will say this is your key. Grab the data from this key
@@ -17,5 +17,5 @@ export interface ISearchQuery<T> {
    * @type {Record<string, string>}
    * @memberof ISearchQuery
    */
-  formatKeyMap: Record<string, keyof T>;
+  formatKeyMap: Record<string, keyof T>
 }

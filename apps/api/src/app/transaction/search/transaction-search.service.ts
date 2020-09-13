@@ -1,10 +1,10 @@
-import { ITransactionDetail } from '@mammoth/api-interfaces';
-import { Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { materialize, toArray } from 'rxjs/operators';
-import { Neo4jService } from '../../neo4j';
-import { transformRecordToDetail } from '../../neo4j/rxjs/neo4j.operators';
-import { searchQueries } from '../queries/transaction-search.queries';
+import { IMonthBoundary, ITransactionDetail } from '@mammoth/api-interfaces'
+import { Injectable } from '@nestjs/common'
+import { Observable } from 'rxjs'
+import { materialize, toArray } from 'rxjs/operators'
+import { Neo4jService } from '../../neo4j'
+import { transformRecordToDetail } from '../../neo4j/rxjs/neo4j.operators'
+import { searchQueries } from '../queries/transaction-search.queries'
 
 @Injectable()
 export class TransactionSearchService {
@@ -28,17 +28,13 @@ export class TransactionSearchService {
       props,
       recordBase,
       formatKeyMap, // TODO take these values and turn them into an IFormattedNode
-    } = searchQueries.getTransactionByPayee(payeeId, budgetId);
+    } = searchQueries.getTransactionByPayee(payeeId, budgetId)
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx
         .run(statement, props)
         .records()
-        .pipe(
-          materialize(),
-          toArray(),
-          transformRecordToDetail(recordBase, formatKeyMap)
-        )
-    );
+        .pipe(materialize(), toArray(), transformRecordToDetail(recordBase, formatKeyMap))
+    )
   }
 
   /**
@@ -59,17 +55,13 @@ export class TransactionSearchService {
       props,
       recordBase,
       formatKeyMap, // TODO take these values and turn them into an IFormattedNode
-    } = searchQueries.getTransactionByCategory(categoryId, budgetId);
+    } = searchQueries.getTransactionByCategory(categoryId, budgetId)
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx
         .run(statement, props)
         .records()
-        .pipe(
-          materialize(),
-          toArray(),
-          transformRecordToDetail(recordBase, formatKeyMap)
-        )
-    );
+        .pipe(materialize(), toArray(), transformRecordToDetail(recordBase, formatKeyMap))
+    )
   }
 
   /**
@@ -85,21 +77,39 @@ export class TransactionSearchService {
     budgetId: string,
     accountId: string
   ): Observable<ITransactionDetail[]> {
-    const {
-      statement,
-      props,
-      recordBase,
-      formatKeyMap,
-    } = searchQueries.getTransactionByAccount(accountId, budgetId);
+    const { statement, props, recordBase, formatKeyMap } = searchQueries.getTransactionByAccount(
+      accountId,
+      budgetId
+    )
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx
         .run(statement, props)
         .records()
-        .pipe(
-          materialize(),
-          toArray(),
-          transformRecordToDetail(recordBase, formatKeyMap)
-        )
-    );
+        .pipe(materialize(), toArray(), transformRecordToDetail(recordBase, formatKeyMap))
+    )
+  }
+
+  /**
+   * Function which will get you the transactions for a given budgetId between two points in time.
+   *
+   * @param {string} budgetId
+   * @param {IMonthBoundary} request
+   * @returns {Observable<ITransactionDetail[]>}
+   * @memberof TransactionSearchService
+   */
+  public getTransactionsByDateBoundary(
+    budgetId: string,
+    request: IMonthBoundary
+  ): Observable<ITransactionDetail[]> {
+    const { statement, props, recordBase, formatKeyMap } = searchQueries.getTransactionsByRange(
+      budgetId,
+      request
+    )
+    return this.neo4jService.rxSession.readTransaction((trx) =>
+      trx
+        .run(statement, props)
+        .records()
+        .pipe(materialize(), toArray(), transformRecordToDetail(recordBase, formatKeyMap))
+    )
   }
 }

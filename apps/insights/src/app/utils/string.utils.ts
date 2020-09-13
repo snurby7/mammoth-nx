@@ -15,3 +15,16 @@ export const replaceKeyPlaceholders = (
   })
   return searchString
 }
+
+/**
+ * Takes in an object of queryParams and will loop over them and convert to a query param string
+ *
+ * @param {Record<string, any>} queryParams An object
+ * @returns {string} All of the keys mapped to query param style 'this=something&otherThis=anotherSomething'
+ */
+export const toQueryParams = (queryParams: Record<string, any>): string => {
+  const queryParamString = Object.keys(queryParams)
+    .map((param) => `${param}=${queryParams[param].toString()}`)
+    .join('&')
+  return `?${queryParamString}`
+}

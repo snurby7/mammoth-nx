@@ -3,7 +3,7 @@ import { AccountStore } from './Account.model'
 import { BudgetStore } from './Budget.model'
 import { CategoryStore } from './Category.model'
 import { PayeeStore } from './Payee.model'
-import { TransactionStore } from './Transaction.model'
+import { TransactionStore } from './TransactionStore.model'
 
 export const RootModel = types.model('RootStore', {
   budgetStore: BudgetStore,
