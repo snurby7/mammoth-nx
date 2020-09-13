@@ -1,9 +1,9 @@
 import { ITransaction, ITransactionDetail } from '@mammoth/api-interfaces'
 import { Instance, SnapshotIn, types } from 'mobx-state-tree'
-import { Account } from './Account.model'
-import { Category } from './Category.model'
+import { Account, IAccountInstance } from './Account.model'
+import { Category, ICategoryInstance } from './Category.model'
 import { DateModel } from './Date.model'
-import { Payee } from './Payee.model'
+import { IPayeeInstance, Payee } from './Payee.model'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let key: keyof ITransaction
 export const Transaction = types
@@ -55,5 +55,9 @@ export const Transaction = types
     },
   }))
 
-export interface ITransactionInstance extends Instance<typeof Transaction> {}
+export interface ITransactionInstance extends Instance<typeof Transaction> {
+  accountId: IAccountInstance
+  categoryId: ICategoryInstance
+  payeeId: IPayeeInstance
+}
 export interface ITransactionSnapshot extends SnapshotIn<typeof Transaction> {}

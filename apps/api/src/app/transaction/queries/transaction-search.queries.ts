@@ -99,7 +99,7 @@ export const searchQueries = {
         (${transaction})-[${NodeRelationship.UsedCategory}]->(${category}:${SupportedLabel.Category})-[:${NodeRelationship.CategoryOf}]->(budget),
         (${transaction})-[${NodeRelationship.UsedAccount}]->(${account}:${SupportedLabel.Account})-[:${NodeRelationship.AccountOf}]->(budget),
         (${transaction})-[${NodeRelationship.UsedPayee}]->(${payee}:${SupportedLabel.Payee})-[:${NodeRelationship.PayeeOf}]->(budget)
-        WHERE datetime({year: ${endYear}, month: ${endMonth} day: ${endDay}}) > transaction.date >= datetime({year: ${startYear}, month: ${startMonth}, day: ${startDay}})
+        WHERE datetime({year: ${endYear}, month: ${endMonth}, day: ${endDay}}) > transaction.date >= datetime({year: ${startYear}, month: ${startMonth}, day: ${startDay}})
         RETURN ${transaction}, ${category}, ${account}, ${payee}
       `,
       props: {

@@ -70,7 +70,6 @@ export const transformRecordToDetail = <TData>(
   map((notifications) =>
     notifications
       .map((notification) => {
-        console.log(notification)
         const { properties } = notification.value?.get(recordBase) ?? {}
         if (!properties) {
           console.warn(`No results found on the given key - ${recordBase}`)

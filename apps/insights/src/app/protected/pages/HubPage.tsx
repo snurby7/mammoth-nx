@@ -33,22 +33,24 @@ const GridCoordinate: React.FC<IGridBlockProps> = ({ children, ...props }): JSX.
 
 export const HubPage = (): JSX.Element => {
   return (
-    <GridLayout rows={5} columns={5}>
-      <GridCoordinate y={1} x={1} ySpan={2} xSpan={2}>
-        <SpendingByCategoryView />
-      </GridCoordinate>
-      <GridCoordinate y={1} x={3} ySpan={2} xSpan={3}>
-        <UpcomingExpenseView />
-      </GridCoordinate>
-      <GridCoordinate y={3} x={1} ySpan={2} xSpan={5}>
-        <NetWorthView />
-      </GridCoordinate>
-      <GridCoordinate y={5} x={1} ySpan={2} xSpan={2}>
-        <IncomeVsExpenseView />
-      </GridCoordinate>
-      <GridCoordinate y={5} x={3} ySpan={2} xSpan={3}>
-        <DynamicIncomeVsExpenseView />
-      </GridCoordinate>
-    </GridLayout>
+    <article>
+      <GridLayout rows={5} columns={5}>
+        <GridCoordinate y={1} x={1} ySpan={2} xSpan={2}>
+          <SpendingByCategoryView />
+        </GridCoordinate>
+        <GridCoordinate y={1} x={3} ySpan={2} xSpan={3}>
+          <UpcomingExpenseView />
+        </GridCoordinate>
+        <GridCoordinate y={3} x={1} ySpan={2} xSpan={5}>
+          <NetWorthView />
+        </GridCoordinate>
+        <GridCoordinate y={5} x={1} ySpan={2} xSpan={2}>
+          <IncomeVsExpenseView />
+        </GridCoordinate>
+        <GridCoordinate y={5} x={3} ySpan={2} xSpan={3}>
+          <DynamicIncomeVsExpenseView />
+        </GridCoordinate>
+      </GridLayout>
+    </article>
   )
 }

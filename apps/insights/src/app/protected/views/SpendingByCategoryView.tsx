@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { Typography } from '@material-ui/core'
 import React, { useEffect } from 'react'
 import { CategoryBreakdown } from '../components'
 import { useBudgetStore, useTransactionStore } from '../hooks'
@@ -21,6 +22,7 @@ export const SpendingByCategoryView = (): JSX.Element => {
 
   return (
     <section>
+      <Typography variant="h4">Month Spend/Category</Typography>
       <CategoryBreakdown transactions={pastMonthTransaction} />
     </section>
   )

@@ -76,7 +76,6 @@ export class TransactionSearchController {
     @Param('budgetId') budgetId: string,
     @Query() query: IDateRangeSearchQuery
   ): Observable<ITransactionDetail[]> {
-    console.log(query)
     return this.transactionSearchService.getTransactionsByDateBoundary(
       budgetId,
       toMonthBoundary(query)
