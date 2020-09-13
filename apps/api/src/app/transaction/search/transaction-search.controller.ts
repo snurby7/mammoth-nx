@@ -62,6 +62,14 @@ export class TransactionSearchController {
     return this.transactionSearchService.getTransactionByCategory(budgetId, categoryId)
   }
 
+  @ApiOperation({
+    summary: 'Query the transactions between two dates in time',
+    description: 'Get the transactions between two dates',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Transactions that are between two dates',
+  })
   @Get(':budgetId/search')
   @UseGuards(AuthGuard('jwt'))
   public getTransactionsByQuery(
