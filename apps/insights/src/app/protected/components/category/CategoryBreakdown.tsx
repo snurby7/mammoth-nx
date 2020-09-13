@@ -46,7 +46,7 @@ export const CategoryBreakdown = observer(({ transactions }: ICategoryBreakdownP
     }, {} as Record<string, IPieSlice>)
 
   return (
-    <div style={{ height: 400, width: 400 }}>
+    <div style={{ height: 400 }}>
       <span>
         Total Spending between {moment(monthStart).format('MM/DD/YYYY')} -{' '}
         {moment(today).format('MM/DD/YYYY')} : <strong>(${accumulatedTotal.toFixed(2)})</strong>

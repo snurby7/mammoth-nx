@@ -21,7 +21,7 @@ export const SpendingByCategoryView = (): JSX.Element => {
   }, [budgetStore.selectedBudget, searchTransactionDateRange])
 
   return (
-    <section>
+    <section style={{ width: 600, height: 550 }}>
       <Typography variant="h4">Month Spend/Category</Typography>
       <CategoryBreakdown transactions={pastMonthTransaction} />
     </section>
