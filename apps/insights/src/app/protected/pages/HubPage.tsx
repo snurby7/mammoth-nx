@@ -8,18 +8,20 @@ import {
   UpcomingExpenseView,
 } from '../views'
 
-const FlexRow = styled.div`
+const FlexRow = styled.div<{ columns?: number }>`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   * {
+    flex: 1 1 auto;
     margin: 0.5rem;
   }
 `
+
 export const HubPage = (): JSX.Element => {
   return (
     <article>
-      <FlexRow>
+      <FlexRow columns={2}>
         <SpendingByCategoryView />
         <UpcomingExpenseView />
       </FlexRow>
