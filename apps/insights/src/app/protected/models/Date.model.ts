@@ -17,4 +17,11 @@ export const DateModel = types
       date.setDate(self.day)
       return date.toDateString()
     },
+    toDateObject(): Date {
+      const date = new Date()
+      date.setFullYear(self.year)
+      date.setMonth(self.month - 1)
+      date.setDate(self.day)
+      return date
+    },
   }))

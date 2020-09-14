@@ -28,21 +28,6 @@ import { PayeeCellTypeProvider } from '../payees'
 
 const getRowId = (row: ITransactionDetail): string => row.id
 
-const priorityWeights = {
-  Low: 0,
-  Normal: 1,
-  High: 2,
-}
-
-const comparePriority = (a, b) => {
-  const priorityA = priorityWeights[a]
-  const priorityB = priorityWeights[b]
-  if (priorityA === priorityB) {
-    return 0
-  }
-  return priorityA < priorityB ? -1 : 1
-}
-
 const EditCell = ({ errors, requiredTransactionFields, ...props }) => {
   const { children } = props
   const anyProps: any = props
@@ -87,16 +72,14 @@ export interface IDataTable<TData> {
   columnExtensions?: IColumnExtension<TData>[]
   transactions: Map<string, ITransactionInstance>
   filter?: (item: ITransactionInstance) => boolean
+  hideControls?: boolean
 }
 
 export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
-  ({ transactions, columns, columnExtensions, filter }) => {
+  ({ transactions, columns, columnExtensions, filter, hideControls }) => {
     const [errors, setErrors] = useState<Record<string, any>>({})
     const transactionStore = useTransactionStore()
     const budgetStore = useBudgetStore()
-    const [integratedSortingColumnExtensions] = useState([
-      { columnName: 'priority', compare: comparePriority },
-    ])
     const selectedBudget = budgetStore.selectedBudget
 
     const [sorting, setSorting] = useState<Sorting[]>([{ columnName: 'date', direction: 'desc' }])
@@ -150,7 +133,7 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
       <Paper>
         <Grid rows={rows} columns={columns as Column[]} getRowId={getRowId}>
           <SortingState sorting={sorting} onSortingChange={setSorting} />
-          <IntegratedSorting columnExtensions={integratedSortingColumnExtensions} />
+          <IntegratedSorting />
           {/* Custom Cells these could probably be abstracted to {children} later */}
           <AccountCellTypeProvider />
           <PayeeCellTypeProvider />
@@ -169,16 +152,20 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
           />
           <TableHeaderRow showSortingControls />
           <TableEditRow />
-          <TableEditColumn
-            // cellComponent={() => <div>this is the cell row button area</div>} // this will change the ADD/EDIT components look
-            // headerCellComponent={() => <div>this is the add button</div>}
-            showAddCommand
-            showEditCommand
-            showDeleteCommand
-            cellComponent={(props) => (
-              <EditCell {...props} errors={errors} requiredTransactionFields={requiredColumnKeys} />
-            )}
-          />
+          {!hideControls && (
+            <TableEditColumn
+              showAddCommand
+              showEditCommand
+              showDeleteCommand
+              cellComponent={(props) => (
+                <EditCell
+                  {...props}
+                  errors={errors}
+                  requiredTransactionFields={requiredColumnKeys}
+                />
+              )}
+            />
+          )}
         </Grid>
       </Paper>
     )

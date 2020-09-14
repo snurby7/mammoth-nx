@@ -53,6 +53,9 @@ export const Transaction = types
         date: self.date.toDate(),
       }
     },
+    get transactionDate(): Date {
+      return self.date.toDateObject()
+    },
   }))
 
 export interface ITransactionInstance extends Instance<typeof Transaction> {
