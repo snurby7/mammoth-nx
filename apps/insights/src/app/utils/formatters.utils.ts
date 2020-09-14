@@ -2,7 +2,7 @@ import moment from 'moment'
 
 export const formatter = {
   date(dateValue: string): string {
-    return moment(dateValue).format('MM/DD/YYYY')
+    return moment(dateValue).format('MM-DD-YYYY')
   },
   utcFormat(date: Date = new Date()): string {
     return moment.parseZone(date.toString()).utc().format()

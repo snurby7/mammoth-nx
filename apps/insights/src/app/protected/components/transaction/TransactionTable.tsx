@@ -28,6 +28,21 @@ import { PayeeCellTypeProvider } from '../payees'
 
 const getRowId = (row: ITransactionDetail): string => row.id
 
+const priorityWeights = {
+  Low: 0,
+  Normal: 1,
+  High: 2,
+}
+
+const comparePriority = (a, b) => {
+  const priorityA = priorityWeights[a]
+  const priorityB = priorityWeights[b]
+  if (priorityA === priorityB) {
+    return 0
+  }
+  return priorityA < priorityB ? -1 : 1
+}
+
 const EditCell = ({ errors, requiredTransactionFields, ...props }) => {
   const { children } = props
   const anyProps: any = props
@@ -79,6 +94,9 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
     const [errors, setErrors] = useState<Record<string, any>>({})
     const transactionStore = useTransactionStore()
     const budgetStore = useBudgetStore()
+    const [integratedSortingColumnExtensions] = useState([
+      { columnName: 'priority', compare: comparePriority },
+    ])
     const selectedBudget = budgetStore.selectedBudget
 
     const [sorting, setSorting] = useState<Sorting[]>([{ columnName: 'date', direction: 'desc' }])
@@ -132,7 +150,7 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
       <Paper>
         <Grid rows={rows} columns={columns as Column[]} getRowId={getRowId}>
           <SortingState sorting={sorting} onSortingChange={setSorting} />
-          <IntegratedSorting />
+          <IntegratedSorting columnExtensions={integratedSortingColumnExtensions} />
           {/* Custom Cells these could probably be abstracted to {children} later */}
           <AccountCellTypeProvider />
           <PayeeCellTypeProvider />

@@ -1,1 +1,2 @@
-export * from './TransactionTable';
+export { FutureTransactionTableView } from './FutureTransactionTableView'
+export * from './TransactionTable'

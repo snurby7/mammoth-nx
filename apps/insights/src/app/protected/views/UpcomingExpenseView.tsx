@@ -1,5 +1,10 @@
 import React from 'react'
+import { FutureTransactionTableView } from '../components'
 
 export const UpcomingExpenseView = (): JSX.Element => {
-  return <section>Upcoming Expenses</section>
+  return (
+    <section>
+      <FutureTransactionTableView />
+    </section>
+  )
 }
