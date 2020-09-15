@@ -1,6 +1,6 @@
 import { IDeleteResponse } from '@mammoth/api-interfaces'
 import { Inject, Injectable, Logger } from '@nestjs/common'
-import { Driver, QueryResult } from 'neo4j-driver'
+import { Driver, QueryResult, ResultSummary } from 'neo4j-driver'
 import RxSession from 'neo4j-driver/types/session-rx'
 import { Observable, throwError } from 'rxjs'
 import { catchError, map } from 'rxjs/operators'
@@ -93,25 +93,33 @@ export class Neo4jService {
    * @returns {Promise<QueryResult>}
    * @memberof Neo4jService
    */
-  public async removeTargetedRelationshipFromNode(
+  public removeTargetedRelationshipFromNode(
     id: string,
     label: string,
     relationship: string
-  ): Promise<QueryResult> {
-    return await this.executeStatement({
-      statement: `
-          MATCH (:${label} {id: $id})-[r:${relationship}]-()
-          DELETE r
-        `,
-      props: {
-        id,
-      },
-    }).then((result) => {
-      this.logger.verbose(
-        `Deleted ${result.summary.counters.updates().relationshipsDeleted} relationship(s)`
-      )
-      return result
-    })
+  ): Promise<ResultSummary> {
+    const statement = `
+      MATCH (:${label} {id: $id})-[r:${relationship}]-()
+      DELETE r
+    `
+
+    return this.rxSession
+      .writeTransaction((trx) => trx.run(statement, { id }).summary())
+      .toPromise()
+    //   ({
+    //   statement: `
+    //       MATCH (:${label} {id: $id})-[r:${relationship}]-()
+    //       DELETE r
+    //     `,
+    //   props: {
+    //     id,
+    //   },
+    // }).then((result) => {
+    //   this.logger.verbose(
+    //     `Deleted ${result.summary.counters.updates().relationshipsDeleted} relationship(s)`
+    //   )
+    //   return result
+    // })
   }
 
   /**
