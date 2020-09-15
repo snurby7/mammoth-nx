@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Observable } from 'rxjs'
 import { CategoryService } from './category.service'
 import { CreateCategory, UpdateCategory } from './dto'
 
@@ -28,8 +29,8 @@ export class CategoryController {
     description: 'The newly created category is returned',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async create(@Body() categoryRequest: CreateCategory): Promise<ICategory> {
-    return await this.categoryService.createCategory(categoryRequest)
+  public create(@Body() categoryRequest: CreateCategory): Observable<ICategory> {
+    return this.categoryService.createCategory(categoryRequest)
   }
 
   @Get('list/:budgetId')

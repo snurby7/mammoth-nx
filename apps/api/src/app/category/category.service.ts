@@ -5,7 +5,7 @@ import {
   ITransaction,
 } from '@mammoth/api-interfaces'
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
-import { v4 as uuid } from 'uuid'
+import { Observable } from 'rxjs'
 import { NodeRelationship, SupportedLabel } from '../constants'
 import {
   CommonAccountService,
@@ -14,8 +14,9 @@ import {
   IAccountLinkRequest,
   ICommonAccountConverter,
 } from '../extensions'
-import { IMammothCoreNode, Neo4jService } from '../neo4j'
+import { getRecordsByKey, IMammothCoreNode, Neo4jService } from '../neo4j'
 import { CreateCategory, UpdateCategory } from './dto'
+import { categoryQueries } from './queries/category.queries'
 
 /**
  * Category service is for handling all things category related.
@@ -37,14 +38,14 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
    *   - Budget Node -> Category Node
    *   - Budget Node -> .... Child_Category -> Child_Category
    * @param {CreateCategory} request
-   * @returns {Promise<ICategory>} Just the node that was created, currently doesn't return possible leafs.
+   * @returns {Observable<ICategory>} Just the node that was created, currently doesn't return possible leafs.
    * @memberof CategoryService
    */
-  public async createCategory(request: CreateCategory): Promise<ICategory> {
+  public createCategory(request: CreateCategory): Observable<ICategory> {
     if (request.parentId) {
-      return await this.createChildCategory(request)
+      return this.createChildCategory(request)
     }
-    return await this.createTopLevelCategory(request)
+    return this.createTopLevelCategory(request)
   }
 
   /**
@@ -212,28 +213,15 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
    *
    * @private
    * @param {ICreateCategory} request
-   * @returns {Promise<ICategory>}
+   * @returns {Observable<ICategory>}
    * @memberof CategoryService
    */
-  private async createTopLevelCategory(request: ICreateCategory): Promise<ICategory> {
-    const key = 'node'
-    return await this.neo4jService
-      .executeStatement({
-        statement: `
-          MATCH (budget:${SupportedLabel.Budget} {id: $budgetId})
-          CREATE (${key}:${SupportedLabel.Category} $nodeProps)
-          MERGE (${key})-[r:${NodeRelationship.CategoryOf}]->(budget)
-          RETURN ${key}
-          `,
-        props: {
-          nodeProps: { ...request, id: uuid() },
-          budgetId: request.budgetId,
-        },
-      })
-      .then((result) => {
-        const [category] = this.neo4jService.flattenStatementResult<ICategory>(result, key)
-        return category
-      })
+  private createTopLevelCategory(request: ICreateCategory): Observable<ICategory> {
+    const resultKey = 'category'
+    const { statement, props } = categoryQueries.createCategory(resultKey, request)
+    return this.neo4jService.rxSession.writeTransaction((trx) =>
+      trx.run(statement, props).records().pipe(getRecordsByKey<ICategory>(resultKey))
+    )
   }
 
   /**
@@ -242,33 +230,15 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
    *
    * @private
    * @param {ICreateCategory} request
-   * @returns {Promise<ICategory>}
+   * @returns {Observable<ICategory>}
    * @memberof CategoryService
    */
-  private async createChildCategory(request: ICreateCategory): Promise<ICategory> {
-    const childNode = 'childCategory'
-    const parentCategory = 'parentCategory'
-    return await this.neo4jService
-      .executeStatement({
-        statement: `
-          MATCH (${parentCategory}:${SupportedLabel.Category} {id: $parentId, budgetId: $budgetId})
-          CREATE (${childNode}:${SupportedLabel.Category} $nodeProps)
-          MERGE (${childNode})-[r:${NodeRelationship.CategoryOf}]->(${parentCategory})
-          RETURN ${childNode}
-        `,
-        props: {
-          budgetId: request.budgetId,
-          parentId: request.parentId,
-          nodeProps: { ...request, id: uuid() },
-        },
-      })
-      .then((result) => {
-        const [childCategory] = this.neo4jService.flattenStatementResult<ICategory>(
-          result,
-          childNode
-        )
-        return childCategory
-      })
+  private createChildCategory(request: ICreateCategory): Observable<ICategory> {
+    const resultKey = 'childCategory'
+    const { statement, props } = categoryQueries.createChildCategory(resultKey, request)
+    return this.neo4jService.rxSession.writeTransaction((trx) =>
+      trx.run(statement, props).records().pipe(getRecordsByKey<ICategory>(resultKey))
+    )
   }
 
   /**
