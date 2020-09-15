@@ -42,4 +42,42 @@ export const categoryQueries = {
       budgetId,
     },
   }),
+  getCategoryWithChildrenById: (categoryId: string, budgetId: string): ExecuteStatement => ({
+    statement: `
+      MATCH (parentCategory:Category {id: $id, budgetId: $budgetId})
+      OPTIONAL MATCH (parentCategory)<-[:${NodeRelationship.CategoryOf}]-(childCategory})
+      WITH COLLECT (childCategory}) + parentCategory AS all
+      UNWIND all as parentCategory
+      MATCH (parentCategory)
+      OPTIONAL MATCH (parentCategory)<-[:${NodeRelationship.CategoryOf}]-(childCategory})
+      RETURN {
+        parentNode: parentCategory,
+        children : {details :collect(childCategory})}
+      }
+    `,
+    props: {
+      id: categoryId,
+      budgetId,
+    },
+  }),
+  deleteCategory: (categoryId: string, budgetId: string): ExecuteStatement => ({
+    statement: `
+        MATCH (node:${SupportedLabel.Category} { id: $categoryId, budgetId: $budgeId })
+        DETACH DELETE node
+      `,
+    props: {
+      budgetId,
+      categoryId,
+    },
+  }),
+  getCategoryNode: (resultKey: string, categoryId: string, budgetId: string): ExecuteStatement => ({
+    statement: `
+        MATCH (${resultKey}:${SupportedLabel.Category} {id: $categoryId, budgetId: $budgetId})
+        RETURN ${resultKey}
+      `,
+    props: {
+      categoryId,
+      budgetId,
+    },
+  }),
 }

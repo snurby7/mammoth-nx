@@ -1,4 +1,4 @@
-import { ICategory, ICategorySearchResponse } from '@mammoth/api-interfaces'
+import { ICategory, ICategorySearchResponse, IDeleteResponse } from '@mammoth/api-interfaces'
 import {
   Body,
   Controller,
@@ -9,7 +9,6 @@ import {
   Param,
   Post,
   Put,
-  Query,
   UseGuards,
 } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
@@ -23,34 +22,36 @@ import { CreateCategory, UpdateCategory } from './dto'
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Post()
+  @Post(':budgetId/create')
   @ApiOperation({ summary: 'Create Category or Child Category' })
   @ApiResponse({
     status: 201,
     description: 'The newly created category is returned',
   })
   @UseGuards(AuthGuard('jwt'))
-  public create(@Body() categoryRequest: CreateCategory): Observable<ICategory> {
+  public createCategory(@Body() categoryRequest: CreateCategory): Observable<ICategory> {
     return this.categoryService.createCategory(categoryRequest)
   }
 
-  @Get('list')
+  @Get(':budgetId/list')
   @ApiOperation({
-    summary: 'Find all categories',
+    summary: 'Get all categories',
     description: 'Get all the categories that have either Category or Child_Category as its label',
   })
   @ApiResponse({
     status: 200,
     description: 'A list of all categories and their properties and labels.',
   })
-  // @UseGuards(AuthGuard('jwt'))
-  public findAll(@Query('budgetId') budgetId: string): Observable<ICategorySearchResponse[]> {
+  @UseGuards(AuthGuard('jwt'))
+  public getAllCategoriesByBudgetId(
+    @Param('budgetId') budgetId: string
+  ): Observable<ICategorySearchResponse[]> {
     return this.categoryService.findCategories(budgetId)
   }
 
   @Get(':id/budget/:budgetId')
   @ApiOperation({
-    summary: 'Find a single category',
+    summary: 'Get a single category',
     description: 'Get a category that has either Category or Child_Category as its label',
   })
   @ApiResponse({
@@ -58,11 +59,11 @@ export class CategoryController {
     description: 'A single category and its properties and labels',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async findOne(
+  public getCategoryWithChildren(
     @Param('id') id: string,
     @Param('budgetId') budgetId: string
-  ): Promise<ICategorySearchResponse[]> {
-    return await this.categoryService.findCategory(id, budgetId)
+  ): Observable<ICategorySearchResponse[]> {
+    return this.categoryService.getCategoryWithChildren(id, budgetId)
   }
 
   @Put(':id')
@@ -80,7 +81,7 @@ export class CategoryController {
       'Returns back the updated category with its properties and labels after being updated',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async update(
+  public async updateCategory(
     @Param('id') id: string,
     @Body() updateCategory: UpdateCategory
   ): Promise<ICategory> {
@@ -90,7 +91,7 @@ export class CategoryController {
     return await this.categoryService.updateCategory(updateCategory)
   }
 
-  @Delete(':id')
+  @Delete(':budgetId/delete/:id')
   @ApiOperation({
     summary: 'Delete a category',
     description: `
@@ -103,7 +104,10 @@ export class CategoryController {
       'Returns back a message saying how many nodes have been deleted. Data will need to refresh itself after making this request.',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async remove(@Param('id') id: string): Promise<{ message: string }> {
-    return await this.categoryService.deleteCategory(id)
+  public delete(
+    @Param('budgetId') budgetId: string,
+    @Param('id') categoryId: string
+  ): Observable<IDeleteResponse> {
+    return this.categoryService.deleteCategory(categoryId, budgetId)
   }
 }

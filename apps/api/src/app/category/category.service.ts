@@ -2,6 +2,7 @@ import {
   ICategory,
   ICategorySearchResponse,
   ICreateCategory,
+  IDeleteResponse,
   ITransaction,
 } from '@mammoth/api-interfaces'
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
@@ -16,6 +17,7 @@ import {
   ICommonAccountConverter,
 } from '../extensions'
 import { getRecordsByKey, IMammothCoreNode, Neo4jService } from '../neo4j'
+import { RxResult } from '../temp'
 import { CreateCategory, UpdateCategory } from './dto'
 import { categoryQueries } from './queries/category.queries'
 
@@ -65,12 +67,12 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
         .pipe(
           materialize(),
           toArray(),
-          map((response) => {
-            return response
+          map((response) =>
+            response
               .reduce((arr, notification) => {
                 const record = notification.value
                 record?.keys.map((key) => {
-                  const { parentNode, children } = record.get(key) as any
+                  const { parentNode, children } = record.get(key)
                   arr.push({
                     name: parentNode.properties.name,
                     budgetId: parentNode.properties.budgetId,
@@ -87,47 +89,57 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
                   searchResponse.budgetId ||
                   (searchResponse.children && searchResponse.children.length > 0)
               )
-          })
+          )
         )
     )
-    // return this.neo4jService
-    //   .flattenOptionalMatch<ICategorySearchResponse>(statementResult)
-    //   .filter((node) => node.budgetId || (node.children && node.children.length > 0))
-    // * filter out the nodes with no children, they're collected via their parent.
   }
 
   /**
    * Goes to Neo4J and matches a single nodes that match the following labels
    *   - Category
    *   - Child_Category
-   * @param {string} id
-   * @param {string} budgetId
-   * @returns {Promise<ICategorySearchResponse>}
+   * @param {string} id The category Id to retrieve
+   * @param {string} budgetId The budgetId that category is tied to.
+   * @returns {Observable<ICategorySearchResponse>}
    * @memberof CategoryService
    */
-  public async findCategory(id: string, budgetId: string): Promise<ICategorySearchResponse[]> {
-    const nodeParent = 'category'
-    const nodeChild = 'categoryChild'
-    return await this.neo4jService
-      .executeStatement({
-        statement: `
-          MATCH (${nodeParent}:Category {id: $id, budgetId: $budgetId})
-          OPTIONAL MATCH (${nodeParent})<-[:${NodeRelationship.CategoryOf}]-(${nodeChild})
-          WITH COLLECT (${nodeChild}) + ${nodeParent} AS all
-          UNWIND all as ${nodeParent}
-          MATCH (${nodeParent})
-          OPTIONAL MATCH (${nodeParent})<-[:${NodeRelationship.CategoryOf}]-(${nodeChild})
-          RETURN {
-            parentNode: ${nodeParent},
-            children : {details :collect(${nodeChild})}
-          }
-        `,
-        props: {
-          id,
-          budgetId,
-        },
-      })
-      .then((result) => this.neo4jService.flattenOptionalMatch<ICategorySearchResponse>(result))
+  public getCategoryWithChildren(
+    id: string,
+    budgetId: string
+  ): Observable<ICategorySearchResponse[]> {
+    const { statement, props } = categoryQueries.getCategoryWithChildrenById(id, budgetId)
+    return this.neo4jService.rxSession.readTransaction((trx) =>
+      trx
+        .run(statement, props)
+        .records()
+        .pipe(
+          materialize(),
+          toArray(),
+          map((response) =>
+            response
+              .reduce((arr, notification) => {
+                const record = notification.value
+                record?.keys.map((key) => {
+                  const { parentNode, children } = record.get(key)
+                  arr.push({
+                    name: parentNode.properties.name,
+                    budgetId: parentNode.properties.budgetId,
+                    id: parentNode.properties.id,
+                    children: children.details?.map((detail) => ({
+                      ...detail.properties,
+                    })),
+                  })
+                })
+                return arr
+              }, [] as ICategorySearchResponse[])
+              .filter(
+                (searchResponse) =>
+                  searchResponse.budgetId ||
+                  (searchResponse.children && searchResponse.children.length > 0)
+              )
+          )
+        )
+    )
   }
 
   /**
@@ -214,19 +226,21 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
    * Removes the node from the tree, this will rip the leaf from the tree and anyone below it.
    *
    * @param {string} id
-   * @returns {Promise<{ message: string }>}
+   * @param {string} budgetId}
+   * @returns {Observable<IDeleteResponse>}
    * @memberof CategoryService
    */
-  public async deleteCategory(id: string): Promise<{ message: string }> {
-    const result = await this.neo4jService.executeStatement({
-      statement: `
-        MATCH (node:${SupportedLabel.Category} { id: '${id}' })
-        DETACH DELETE node
-      `,
-    })
-    return {
-      message: `Deleted ${result.summary.counters.updates().nodesDeleted || 0} record(s)`,
-    }
+  public deleteCategory(categoryId: string, budgetId: string): Observable<IDeleteResponse> {
+    const { statement, props } = categoryQueries.deleteCategory(categoryId, budgetId)
+    return this.neo4jService.rxSession.writeTransaction((trx) =>
+      ((trx.run(statement, props) as unknown) as RxResult).consume().pipe(
+        map((result) => ({
+          message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
+          id: categoryId,
+          isDeleted: result.counters.updates().nodesDeleted > 0,
+        }))
+      )
+    )
   }
 
   /**
@@ -267,27 +281,20 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
    * the database.
    *
    * @private
-   * @param {string} id
+   * @param {string} categoryId
    * @param {string} budgetId
    * @returns {Promise<ICategory>}
    * @memberof CategoryService
    */
-  private async getCategoryById(id: string, budgetId: string): Promise<ICategory> {
-    return await this.neo4jService
-      .executeStatement({
-        statement: `
-        MATCH (category:${SupportedLabel.Category} {id: $id, budgetId: $budgetId})
-        RETURN category
-      `,
-        props: {
-          id,
-          budgetId,
-        },
-      })
-      .then((result) => {
-        const [category] = this.neo4jService.flattenStatementResult<ICategory>(result, 'category')
-        return category
-      })
+  private getCategoryById(categoryId: string, budgetId: string): Promise<ICategory> {
+    const resultKey = 'category'
+    const { statement, props } = categoryQueries.getCategoryNode(resultKey, categoryId, budgetId)
+    // TODO This is still entangled in the method up above in updateCategory
+    return this.neo4jService.rxSession
+      .readTransaction((trx) =>
+        trx.run(statement, props).records().pipe(getRecordsByKey<ICategory>(resultKey))
+      )
+      .toPromise()
   }
 
   /**

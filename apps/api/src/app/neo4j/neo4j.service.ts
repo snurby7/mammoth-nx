@@ -83,33 +83,6 @@ export class Neo4jService {
   }
 
   /**
-   * Flattens an optional match but is currently only used by the categoryService
-   *
-   * @template TResponse Expected response type
-   * @param {QueryResult} statementResult The result to loop over
-   * @returns {TResponse[]}
-   * @memberof Neo4jService
-   */
-  public flattenOptionalMatch<TResponse = any>(statementResult: QueryResult): TResponse[] {
-    const response: TResponse[] = []
-    statementResult.records.map((record) => {
-      record.keys.map((key) => {
-        const { parentNode, children } = record.get(key) as any
-        // this needs to be cleaned up with the above TODO
-        response.push(({
-          name: parentNode.properties.name,
-          budgetId: parentNode.properties.budgetId,
-          id: parentNode.properties.id,
-          children: children.details?.map((detail) => ({
-            ...detail.properties,
-          })),
-        } as unknown) as TResponse)
-      })
-    })
-    return response
-  }
-
-  /**
    * This deletes all outgoing {relationship} relationships from the node {label} with the id {id}.
    * * https://neo4j.com/docs/cypher-manual/current/clauses/delete/#delete-delete-relationships-only
    *
