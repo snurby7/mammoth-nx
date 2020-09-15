@@ -1,9 +1,9 @@
-import { IPayee, IPayeeCreate } from '@mammoth/api-interfaces'
+import { ICreatePayee, IPayee } from '@mammoth/api-interfaces'
 import { axiosInstance, replaceKeyPlaceholders } from '../../utils'
 
 enum ApiRoute {
-  LoadPayees = '/api/v1/payee/budget/:budgetId', // TODO The Payee API needs updating!
-  CreatePayee = '/api/v1/payee',
+  LoadPayees = '/api/v1/payee/:budgetId',
+  CreatePayee = '/api/v1/payee/:budgetId',
 }
 
 class PayeeApi {
@@ -14,8 +14,11 @@ class PayeeApi {
     return response.data
   }
 
-  public async createPayee(request: IPayeeCreate): Promise<IPayee> {
-    const response = await axiosInstance.post<IPayee>(ApiRoute.CreatePayee, request)
+  public async createPayee(request: ICreatePayee): Promise<IPayee> {
+    const response = await axiosInstance.post<IPayee>(
+      replaceKeyPlaceholders(ApiRoute.CreatePayee, { budgetId: request.budgetId }),
+      request
+    )
     return response.data
   }
 }

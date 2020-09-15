@@ -1,7 +1,17 @@
 import { IPayee } from '@mammoth/api-interfaces'
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Observable } from 'rxjs'
 import { CreatePayee } from './dto'
 import { PayeeService } from './payee.service'
 
@@ -10,25 +20,31 @@ import { PayeeService } from './payee.service'
 export class PayeeController {
   constructor(private payeeService: PayeeService) {}
 
-  @Post()
+  @Post(':budgetId')
   @ApiOperation({ summary: 'Create a payee' })
   @ApiResponse({
     status: 201,
     description: 'Returns the newly created payee',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async createPayee(@Body() createRequest: CreatePayee): Promise<IPayee> {
-    return await this.payeeService.createPayee(createRequest)
+  public createPayee(
+    @Param('budgetId') budgetId: string,
+    @Body() createRequest: CreatePayee
+  ): Observable<IPayee> {
+    if (!createRequest.budgetId || createRequest.budgetId !== budgetId) {
+      throw new HttpException('No budgetId found on request', HttpStatus.CONFLICT)
+    }
+    return this.payeeService.createPayee(createRequest)
   }
 
-  @Get('/budget/:budgetId')
+  @Get(':budgetId')
   @ApiOperation({ summary: 'Get all Payees by a given request' })
   @ApiResponse({
     status: 201,
     description: 'All payees that match the given request',
   })
   @UseGuards(AuthGuard('jwt'))
-  public async getAllPayees(@Param('budgetId') budgetId: string): Promise<IPayee[]> {
-    return await this.payeeService.getAllPayees(budgetId)
+  public getAllPayees(@Param('budgetId') budgetId: string): Observable<IPayee[]> {
+    return this.payeeService.getAllPayees(budgetId)
   }
 }

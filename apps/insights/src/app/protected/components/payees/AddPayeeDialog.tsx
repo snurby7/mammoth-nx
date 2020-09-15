@@ -1,23 +1,23 @@
-import { IPayeeCreate } from '@mammoth/api-interfaces'
+import { ICreatePayee } from '@mammoth/api-interfaces'
 import { Button } from '@mammoth/insights-ui'
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@material-ui/core'
 import React, { ChangeEvent, useState } from 'react'
 import { useBudgetStore } from '../../hooks'
 
 interface IAddPayeeDialogProps {
-  onClose: (accountDetails: IPayeeCreate | null) => void
+  onClose: (accountDetails: ICreatePayee | null) => void
   isOpen: boolean
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-let key: keyof IPayeeCreate
+let key: keyof ICreatePayee
 
 export const AddPayeeDialog: React.FC<IAddPayeeDialogProps> = ({
   onClose,
   isOpen,
 }): JSX.Element => {
   const budgetStore = useBudgetStore()
-  const [details, setDetails] = useState<IPayeeCreate>({
+  const [details, setDetails] = useState<ICreatePayee>({
     name: '',
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     budgetId: budgetStore.selectedBudget!.id,

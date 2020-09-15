@@ -1,4 +1,4 @@
-import { IFormattedNode, IPayee, IPayeeCreate } from '@mammoth/api-interfaces'
+import { ICreatePayee, IFormattedNode, IPayee } from '@mammoth/api-interfaces'
 import { flow, getParent, Instance, SnapshotIn, types } from 'mobx-state-tree'
 import { payeeApi } from '../api'
 import { RootModel } from './Root.model'
@@ -52,7 +52,7 @@ export const PayeeStore = types
       }
     })
 
-    const createPayee = flow(function* createPayee(request: IPayeeCreate) {
+    const createPayee = flow(function* createPayee(request: ICreatePayee) {
       setLoading(true)
       try {
         const payee: any = yield payeeApi.createPayee(request)

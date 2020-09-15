@@ -1,12 +1,12 @@
-import { IPayeeCreate } from '@mammoth/api-interfaces';
-import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { ICreatePayee } from '@mammoth/api-interfaces'
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator'
 
-export class CreatePayee implements IPayeeCreate {
+export class CreatePayee implements ICreatePayee {
   @IsNotEmpty()
   @IsUUID()
-  budgetId: string;
+  budgetId: string
 
   @IsNotEmpty()
   @IsString()
-  name: string;
+  name: string
 }

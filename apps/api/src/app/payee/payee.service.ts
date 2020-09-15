@@ -1,7 +1,8 @@
 import { IPayee, ITransaction } from '@mammoth/api-interfaces'
 import { Injectable, Logger } from '@nestjs/common'
-import { v4 as uuid } from 'uuid'
-import { NodeRelationship, SupportedLabel } from '../constants'
+import { Observable } from 'rxjs'
+import { materialize, toArray } from 'rxjs/operators'
+import { SupportedLabel } from '../constants'
 import {
   CommonAccountService,
   IAccountBalanceRequest,
@@ -9,8 +10,9 @@ import {
   IAccountLinkRequest,
   ICommonAccountConverter,
 } from '../extensions'
-import { Neo4jService } from '../neo4j'
+import { getRecordsByKey, getRecordsByKeyNotification, Neo4jService } from '../neo4j'
 import { CreatePayee } from './dto'
+import { payeeQueries } from './queries/payee.queries'
 
 @Injectable()
 export class PayeeService extends CommonAccountService implements ICommonAccountConverter {
@@ -23,50 +25,34 @@ export class PayeeService extends CommonAccountService implements ICommonAccount
   /**
    * Create a payee and return the newly created payee
    *
-   * @param {CreatePayee} createRequest
-   * @returns {Promise<IPayee>}
+   * @param {CreatePayee} request
+   * @returns {Observable<IPayee>}
    * @memberof PayeeService
    */
-  public async createPayee(createRequest: CreatePayee): Promise<IPayee> {
-    const payee = 'node'
-    const statementResult = await this.neo4jService.executeStatement({
-      statement: `
-        MATCH (budget:Budget {id: $budgetId})
-        CREATE (${payee}:${SupportedLabel.Payee} $nodeProps)
-        MERGE (${payee})-[r:${NodeRelationship.PayeeOf}]->(budget)
-        RETURN ${payee}
-      `,
-      props: {
-        budgetId: createRequest.budgetId,
-        nodeProps: {
-          ...createRequest,
-          createdDate: new Date().toISOString(),
-          id: uuid(),
-        },
-      },
-    })
-    return this.neo4jService.flattenStatementResult<IPayee>(statementResult, payee)[0]
+  public createPayee(request: CreatePayee): Observable<IPayee> {
+    const resultKey = 'payee'
+    const { statement, props } = payeeQueries.createPayee(resultKey, request)
+    return this.neo4jService.rxSession.writeTransaction((trx) =>
+      trx.run(statement, props).records().pipe(getRecordsByKey<IPayee>(resultKey))
+    )
   }
 
   /**
    * Get all the payees for a given budget
    *
    * @param {string} budgetId
-   * @returns {Promise<IPayee[]>}
+   * @returns {Observable<IPayee[]>}
    * @memberof PayeeService
    */
-  public async getAllPayees(budgetId: string): Promise<IPayee[]> {
-    const nodes = 'payees'
-    const statementResult = await this.neo4jService.executeStatement({
-      statement: `
-        MATCH (${nodes}:${SupportedLabel.Payee} { budgetId: $budgetId })
-        RETURN ${nodes}
-      `,
-      props: {
-        budgetId,
-      },
-    })
-    return this.neo4jService.flattenStatementResult<IPayee>(statementResult, nodes)
+  public getAllPayees(budgetId: string): Observable<IPayee[]> {
+    const resultKey = 'payees'
+    const { statement, props } = payeeQueries.getAllPayeesByBudgetId(resultKey, budgetId)
+    return this.neo4jService.rxSession.readTransaction((trx) =>
+      trx
+        .run(statement, props)
+        .records()
+        .pipe(materialize(), toArray(), getRecordsByKeyNotification(resultKey))
+    )
   }
 
   /**
