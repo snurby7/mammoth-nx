@@ -6,6 +6,7 @@ import {
 } from '@mammoth/api-interfaces'
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { Observable } from 'rxjs'
+import { map, materialize, toArray } from 'rxjs/operators'
 import { NodeRelationship, SupportedLabel } from '../constants'
 import {
   CommonAccountService,
@@ -52,26 +53,46 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
    * This goes to Neo4J and matches all the nodes that match the following labels
    *   - Category
    * @param {string} BudgetId
-   * @returns {Promise<ICategorySearchResponse[]>}
+   * @returns {Observable<ICategorySearchResponse[]>}
    * @memberof CategoryService
    */
-  public async findCategories(budgetId: string): Promise<ICategorySearchResponse[]> {
-    const statementResult = await this.neo4jService.executeStatement({
-      statement: `
-        MATCH (parent:${SupportedLabel.Category} {budgetId: $budgetId})
-        OPTIONAL MATCH (parent)<-[:${NodeRelationship.CategoryOf}]-(child)
-        RETURN {
-          parentNode: parent,
-          children: {details :collect(child)}
-        }
-        `,
-      props: {
-        budgetId,
-      },
-    })
-    return this.neo4jService
-      .flattenOptionalMatch<ICategorySearchResponse>(statementResult)
-      .filter((node) => node.budgetId || (node.children && node.children.length > 0))
+  public findCategories(budgetId: string): Observable<ICategorySearchResponse[]> {
+    const { statement, props } = categoryQueries.getAllCategoriesByBudget(budgetId)
+    return this.neo4jService.rxSession.readTransaction((trx) =>
+      trx
+        .run(statement, props)
+        .records()
+        .pipe(
+          materialize(),
+          toArray(),
+          map((response) => {
+            return response
+              .reduce((arr, notification) => {
+                const record = notification.value
+                record?.keys.map((key) => {
+                  const { parentNode, children } = record.get(key) as any
+                  arr.push({
+                    name: parentNode.properties.name,
+                    budgetId: parentNode.properties.budgetId,
+                    id: parentNode.properties.id,
+                    children: children.details?.map((detail) => ({
+                      ...detail.properties,
+                    })),
+                  })
+                })
+                return arr
+              }, [] as ICategorySearchResponse[])
+              .filter(
+                (searchResponse) =>
+                  searchResponse.budgetId ||
+                  (searchResponse.children && searchResponse.children.length > 0)
+              )
+          })
+        )
+    )
+    // return this.neo4jService
+    //   .flattenOptionalMatch<ICategorySearchResponse>(statementResult)
+    //   .filter((node) => node.budgetId || (node.children && node.children.length > 0))
     // * filter out the nodes with no children, they're collected via their parent.
   }
 

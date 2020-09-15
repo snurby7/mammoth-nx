@@ -9,6 +9,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
@@ -33,7 +34,7 @@ export class CategoryController {
     return this.categoryService.createCategory(categoryRequest)
   }
 
-  @Get('list/:budgetId')
+  @Get('list')
   @ApiOperation({
     summary: 'Find all categories',
     description: 'Get all the categories that have either Category or Child_Category as its label',
@@ -42,9 +43,9 @@ export class CategoryController {
     status: 200,
     description: 'A list of all categories and their properties and labels.',
   })
-  @UseGuards(AuthGuard('jwt'))
-  public async findAll(@Param('budgetId') budgetId: string): Promise<ICategorySearchResponse[]> {
-    return await this.categoryService.findCategories(budgetId)
+  // @UseGuards(AuthGuard('jwt'))
+  public findAll(@Query('budgetId') budgetId: string): Observable<ICategorySearchResponse[]> {
+    return this.categoryService.findCategories(budgetId)
   }
 
   @Get(':id/budget/:budgetId')

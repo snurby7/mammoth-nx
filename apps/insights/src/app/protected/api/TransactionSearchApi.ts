@@ -17,7 +17,6 @@ class TransactionSearchApi {
     budgetId: string,
     searchRequest: IDateRangeSearchQuery
   ): Promise<ITransactionDetail[]> {
-    // TODO make this use query parameters, so it can be restful.
     const url = replaceKeyPlaceholders(ApiRoute.SearchTransactions, { budgetId }).concat(
       toQueryParams(searchRequest)
     )

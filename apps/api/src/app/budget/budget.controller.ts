@@ -39,7 +39,7 @@ export class BudgetController {
 
   @Get()
   @ApiOperation({
-    summary: 'Find all budgets',
+    summary: 'Get all budgets',
     description: 'Get all the budgets that have Budget as its label',
   })
   @ApiResponse({
@@ -53,7 +53,7 @@ export class BudgetController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Find a single budget',
+    summary: 'Get a single budget',
     description: 'Get a budget that has Budget as its label',
   })
   @ApiResponse({

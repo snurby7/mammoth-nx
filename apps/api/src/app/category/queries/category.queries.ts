@@ -29,4 +29,17 @@ export const categoryQueries = {
       budgetId: request.budgetId,
     },
   }),
+  getAllCategoriesByBudget: (budgetId: string): ExecuteStatement => ({
+    statement: `
+      MATCH (parent:${SupportedLabel.Category} {budgetId: $budgetId})
+      OPTIONAL MATCH (parent)<-[:${NodeRelationship.CategoryOf}]-(child)
+      RETURN {
+        parentNode: parent,
+        children: {details :collect(child)}
+      }
+    `,
+    props: {
+      budgetId,
+    },
+  }),
 }

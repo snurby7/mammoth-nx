@@ -1,9 +1,9 @@
 import { ICategory, ICreateCategory } from '@mammoth/api-interfaces'
-import { axiosInstance, replaceKeyPlaceholders } from '../../utils'
+import { axiosInstance, toQueryParams } from '../../utils'
 
 enum ApiRoute {
   CreateCategory = '/api/v1/category',
-  LoadCategories = '/api/v1/category/list/:budgetId',
+  LoadCategories = '/api/v1/category/list',
 }
 
 class CategoryApi {
@@ -13,7 +13,7 @@ class CategoryApi {
   }
   public async loadCategories(budgetId: string) {
     const response = await axiosInstance.get<ICategory[]>(
-      replaceKeyPlaceholders(ApiRoute.LoadCategories, { budgetId })
+      ApiRoute.LoadCategories.concat(toQueryParams({ budgetId }))
     )
     return response.data
   }
