@@ -106,20 +106,6 @@ export class Neo4jService {
     return this.rxSession
       .writeTransaction((trx) => trx.run(statement, { id }).summary())
       .toPromise()
-    //   ({
-    //   statement: `
-    //       MATCH (:${label} {id: $id})-[r:${relationship}]-()
-    //       DELETE r
-    //     `,
-    //   props: {
-    //     id,
-    //   },
-    // }).then((result) => {
-    //   this.logger.verbose(
-    //     `Deleted ${result.summary.counters.updates().relationshipsDeleted} relationship(s)`
-    //   )
-    //   return result
-    // })
   }
 
   /**
