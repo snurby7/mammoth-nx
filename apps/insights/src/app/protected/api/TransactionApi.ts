@@ -3,13 +3,15 @@ import {
   IDeleteResponse,
   ITransaction,
   ITransactionDetail,
+  ITransactionQuery,
 } from '@mammoth/api-interfaces'
-import { axiosInstance, replaceKeyPlaceholders } from '../../utils'
+import { axiosInstance, replaceKeyPlaceholders, toQueryParams } from '../../utils'
 
 enum ApiRoute {
   LoadTransactionsByAccount = 'api/v1/transaction/:budgetId/account/:accountId',
   CreateTransaction = 'api/v1/transaction/:budgetId',
   ModifyExistingTransaction = 'api/v1/transaction/:budgetId/detail/:transactionId',
+  SearchTransactions = 'api/v1/transaction/:budgetId/search',
 }
 
 class TransactionApi {
@@ -84,6 +86,25 @@ class TransactionApi {
       }),
       payload
     )
+    return response.data
+  }
+
+  /**
+   *
+   *
+   * @param {string} budgetId
+   * @param {Partial<ITransactionQuery>} query
+   * @returns {Promise<ITransaction[]>}
+   * @memberof TransactionApi
+   */
+  public async searchTransactions(
+    budgetId: string,
+    query?: Partial<ITransactionQuery>
+  ): Promise<ITransaction[]> {
+    const url = replaceKeyPlaceholders(ApiRoute.SearchTransactions, { budgetId }).concat(
+      toQueryParams(query ?? {})
+    )
+    const response = await axiosInstance.get<ITransaction[]>(url)
     return response.data
   }
 }

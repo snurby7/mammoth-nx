@@ -62,10 +62,10 @@ export const TransactionQueries = {
    * Returns back a statement and its properties given a search request.
    *
    * @param {string} resultKey Key where the results are placed
-   * @param {ITransactionQuery} query Query properties to find a transaction
+   * @param {Partial<ITransactionQuery>} query Query properties to find a transaction
    * @returns {ExecuteStatement}
    */
-  searchTransactions: (resultKey: string, query: ITransactionQuery): ExecuteStatement => {
+  searchTransactions: (resultKey: string, query: Partial<ITransactionQuery>): ExecuteStatement => {
     const { budgetId, categoryId, payeeId, accountId, id } = query
     return {
       statement: `

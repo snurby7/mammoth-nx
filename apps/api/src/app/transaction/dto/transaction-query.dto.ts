@@ -1,6 +1,6 @@
-import { ITransactionQuery } from '@mammoth/api-interfaces';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsUUID } from 'class-validator';
+import { ITransactionQuery } from '@mammoth/api-interfaces'
+import { ApiProperty } from '@nestjs/swagger'
+import { IsNumber, IsOptional, IsUUID } from 'class-validator'
 
 /**
  * Transaction query object. Currently supported query objects.
@@ -15,24 +15,15 @@ import { IsNumber, IsOptional, IsUUID } from 'class-validator';
  * @class TransactionQueryDto
  * @implements {ITransactionQuery}
  */
-export class TransactionQueryDto implements ITransactionQuery {
+export class TransactionQueryDto implements Partial<ITransactionQuery> {
   @ApiProperty({
-    description: 'Id on the budget you want to search over',
-    required: true,
-    example: 'dc293001-41a5-4bd7-9484-6db520516587',
-  })
-  @IsUUID()
-  budgetId: string;
-
-  @ApiProperty({
-    description:
-      'If you know the specific transaction id you can pass that here',
+    description: 'If you know the specific transaction id you can pass that here',
     required: false,
     example: '53b37aa8-2297-4dc8-a9c4-6f40fd5dbdd8',
   })
   @IsUUID()
   @IsOptional()
-  id?: string;
+  id?: string
 
   @ApiProperty({
     description: 'If you know the specific account id you can pass that here',
@@ -41,7 +32,7 @@ export class TransactionQueryDto implements ITransactionQuery {
   })
   @IsUUID()
   @IsOptional()
-  accountId?: string;
+  accountId?: string
 
   @ApiProperty({
     description: 'If you know the specific payee id you can pass that here',
@@ -50,7 +41,7 @@ export class TransactionQueryDto implements ITransactionQuery {
   })
   @IsUUID()
   @IsOptional()
-  payeeId?: string;
+  payeeId?: string
 
   @ApiProperty({
     description: 'If you know the specific category id you can pass that here',
@@ -59,14 +50,13 @@ export class TransactionQueryDto implements ITransactionQuery {
   })
   @IsUUID()
   @IsOptional()
-  categoryId?: string;
+  categoryId?: string
 
   @ApiProperty({
-    description:
-      'If you have a set number of transactions you want back it can go here',
+    description: 'If you have a set number of transactions you want back it can go here',
     required: false,
   })
   @IsOptional()
   @IsNumber()
-  limit?: number;
+  limit?: number
 }

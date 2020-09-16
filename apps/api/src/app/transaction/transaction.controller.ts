@@ -4,8 +4,10 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
@@ -50,13 +52,13 @@ export class TransactionController {
     status: 201,
     description: 'Transactions that match some property on the ',
   })
-  @Post(':budgetId/search')
+  @Get(':budgetId/search')
   @UseGuards(AuthGuard('jwt'))
   public getTransactionsByQuery(
     @Param('budgetId') budgetId: string,
-    @Body() query: TransactionQueryDto
+    @Query() query?: TransactionQueryDto
   ): Observable<ITransaction[]> {
-    return this.transactionService.getTransactionsByQuery(query)
+    return this.transactionService.getTransactionsByQuery({ ...query, budgetId })
   }
 
   @ApiOperation({

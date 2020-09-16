@@ -78,7 +78,7 @@ export class TransactionService {
    * @returns {Observable<ITransaction[]>}
    * @memberof TransactionService
    */
-  public getTransactionsByQuery(query: ITransactionQuery): Observable<ITransaction[]> {
+  public getTransactionsByQuery(query: Partial<ITransactionQuery>): Observable<ITransaction[]> {
     const resultKey = 'nodes'
     const { statement, props } = TransactionQueries.searchTransactions(resultKey, query)
     return this.neo4jService.rxSession.readTransaction((trx) =>

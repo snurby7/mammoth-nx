@@ -3,6 +3,7 @@ import {
   IDeleteResponse,
   ITransaction,
   ITransactionDetail,
+  ITransactionQuery,
 } from '@mammoth/api-interfaces'
 import { flow, types } from 'mobx-state-tree'
 import { ITransactionGridRow } from '../../interface'
@@ -136,11 +137,24 @@ export const TransactionStore = types
       }
     })
 
+    const searchTransactionsByQuery = flow(function* searchTransactionsByQuery(
+      budgetId: string,
+      query?: Partial<ITransactionQuery>
+    ) {
+      try {
+        const transactions: any[] = yield transactionApi.searchTransactions(budgetId, query)
+        transactions.forEach((transaction) => self.transactions.put(transaction))
+      } catch (err) {
+        console.log('Transaction search query failed -> ', err)
+      }
+    })
+
     return {
       addTransactions,
       createTransactions,
       deleteTransactions,
       searchTransactionDateRange,
+      searchTransactionsByQuery,
       updateTransactions,
     }
   })

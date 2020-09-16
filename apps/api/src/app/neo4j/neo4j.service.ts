@@ -19,8 +19,6 @@ export class Neo4jService {
    * Simple getter to return an instance of an RxSession, this is up to the implementer to work out.
    * Implementer also will need to close the session when they are done with it you can use this pipe operator
    *
-   * concat(rxSession.close())
-   *
    * * Docs https://neo4j.com/docs/api/javascript-driver/current/class/src/session-rx.js~RxSession.html
    * * Session access Modes: https://neo4j.com/docs/driver-manual/1.7/sessions-transactions/#driver-transactions-access-mode
    *

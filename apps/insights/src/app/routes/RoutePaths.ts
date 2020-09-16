@@ -3,4 +3,5 @@ export enum RoutePaths {
   App = '/app/',
   BudgetHub = '/app/:budgetId',
   AccountPage = '/app/:budgetId/account/:accountId',
+  TransactionsPage = '/app/:budgetId/transactions/',
 }
