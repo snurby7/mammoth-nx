@@ -1,2 +1,2 @@
-export * from './CategoryBreakdown';
-export * from './CategoryCellTypeProvider';
+export * from './CategoryCellTypeProvider'
+export * from './SpendingByCategory.chart'

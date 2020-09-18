@@ -18,7 +18,7 @@ const today = new Date()
 const monthStart = new Date()
 monthStart.setDate(1)
 
-export const CategoryBreakdown = observer(({ transactions }: ICategoryBreakdownProps) => {
+export const SpendingByCategoryChart = observer(({ transactions }: ICategoryBreakdownProps) => {
   // TODO: Enable this to support breakdown over a few different periods. Current Month, past 3 months, past 6 months
   let accumulatedTotal = 0
   const transactionsInRangeRecordMap = transactions

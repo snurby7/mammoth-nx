@@ -3,7 +3,7 @@ import { Route, Switch } from 'react-router-dom'
 import { RoutePaths } from '../../routes'
 import { AccountMenuOptions, BudgetMenuOptions, PageLayout } from '../components'
 import { useBudgetStore } from '../hooks'
-import { AccountPage, HubPage, TransactionsPage } from '../pages'
+import { AccountPage, CategoryBreakdownPage, HubPage, TransactionsPage } from '../pages'
 import { DataProvider } from './DataProvider'
 
 export const BudgetRouter = () => {
@@ -16,6 +16,7 @@ export const BudgetRouter = () => {
         content={
           <Switch>
             <Route exact path={RoutePaths.BudgetHub} component={HubPage} />
+            <Route path={RoutePaths.CategoryBreakdownPage} component={CategoryBreakdownPage} />
             <Route path={RoutePaths.AccountPage} component={AccountPage} />
             <Route path={RoutePaths.TransactionsPage} component={TransactionsPage} />
           </Switch>
