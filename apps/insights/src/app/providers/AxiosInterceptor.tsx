@@ -8,12 +8,14 @@ export const AxiosInterceptor: React.FC = ({ children }): JSX.Element => {
   const [isFetchingToken, setIsFetchingToken] = useState(false)
 
   useEffect(() => {
+    // TODO: Interceptor is messed up and doesn't put the token on all the time.
     let axiosInterceptor
     if (user && !isFetchingToken) {
       setIsFetchingToken(true)
       getAccessTokenSilently().then((token) => {
         setAccessToken(token)
         axiosInstance.interceptors.request.use((request) => {
+          console.log('Interceptor', token)
           if (token) {
             request.headers['Authorization'] = `Bearer ${token}`
           }
