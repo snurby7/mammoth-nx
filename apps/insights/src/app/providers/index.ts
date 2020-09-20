@@ -1,2 +1,1 @@
-export * from './AxiosInterceptor';
-export * from './ThemeProvider';
+export * from './ThemeProvider'
