@@ -74,7 +74,7 @@ export class CommonAccountService {
     linkedAccountMeta: IAccountLinkedNodeMeta
   ): Observable<TResponse> {
     const resultKey = 'matchedNode'
-    const { statement, props } = CommonQueries.getNodeStatement(resultKey, {
+    const { query, params } = CommonQueries.getNodeStatement(resultKey, {
       id: linkedAccountMeta.id,
       label: linkedAccountMeta.label,
       budgetId: linkedAccountMeta.budgetId,
@@ -82,7 +82,7 @@ export class CommonAccountService {
     return this.neo4jService.rxSession.writeTransaction(
       (txc) =>
         txc
-          .run(statement, props)
+          .run(query, params)
           .records()
           .pipe(
             first(),
@@ -110,11 +110,11 @@ export class CommonAccountService {
     linkedNode: IAccountLinkedNodeMeta
   ): Observable<TResponse> {
     const resultKey = 'linkedNode'
-    const { statement, props } = updateLinkedNodeBalance(resultKey, linkedNode, currentBalance)
+    const { query, params } = updateLinkedNodeBalance(resultKey, linkedNode, currentBalance)
     return this.neo4jService.rxSession.writeTransaction<TResponse>(
       (rxTransaction) =>
         rxTransaction
-          .run(statement, props)
+          .run(query, params)
           .records()
           .pipe(
             first(),
@@ -169,11 +169,11 @@ export class CommonAccountService {
     const node = 'node'
     return await this.neo4jService
       .executeStatement({
-        statement: `
+        query: `
           MATCH (${node}:${label} {id: $id, budgetId: $budgetId})
           RETURN ${node}
         `,
-        props: {
+        params: {
           id,
           budgetId,
         },
@@ -192,10 +192,10 @@ export class CommonAccountService {
    */
   public getNodeBalance$(request: IMammothCoreNode): Observable<number> {
     const node = 'node'
-    const { statement, props } = CommonQueries.getNodeStatement(node, request)
+    const { query, params } = CommonQueries.getNodeStatement(node, request)
     return this.neo4jService.rxSession.writeTransaction<number>((trx) =>
       trx
-        .run(statement, props)
+        .run(query, params)
         .records()
         .pipe(
           first(),

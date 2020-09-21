@@ -37,24 +37,24 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    */
   public createAccount(request: ICreateAccount): Observable<IAccount> {
     const resultKey = 'account'
-    const { statement, props } = accountQueries.createAccount(resultKey, request)
+    const { query, params } = accountQueries.createAccount(resultKey, request)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      trx.run(statement, props).records().pipe(getRecordsByKey<IAccount>(resultKey))
+      trx.run(query, params).records().pipe(getRecordsByKey<IAccount>(resultKey))
     )
   }
 
   /**
    * Find all the given categories that below to a certain budget
    *
-   * @param {IAccountQueryDto} query
+   * @param {IAccountQueryDto} request
    * @returns {Observable<IAccount[]>}
    * @memberof AccountService
    */
-  public findAccounts(query: IAccountQuery): Observable<IAccount[]> {
+  public findAccounts(request: IAccountQuery): Observable<IAccount[]> {
     const resultKey = 'accounts'
-    const { statement, props } = accountQueries.findAccounts(resultKey, query)
+    const { query, params } = accountQueries.findAccounts(resultKey, request)
     return this.neo4jService.rxSession.readTransaction((trx) =>
-      trx.run(statement, props).records().pipe(
+      trx.run(query, params).records().pipe(
         materialize(), // gather all the notifications from the stream
         toArray(), // turn them all into an array
         getRecordsByKeyNotification(resultKey) // * Grab results
@@ -72,9 +72,9 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    */
   public findAccount(budgetId: string, accountId: string): Observable<IAccount> {
     const resultKey = 'account'
-    const { statement, props } = accountQueries.getAccountById(resultKey, budgetId, accountId)
+    const { query, params } = accountQueries.getAccountById(resultKey, budgetId, accountId)
     return this.neo4jService.rxSession.readTransaction((trx) =>
-      trx.run(statement, props).records().pipe(
+      trx.run(query, params).records().pipe(
         getRecordsByKey<IAccount>(resultKey) // this knowingly only grabs the first record, only one should be emitted here
       )
     )
@@ -89,9 +89,9 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    */
   public updateAccountDetails(request: IAccount): Observable<IAccount> {
     const resultKey = 'account'
-    const { statement, props } = accountQueries.updateExistingAccount(resultKey, request)
+    const { query, params } = accountQueries.updateExistingAccount(resultKey, request)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      trx.run(statement, props).records().pipe(getRecordsByKey<IAccount>(resultKey))
+      trx.run(query, params).records().pipe(getRecordsByKey<IAccount>(resultKey))
     )
   }
 
@@ -104,9 +104,9 @@ export class AccountService extends CommonAccountService implements ICommonAccou
    */
   public deleteAccount(budgetId: string, accountId: string): Observable<IDeleteResponse> {
     const resultKey = 'deletedAccount'
-    const { statement, props } = accountQueries.deleteAccountById(resultKey, budgetId, accountId)
+    const { query, params } = accountQueries.deleteAccountById(resultKey, budgetId, accountId)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      ((trx.run(statement, props) as unknown) as RxResult).consume().pipe(
+      ((trx.run(query, params) as unknown) as RxResult).consume().pipe(
         map((result) => ({
           message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
           id: accountId,

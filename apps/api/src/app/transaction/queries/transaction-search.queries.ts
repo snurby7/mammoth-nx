@@ -14,14 +14,14 @@ export const searchQueries = {
     budgetId: string
   ): ISearchQuery<ITransactionDetailLinks> => {
     return {
-      statement: `
+      query: `
         MATCH (${transaction}:Transaction)
           -[:${NodeRelationship.UsedAccount}]->(${account}:${SupportedLabel.Account} {id: $accountId})
           -[:${NodeRelationship.AccountOf}]->(${budget}:${SupportedLabel.Budget} {id: $budgetId}),
         (${transaction})-[${NodeRelationship.UsedCategory}]->(${category}:${SupportedLabel.Category})-[:${NodeRelationship.CategoryOf}]->(budget),
         (${transaction})-[${NodeRelationship.UsedPayee}]->(${payee}:${SupportedLabel.Payee})-[:${NodeRelationship.PayeeOf}]->(budget)
         RETURN ${transaction}, ${category}, ${account}, ${payee}`,
-      props: {
+      params: {
         accountId,
         budgetId,
       },
@@ -38,14 +38,14 @@ export const searchQueries = {
     budgetId: string
   ): ISearchQuery<ITransactionDetailLinks> => {
     return {
-      statement: `
+      query: `
         MATCH (${transaction}:Transaction)
           -[:${NodeRelationship.UsedPayee}]->(${payee}:${SupportedLabel.Payee} {id: $payeeId})
           -[:${NodeRelationship.PayeeOf}]->(${budget}:${SupportedLabel.Budget} {id: $budgetId}),
         (${transaction})-[${NodeRelationship.UsedCategory}]->(${category}:${SupportedLabel.Category})-[:${NodeRelationship.CategoryOf}]->(budget),
         (${transaction})-[${NodeRelationship.UsedAccount}]->(${account}:${SupportedLabel.Account})-[:${NodeRelationship.AccountOf}]->(budget),
         RETURN ${transaction}, ${category}, ${account}, ${payee}`,
-      props: {
+      params: {
         payeeId,
         budgetId,
       },
@@ -62,14 +62,14 @@ export const searchQueries = {
     budgetId: string
   ): ISearchQuery<ITransactionDetailLinks> => {
     return {
-      statement: `
+      query: `
         MATCH (${transaction}:Transaction)
           -[:${NodeRelationship.UsedCategory}]->(${category}:${SupportedLabel.Category} {id: $categoryId})
           -[:${NodeRelationship.CategoryOf}]->(${budget}:${SupportedLabel.Budget} {id: $budgetId}),
         (${transaction})-[${NodeRelationship.UsedAccount}]->(${account}:${SupportedLabel.Account})-[:${NodeRelationship.AccountOf}]->(budget),
         (${transaction})-[${NodeRelationship.UsedPayee}]->(${payee}:${SupportedLabel.Payee})-[:${NodeRelationship.PayeeOf}]->(budget)
         RETURN ${transaction}, ${category}, ${account}, ${payee}`,
-      props: {
+      params: {
         categoryId,
         budgetId,
       },
@@ -94,7 +94,7 @@ export const searchQueries = {
     const endMonth = +boundary.end.month
     const endYear = +boundary.end.year
     return {
-      statement: `
+      query: `
         MATCH (${transaction}:Transaction {budgetId: $budgetId}),
         (${transaction})-[${NodeRelationship.UsedCategory}]->(${category}:${SupportedLabel.Category})-[:${NodeRelationship.CategoryOf}]->(budget),
         (${transaction})-[${NodeRelationship.UsedAccount}]->(${account}:${SupportedLabel.Account})-[:${NodeRelationship.AccountOf}]->(budget),
@@ -102,7 +102,7 @@ export const searchQueries = {
         WHERE datetime({year: ${endYear}, month: ${endMonth}, day: ${endDay}}) > transaction.date >= datetime({year: ${startYear}, month: ${startMonth}, day: ${startDay}})
         RETURN ${transaction}, ${category}, ${account}, ${payee}
       `,
-      props: {
+      params: {
         budgetId,
       },
       recordBase: transaction,

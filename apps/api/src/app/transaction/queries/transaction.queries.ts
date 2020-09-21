@@ -17,7 +17,7 @@ export const TransactionQueries = {
    * @returns {ExecuteStatement}
    */
   createNewTransaction: (requestKey: string, request: ICreateTransaction): ExecuteStatement => ({
-    statement: `
+    query: `
       MATCH (category:Category {id: $categoryId, budgetId: $budgetId})
       MATCH (account:Account {id: $accountId, budgetId: $budgetId})
       MATCH (payee:Payee {id: $payeeId, budgetId: $budgetId})
@@ -29,7 +29,7 @@ export const TransactionQueries = {
       MERGE (${requestKey})-[relatesToPayee:${NodeRelationship.UsedPayee}]->(payee)
       RETURN ${requestKey}
     `,
-    props: {
+    params: {
       budgetId: request.budgetId,
       categoryId: request.categoryId,
       accountId: request.accountId,
@@ -68,7 +68,7 @@ export const TransactionQueries = {
   searchTransactions: (resultKey: string, query: Partial<ITransactionQuery>): ExecuteStatement => {
     const { budgetId, categoryId, payeeId, accountId, id } = query
     return {
-      statement: `
+      query: `
       MATCH (${resultKey}:${SupportedLabel.Transaction} {budgetId: $budgetId})
       WHERE ${resultKey}.categoryId = $categoryId
         OR ${resultKey}.id = $id
@@ -77,7 +77,7 @@ export const TransactionQueries = {
         OR ${resultKey}.budgetId = $budgetId
       RETURN ${resultKey}
     `,
-      props: {
+      params: {
         id: id || '',
         budgetId: budgetId || '',
         categoryId: categoryId || '',
@@ -95,12 +95,12 @@ export const TransactionQueries = {
    * @returns {ExecuteStatement}
    */
   updateTransaction: (resultKey: string, request: ITransaction): ExecuteStatement => ({
-    statement: `
+    query: `
     MATCH (${resultKey}:${SupportedLabel.Transaction} { id: $id})
     SET ${resultKey} += {inflow: $inflow, outflow: $outflow, memo: $memo, date: datetime($date), accountId: $accountId, payeeId: $payeeId, categoryId: $categoryId}
     RETURN ${resultKey}
   `,
-    props: {
+    params: {
       memo: request.memo || null,
       inflow: request.inflow || null,
       outflow: request.outflow || null,

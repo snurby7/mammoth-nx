@@ -31,9 +31,9 @@ export class PayeeService extends CommonAccountService implements ICommonAccount
    */
   public createPayee(request: CreatePayee): Observable<IPayee> {
     const resultKey = 'payee'
-    const { statement, props } = payeeQueries.createPayee(resultKey, request)
+    const { query, params } = payeeQueries.createPayee(resultKey, request)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      trx.run(statement, props).records().pipe(getRecordsByKey<IPayee>(resultKey))
+      trx.run(query, params).records().pipe(getRecordsByKey<IPayee>(resultKey))
     )
   }
 
@@ -46,10 +46,10 @@ export class PayeeService extends CommonAccountService implements ICommonAccount
    */
   public getAllPayees(budgetId: string): Observable<IPayee[]> {
     const resultKey = 'payees'
-    const { statement, props } = payeeQueries.getAllPayeesByBudgetId(resultKey, budgetId)
+    const { query, params } = payeeQueries.getAllPayeesByBudgetId(resultKey, budgetId)
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx
-        .run(statement, props)
+        .run(query, params)
         .records()
         .pipe(materialize(), toArray(), getRecordsByKeyNotification(resultKey))
     )

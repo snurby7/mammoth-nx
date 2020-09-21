@@ -1,6 +1,6 @@
 export interface ISearchQuery<T> {
-  statement: string
-  props: Record<string, string | number>
+  query: string
+  params: Record<string, string | number>
 
   /**
    * The main record to get details

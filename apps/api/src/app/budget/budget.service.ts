@@ -25,9 +25,9 @@ export class BudgetService {
    */
   public createBudget(request: Budget): Observable<IBudget> {
     const node = 'createdBudget'
-    const { statement, props } = getCreateBudgetStatement(node, request)
+    const { query, params } = getCreateBudgetStatement(node, request)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      trx.run(statement, props).records().pipe(
+      trx.run(query, params).records().pipe(
         getRecordsByKey<IBudget>(node) // this knowingly only grabs the first record, only one should be emitted here
       )
     )
@@ -37,15 +37,15 @@ export class BudgetService {
    * Get budgets, there is a limit option that can be used, currently it justs gets all nodes that match the
    * Budget label
    *
-   * @param {BudgetQuery} query
+   * @param {BudgetQuery} request
    * @returns {Observable<IBudget[]>}
    * @memberof BudgetService
    */
-  public queryBudgets(query: BudgetQuery): Observable<IBudget[]> {
+  public queryBudgets(request: BudgetQuery): Observable<IBudget[]> {
     const resultKey = 'budgets'
-    const { statement } = getBudgetsByQuery(resultKey, query)
+    const { query } = getBudgetsByQuery(resultKey, request)
     return this.neo4jService.rxSession.readTransaction((trx) =>
-      trx.run(statement).records().pipe(
+      trx.run(query).records().pipe(
         materialize(), // gather all the notifications from the stream
         toArray(), // turn them all into an array
         getRecordsByKeyNotification(resultKey) // * Grab results
@@ -62,9 +62,9 @@ export class BudgetService {
    */
   public getBudget(id: string): Observable<IBudget> {
     const resultKey = 'budget'
-    const { statement, props } = getBudgetById(resultKey, id)
+    const { query, params } = getBudgetById(resultKey, id)
     return this.neo4jService.rxSession.readTransaction((trx) =>
-      trx.run(statement, props).records().pipe(
+      trx.run(query, params).records().pipe(
         getRecordsByKey<IBudget>(resultKey) // this knowingly only grabs the first record, only one should be emitted here
       )
     )
@@ -79,10 +79,10 @@ export class BudgetService {
    * @memberof BudgetService
    */
   public deleteBudget(id: string): Observable<IDeleteResponse> {
-    const { statement, props } = deleteBudgetById(id)
+    const { query, params } = deleteBudgetById(id)
 
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      ((trx.run(statement, props) as unknown) as RxResult).consume().pipe(
+      ((trx.run(query, params) as unknown) as RxResult).consume().pipe(
         map((result) => ({
           message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
           id,
@@ -102,9 +102,9 @@ export class BudgetService {
    */
   public saveBudget(request: UpdateBudget): Observable<IBudget> {
     const budgetKey = 'budget'
-    const { statement, props } = updateBudgetRequest(budgetKey, request)
+    const { query, params } = updateBudgetRequest(budgetKey, request)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      trx.run(statement, props).records().pipe(getRecordsByKey<IBudget>(budgetKey))
+      trx.run(query, params).records().pipe(getRecordsByKey<IBudget>(budgetKey))
     )
   }
 }

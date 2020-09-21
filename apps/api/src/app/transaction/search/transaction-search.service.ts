@@ -24,14 +24,14 @@ export class TransactionSearchService {
     payeeId: string
   ): Observable<ITransactionDetail[]> {
     const {
-      statement,
-      props,
+      query,
+      params,
       recordBase,
       formatKeyMap, // TODO take these values and turn them into an IFormattedNode
     } = searchQueries.getTransactionByPayee(payeeId, budgetId)
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx
-        .run(statement, props)
+        .run(query, params)
         .records()
         .pipe(materialize(), toArray(), transformRecordToDetail(recordBase, formatKeyMap))
     )
@@ -51,14 +51,14 @@ export class TransactionSearchService {
     categoryId: string
   ): Observable<ITransactionDetail[]> {
     const {
-      statement,
-      props,
+      query,
+      params,
       recordBase,
       formatKeyMap, // TODO take these values and turn them into an IFormattedNode
     } = searchQueries.getTransactionByCategory(categoryId, budgetId)
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx
-        .run(statement, props)
+        .run(query, params)
         .records()
         .pipe(materialize(), toArray(), transformRecordToDetail(recordBase, formatKeyMap))
     )
@@ -77,13 +77,13 @@ export class TransactionSearchService {
     budgetId: string,
     accountId: string
   ): Observable<ITransactionDetail[]> {
-    const { statement, props, recordBase, formatKeyMap } = searchQueries.getTransactionByAccount(
+    const { query, params, recordBase, formatKeyMap } = searchQueries.getTransactionByAccount(
       accountId,
       budgetId
     )
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx
-        .run(statement, props)
+        .run(query, params)
         .records()
         .pipe(materialize(), toArray(), transformRecordToDetail(recordBase, formatKeyMap))
     )
@@ -101,13 +101,13 @@ export class TransactionSearchService {
     budgetId: string,
     request: IMonthBoundary
   ): Observable<ITransactionDetail[]> {
-    const { statement, props, recordBase, formatKeyMap } = searchQueries.getTransactionsByRange(
+    const { query, params, recordBase, formatKeyMap } = searchQueries.getTransactionsByRange(
       budgetId,
       request
     )
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx
-        .run(statement, props)
+        .run(query, params)
         .records()
         .pipe(materialize(), toArray(), transformRecordToDetail(recordBase, formatKeyMap))
     )

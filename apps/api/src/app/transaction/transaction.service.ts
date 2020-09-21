@@ -42,9 +42,9 @@ export class TransactionService {
    */
   public createTransaction(request: ICreateTransaction): Observable<ITransaction> {
     const resultKey = 'transactionResult'
-    const { statement, props } = TransactionQueries.createNewTransaction(resultKey, request)
+    const { query, params } = TransactionQueries.createNewTransaction(resultKey, request)
     const createTransaction$: Observable<ITransaction> = this.neo4jService.rxSession.writeTransaction(
-      (txc) => txc.run(statement, props).records().pipe(getRecordsByKey<ITransaction>(resultKey))
+      (txc) => txc.run(query, params).records().pipe(getRecordsByKey<ITransaction>(resultKey))
     )
     return createTransaction$.pipe(
       switchMap((result) => this.updateLinkedNodeBalanceByService$(result))
@@ -74,16 +74,16 @@ export class TransactionService {
   /**
    * Function to get all the transactions that match the given query.
    *
-   * @param {ITransactionQuery} query
+   * @param {ITransactionQuery} request
    * @returns {Observable<ITransaction[]>}
    * @memberof TransactionService
    */
-  public getTransactionsByQuery(query: Partial<ITransactionQuery>): Observable<ITransaction[]> {
+  public getTransactionsByQuery(request: Partial<ITransactionQuery>): Observable<ITransaction[]> {
     const resultKey = 'nodes'
-    const { statement, props } = TransactionQueries.searchTransactions(resultKey, query)
+    const { query, params } = TransactionQueries.searchTransactions(resultKey, request)
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx
-        .run(statement, props)
+        .run(query, params)
         .records()
         .pipe(materialize(), toArray(), getRecordsByKeyNotification<ITransaction>(resultKey))
     )
@@ -149,14 +149,10 @@ export class TransactionService {
    */
   public getTransaction(transactionId: string, budgetId: string): Observable<ITransaction> {
     const resultKey = 'transaction'
-    const { statement, props } = TransactionQueries.getTransaction(
-      resultKey,
-      transactionId,
-      budgetId
-    )
+    const { query, params } = TransactionQueries.getTransaction(resultKey, transactionId, budgetId)
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx
-        .run(statement, props)
+        .run(query, params)
         .records()
         .pipe(
           catchError((err) => throwError(err)),
@@ -176,10 +172,10 @@ export class TransactionService {
    */
   private updateTransactionProperties$(request: ITransaction): Observable<ITransaction> {
     const resultKey = 'transactionNode'
-    const { statement, props } = TransactionQueries.updateTransaction(resultKey, request)
+    const { query, params } = TransactionQueries.updateTransaction(resultKey, request)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
       trx
-        .run(statement, props)
+        .run(query, params)
         .records()
         .pipe(
           getRecordsByKey<ITransaction>(resultKey),
@@ -314,12 +310,9 @@ export class TransactionService {
     transactionId: string,
     budgetId: string
   ): Observable<IDeleteResponse> {
-    const { statement, props } = TransactionQueries.deleteTransactionStatement(
-      transactionId,
-      budgetId
-    )
+    const { query, params } = TransactionQueries.deleteTransactionStatement(transactionId, budgetId)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      ((trx.run(statement, props) as unknown) as RxResult).consume().pipe(
+      ((trx.run(query, params) as unknown) as RxResult).consume().pipe(
         map((result) => ({
           message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
           isDeleted: true,

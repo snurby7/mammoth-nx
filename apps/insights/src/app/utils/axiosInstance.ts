@@ -9,7 +9,6 @@ export const setAuthorizationToken = (token: string): void => {
 }
 
 axios.interceptors.request.use((request) => {
-  console.log('token setting', authorizationToken)
   if (authorizationToken) {
     request.headers['Authorization'] = `Bearer ${authorizationToken}`
   }

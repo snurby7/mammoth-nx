@@ -11,7 +11,7 @@ export interface ExecuteStatement {
    * @type {string}
    * @memberof ExecuteStatement
    */
-  statement: string
+  query: string
 
   /**
    * @description If your statement has a $personDetails your object will need to look like
@@ -22,5 +22,5 @@ export interface ExecuteStatement {
    * @type {Record<string, any>}
    * @memberof ExecuteStatement
    */
-  props?: Record<string, any>
+  params?: Record<string, any>
 }

@@ -40,9 +40,9 @@ export class Neo4jService {
    * @memberof Neo4jService
    */
   public async executeStatement(statementProps: ExecuteStatement): Promise<QueryResult> {
-    const { statement, props } = statementProps
+    const { query, params } = statementProps
     const session = this.neo4jDriver.session()
-    const result = await session.run(statement, { ...props } ?? {})
+    const result = await session.run(query, { ...params } ?? {})
     session.close()
 
     return result
@@ -160,13 +160,13 @@ export class Neo4jService {
       throw new Error('Error - Budget Id on the two nodes must match.')
     }
     return await this.executeStatement({
-      statement: `
+      query: `
         MATCH (fromNode:${fromLabel} {id: $fromNodeProps.id })
         MATCH (toNode:${toLabel} {id: $toNodeProps.id })
         CREATE (fromNode)-[r:${relationship}]->(toNode)
         RETURN r
       `,
-      props: {
+      params: {
         toNodeProps,
         fromNodeProps,
       },
@@ -188,7 +188,7 @@ export class Neo4jService {
     toNode: IMammothCoreNode
   ): Observable<QueryResult> {
     const relationshipKey = 'relationshipKey'
-    const { statement, props } = Neo4jCommonQueries.createRelationship(
+    const { query, params } = Neo4jCommonQueries.createRelationship(
       relationshipKey,
       fromNode,
       relationship,
@@ -196,7 +196,7 @@ export class Neo4jService {
     )
     return this.rxSession.writeTransaction((trx) =>
       trx
-        .run(statement, props)
+        .run(query, params)
         .records()
         .pipe(
           getRecordsByKey<QueryResult>(relationshipKey),

@@ -11,14 +11,14 @@ import { IAccountLinkedNodeMeta } from '../contracts'
 export const updateLinkedNodeBalance = (
   resultKey: string,
   linkedAccountMeta: IAccountLinkedNodeMeta,
-  balance: number = 0,
+  balance: number = 0
 ): ExecuteStatement => ({
-  statement: `
+  query: `
     MATCH (${resultKey}:${linkedAccountMeta.label} {id: $nodeId, budgetId: $budgetId})
     SET ${resultKey}.balance = $updatedBalance
     RETURN ${resultKey}
   `,
-  props: {
+  params: {
     nodeId: linkedAccountMeta.id,
     budgetId: linkedAccountMeta.budgetId,
     updatedBalance: balance + (linkedAccountMeta.amount || 0) + (linkedAccountMeta.refund || 0),

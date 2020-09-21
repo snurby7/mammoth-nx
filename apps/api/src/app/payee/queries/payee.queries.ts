@@ -5,13 +5,13 @@ import { ExecuteStatement } from '../../neo4j'
 
 export const payeeQueries = {
   createPayee: (resultKey: string, request: ICreatePayee): ExecuteStatement => ({
-    statement: `
+    query: `
         MATCH (budget:Budget {id: $budgetId})
         CREATE (${resultKey}:${SupportedLabel.Payee} $nodeProps)
         MERGE (${resultKey})-[r:${NodeRelationship.PayeeOf}]->(budget)
         RETURN ${resultKey}
       `,
-    props: {
+    params: {
       budgetId: request.budgetId,
       nodeProps: {
         ...request,
@@ -21,11 +21,11 @@ export const payeeQueries = {
     },
   }),
   getAllPayeesByBudgetId: (resultKey: string, budgetId: string): ExecuteStatement => ({
-    statement: `
+    query: `
         MATCH (${resultKey}:${SupportedLabel.Payee} { budgetId: $budgetId })
         RETURN ${resultKey}
       `,
-    props: {
+    params: {
       budgetId,
     },
   }),

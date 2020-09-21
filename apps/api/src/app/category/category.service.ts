@@ -59,10 +59,10 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
    * @memberof CategoryService
    */
   public findCategories(budgetId: string): Observable<ICategorySearchResponse[]> {
-    const { statement, props } = categoryQueries.getAllCategoriesByBudget(budgetId)
+    const { query, params } = categoryQueries.getAllCategoriesByBudget(budgetId)
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx
-        .run(statement, props)
+        .run(query, params)
         .records()
         .pipe(
           materialize(),
@@ -107,10 +107,10 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
     id: string,
     budgetId: string
   ): Observable<ICategorySearchResponse[]> {
-    const { statement, props } = categoryQueries.getCategoryWithChildrenById(id, budgetId)
+    const { query, params } = categoryQueries.getCategoryWithChildrenById(id, budgetId)
     return this.neo4jService.rxSession.readTransaction((trx) =>
       trx
-        .run(statement, props)
+        .run(query, params)
         .records()
         .pipe(
           materialize(),
@@ -205,12 +205,12 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
     const balance = await this.getNodeBalance(fromNode)
     return await this.neo4jService
       .executeStatement({
-        statement: `
+        query: `
           MATCH (${key}:${SupportedLabel.Category} { id: $categoryId, budgetId: $budgetId})
           SET ${key} = $props
           RETURN ${key}
         `,
-        props: {
+        params: {
           budgetId: request.budgetId,
           categoryId: request.id,
           props: { ...request, balance },
@@ -231,9 +231,9 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
    * @memberof CategoryService
    */
   public deleteCategory(categoryId: string, budgetId: string): Observable<IDeleteResponse> {
-    const { statement, props } = categoryQueries.deleteCategory(categoryId, budgetId)
+    const { query, params } = categoryQueries.deleteCategory(categoryId, budgetId)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      ((trx.run(statement, props) as unknown) as RxResult).consume().pipe(
+      ((trx.run(query, params) as unknown) as RxResult).consume().pipe(
         map((result) => ({
           message: `Deleted ${result.counters.updates().nodesDeleted || 0} record(s)`,
           id: categoryId,
@@ -253,9 +253,9 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
    */
   private createTopLevelCategory(request: ICreateCategory): Observable<ICategory> {
     const resultKey = 'category'
-    const { statement, props } = categoryQueries.createCategory(resultKey, request)
+    const { query, params } = categoryQueries.createCategory(resultKey, request)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      trx.run(statement, props).records().pipe(getRecordsByKey<ICategory>(resultKey))
+      trx.run(query, params).records().pipe(getRecordsByKey<ICategory>(resultKey))
     )
   }
 
@@ -270,9 +270,9 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
    */
   private createChildCategory(request: ICreateCategory): Observable<ICategory> {
     const resultKey = 'childCategory'
-    const { statement, props } = categoryQueries.createChildCategory(resultKey, request)
+    const { query, params } = categoryQueries.createChildCategory(resultKey, request)
     return this.neo4jService.rxSession.writeTransaction((trx) =>
-      trx.run(statement, props).records().pipe(getRecordsByKey<ICategory>(resultKey))
+      trx.run(query, params).records().pipe(getRecordsByKey<ICategory>(resultKey))
     )
   }
 
@@ -288,11 +288,11 @@ export class CategoryService extends CommonAccountService implements ICommonAcco
    */
   private getCategoryById(categoryId: string, budgetId: string): Promise<ICategory> {
     const resultKey = 'category'
-    const { statement, props } = categoryQueries.getCategoryNode(resultKey, categoryId, budgetId)
+    const { query, params } = categoryQueries.getCategoryNode(resultKey, categoryId, budgetId)
     // TODO This is still entangled in the method up above in updateCategory
     return this.neo4jService.rxSession
       .readTransaction((trx) =>
-        trx.run(statement, props).records().pipe(getRecordsByKey<ICategory>(resultKey))
+        trx.run(query, params).records().pipe(getRecordsByKey<ICategory>(resultKey))
       )
       .toPromise()
   }

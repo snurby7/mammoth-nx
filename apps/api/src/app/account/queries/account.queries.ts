@@ -8,13 +8,13 @@ import { ExecuteStatement } from '../../neo4j'
  */
 export const accountQueries = {
   createAccount: (resultKey: string, request: ICreateAccount): ExecuteStatement => ({
-    statement: `
+    query: `
         MATCH (budget:${SupportedLabel.Budget} {id: $budgetId})
         CREATE (${resultKey}:${SupportedLabel.Account} $nodeProps)
         MERGE (${resultKey})-[r:${NodeRelationship.AccountOf}]->(budget)
         RETURN ${resultKey}
       `,
-    props: {
+    params: {
       budgetId: request.budgetId,
       nodeProps: {
         ...request,
@@ -25,32 +25,32 @@ export const accountQueries = {
   }),
 
   findAccounts: (resultKey: string, request: IAccountQuery): ExecuteStatement => ({
-    statement: `
+    query: `
         MATCH (${resultKey}:${SupportedLabel.Account} {budgetId: $budgetId})
         RETURN ${resultKey}
         ${request.limit ? `LIMIT ${request.limit}` : ''}
       `,
-    props: {
+    params: {
       budgetId: request.budgetId,
     },
   }),
   getAccountById: (resultKey: string, budgetId: string, accountId: string): ExecuteStatement => ({
-    statement: `
+    query: `
         MATCH (${resultKey}:${SupportedLabel.Account} {id: $accountId, budgetId: $budgetId})
         RETURN ${resultKey}
       `,
-    props: {
+    params: {
       accountId,
       budgetId,
     },
   }),
   updateExistingAccount: (resultKey: string, request: IAccount): ExecuteStatement => ({
-    statement: `
+    query: `
         MATCH (${resultKey}:${SupportedLabel.Account} {id: $accountId, budgetId: $budgetId})
         SET ${resultKey} += {name: $updatedName, balance: $updatedBalance}
         RETURN ${resultKey}
       `,
-    props: {
+    params: {
       accountId: request.id,
       budgetId: request.budgetId,
       updatedName: request.name,
@@ -62,11 +62,11 @@ export const accountQueries = {
     budgetId: string,
     accountId: string
   ): ExecuteStatement => ({
-    statement: `
+    query: `
         MATCH (${resultKey}:${SupportedLabel.Account} { id: $accountId, budgetId: $budgetId })
         DETACH DELETE ${resultKey}
       `,
-    props: {
+    params: {
       accountId,
       budgetId,
     },

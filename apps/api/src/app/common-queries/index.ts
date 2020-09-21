@@ -1,4 +1,4 @@
-import { ExecuteStatement, IMammothCoreNode } from '../neo4j';
+import { ExecuteStatement, IMammothCoreNode } from '../neo4j'
 
 export const CommonQueries = {
   /**
@@ -8,21 +8,18 @@ export const CommonQueries = {
    * @param {IMammothCoreNode} request
    * @returns {ExecuteStatement}
    */
-  getNodeStatement: (
-    resultKey: string,
-    request: IMammothCoreNode
-  ): ExecuteStatement => {
-    const { id, label, budgetId } = request;
+  getNodeStatement: (resultKey: string, request: IMammothCoreNode): ExecuteStatement => {
+    const { id, label, budgetId } = request
     return {
-      statement: `
+      query: `
         MATCH (${resultKey}:${label} {id: $id, budgetId: $budgetId})
         RETURN ${resultKey}
       `,
-      props: {
+      params: {
         id,
         budgetId,
       },
-    };
+    }
   },
 
   /**
@@ -32,20 +29,17 @@ export const CommonQueries = {
    * @param {IMammothCoreNode} request
    * @returns {ExecuteStatement}
    */
-  deleteNodeStatement: (
-    resultKey: string,
-    request: IMammothCoreNode
-  ): ExecuteStatement => {
-    const { id, label, budgetId } = request;
+  deleteNodeStatement: (resultKey: string, request: IMammothCoreNode): ExecuteStatement => {
+    const { id, label, budgetId } = request
     return {
-      statement: `
+      query: `
         MATCH (${resultKey}:${label} {id: $id, budgetId: $budgetId})
         DELETE ${resultKey}
       `,
-      props: {
+      params: {
         id,
         budgetId,
       },
-    };
+    }
   },
-};
+}

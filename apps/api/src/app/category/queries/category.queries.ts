@@ -5,32 +5,32 @@ import { ExecuteStatement } from '../../neo4j'
 
 export const categoryQueries = {
   createChildCategory: (resultKey: string, request: ICreateCategory): ExecuteStatement => ({
-    statement: `
+    query: `
       MATCH (parentCategory:${SupportedLabel.Category} {id: $parentId, budgetId: $budgetId})
       CREATE (${resultKey}:${SupportedLabel.Category} $nodeProps)
       MERGE (${resultKey})-[r:${NodeRelationship.CategoryOf}]->(parentCategory)
       RETURN ${resultKey}
     `,
-    props: {
+    params: {
       budgetId: request.budgetId,
       parentId: request.parentId,
       nodeProps: { ...request, id: uuid() },
     },
   }),
   createCategory: (resultKey: string, request: ICreateCategory): ExecuteStatement => ({
-    statement: `
+    query: `
       MATCH (budget:${SupportedLabel.Budget} {id: $budgetId})
       CREATE (${resultKey}:${SupportedLabel.Category} $nodeProps)
       MERGE (${resultKey})-[r:${NodeRelationship.CategoryOf}]->(budget)
       RETURN ${resultKey}
     `,
-    props: {
+    params: {
       nodeProps: { ...request, id: uuid() },
       budgetId: request.budgetId,
     },
   }),
   getAllCategoriesByBudget: (budgetId: string): ExecuteStatement => ({
-    statement: `
+    query: `
       MATCH (parent:${SupportedLabel.Category} {budgetId: $budgetId})
       OPTIONAL MATCH (parent)<-[:${NodeRelationship.CategoryOf}]-(child)
       RETURN {
@@ -38,12 +38,12 @@ export const categoryQueries = {
         children: {details :collect(child)}
       }
     `,
-    props: {
+    params: {
       budgetId,
     },
   }),
   getCategoryWithChildrenById: (categoryId: string, budgetId: string): ExecuteStatement => ({
-    statement: `
+    query: `
       MATCH (parentCategory:Category {id: $id, budgetId: $budgetId})
       OPTIONAL MATCH (parentCategory)<-[:${NodeRelationship.CategoryOf}]-(childCategory})
       WITH COLLECT (childCategory}) + parentCategory AS all
@@ -55,27 +55,27 @@ export const categoryQueries = {
         children : {details :collect(childCategory})}
       }
     `,
-    props: {
+    params: {
       id: categoryId,
       budgetId,
     },
   }),
   deleteCategory: (categoryId: string, budgetId: string): ExecuteStatement => ({
-    statement: `
+    query: `
         MATCH (node:${SupportedLabel.Category} { id: $categoryId, budgetId: $budgeId })
         DETACH DELETE node
       `,
-    props: {
+    params: {
       budgetId,
       categoryId,
     },
   }),
   getCategoryNode: (resultKey: string, categoryId: string, budgetId: string): ExecuteStatement => ({
-    statement: `
+    query: `
         MATCH (${resultKey}:${SupportedLabel.Category} {id: $categoryId, budgetId: $budgetId})
         RETURN ${resultKey}
       `,
-    props: {
+    params: {
       categoryId,
       budgetId,
     },

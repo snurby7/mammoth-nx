@@ -14,11 +14,11 @@ export const getCreateBudgetStatement = (
   key: string,
   request: ICreateBudget
 ): ExecuteStatement => ({
-  statement: `
+  query: `
     CREATE (${key}:${SupportedLabel.Budget} $nodeProps)
     RETURN ${key}
   `,
-  props: {
+  params: {
     nodeProps: {
       ...request,
       // * override any passed in budget so I control it.
@@ -35,7 +35,7 @@ export const getCreateBudgetStatement = (
  * @returns {ExecuteStatement}
  */
 export const getBudgetsByQuery = (resultKey: string, request: IBudgetQuery): ExecuteStatement => ({
-  statement: `
+  query: `
     MATCH (${resultKey}:${SupportedLabel.Budget})
     RETURN ${resultKey}
     ${request.limit ? `LIMIT ${request.limit}` : ''}
@@ -50,12 +50,12 @@ export const getBudgetsByQuery = (resultKey: string, request: IBudgetQuery): Exe
  * @returns {ExecuteStatement}
  */
 export const getBudgetById = (resultKey: string, id: string): ExecuteStatement => ({
-  statement: `
+  query: `
     MATCH (${resultKey}:${SupportedLabel.Budget})
     WHERE ${resultKey}.id = $id
     RETURN ${resultKey}
   `,
-  props: {
+  params: {
     id,
   },
 })
@@ -74,11 +74,11 @@ export const getBudgetById = (resultKey: string, id: string): ExecuteStatement =
  * @returns {ExecuteStatement}
  */
 export const deleteBudgetById = (id: string): ExecuteStatement => ({
-  statement: `
+  query: `
     MATCH (budget:${SupportedLabel.Budget} { id: $id })
     DETACH DELETE budget
   `,
-  props: {
+  params: {
     id,
   },
 })
@@ -97,12 +97,12 @@ export const updateBudgetRequest = (
   resultKey: string,
   request: IUpdateBudget
 ): ExecuteStatement => ({
-  statement: `
+  query: `
     MATCH (${resultKey}:${SupportedLabel.Budget} { id: $id })
     SET ${resultKey}.name = $name
     RETURN ${resultKey}
   `,
-  props: {
+  params: {
     name: request.name,
     id: request.id,
   },
