@@ -2,18 +2,20 @@
 import { ITransactionDetail } from '@mammoth/api-interfaces'
 import React, { useCallback, useEffect } from 'react'
 import { IColumnExtension, IDataColumn, TransactionDataTable } from '../components'
-import { useAccountStore, useTransactionStore } from '../hooks'
 import { ITransactionInstance } from '../models'
+import { rxAccountApi } from '../models/account'
+import { rxTransactionApi } from '../models/transaction'
 export const AccountPage = () => {
-  const accountStore = useAccountStore()
-  const transactionStore = useTransactionStore()
+  // const accountStore = useAccountStore()
+  // const transactionStore = useTransactionStore()
+  const viewAccount = rxAccountApi.viewAccountRef
 
   useEffect(() => {
-    if (accountStore.selectedAccount) {
+    if (viewAccount) {
       // must be defined in order to get this to work and optional chaining makes that slightly less clear
-      accountStore.selectedAccount.loadTransactions()
+      viewAccount.getTransactionsByAccount()
     }
-  }, [accountStore.selectedAccount])
+  }, [viewAccount])
 
   const dataColumns: IDataColumn<ITransactionDetail>[] = [
     { name: 'date', title: 'Date', isRequired: true },
@@ -34,15 +36,15 @@ export const AccountPage = () => {
 
   const dataFilter = useCallback(
     (record: ITransactionInstance) => {
-      return record.accountId.id === accountStore.selectedAccount.id
+      return record.accountId.id === viewAccount.detailRef.id
     },
-    [accountStore.selectedAccount]
+    [viewAccount.detailRef.id]
   )
 
   return (
     <article>
       <TransactionDataTable
-        transactions={transactionStore.transactions}
+        transactions$={rxTransactionApi.transactions$}
         columns={dataColumns}
         columnExtensions={columnExtensions}
         filter={dataFilter}

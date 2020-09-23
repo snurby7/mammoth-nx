@@ -6,11 +6,15 @@ import { rxTransactionApi } from '../transaction'
 export class Account {
   private detailsSubject = new BehaviorSubject(this.details)
 
+  constructor(private details: IAccount) {}
+
   public get details$(): Observable<IAccount> {
     return this.detailsSubject.asObservable()
   }
 
-  constructor(private details: IAccount) {}
+  public get detailRef(): IAccount {
+    return this.detailsSubject.value
+  }
 
   public toFormattedNode(): IFormattedNode {
     return {

@@ -18,6 +18,7 @@ import Paper from '@material-ui/core/Paper'
 import { observer } from 'mobx-react'
 import { SnapshotIn } from 'mobx-state-tree'
 import React, { useState } from 'react'
+import { Observable } from 'rxjs'
 import { ITransactionGridRow } from '../../../interface'
 import { useBudgetStore, useTransactionStore } from '../../hooks'
 import { ITransactionInstance, Transaction } from '../../models'
@@ -70,7 +71,7 @@ export interface IColumnExtension<TData> {
 export interface IDataTable<TData> {
   columns: IDataColumn<TData>[]
   columnExtensions?: IColumnExtension<TData>[]
-  transactions: Map<string, ITransactionInstance>
+  transactions$: Observable<ITransactionDetail[]>
   filter?: (item: ITransactionInstance) => boolean
   hideControls?: boolean
 }

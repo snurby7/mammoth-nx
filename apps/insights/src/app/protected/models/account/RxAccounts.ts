@@ -1,13 +1,31 @@
-import { IAccount, ICreateAccount } from '@mammoth/api-interfaces'
-import { Observable } from 'rxjs'
+import { IAccount, ICreateAccount, SupportedAccountType } from '@mammoth/api-interfaces'
+import { BehaviorSubject, Observable } from 'rxjs'
 import { accountApi } from '../../api'
 import { Account } from './Account'
 
 class RxAccountApi {
+  private accountIdList = new BehaviorSubject<string[]>([])
   private accountMap: Map<string, Account> = new Map()
+  private viewAccount: Account
+
+  public readonly defaultAccount: IAccount = {
+    name: '',
+    type: SupportedAccountType.Cash,
+    balance: 0,
+    budgetId: '',
+    id: '',
+  }
 
   public get accountDetailList$(): Observable<IAccount>[] {
     return Array.from(this.accountMap.values()).map((account) => account.details$)
+  }
+
+  public get accountIdList$(): Observable<string[]> {
+    return this.accountIdList.asObservable()
+  }
+
+  public get viewAccountRef(): Account {
+    return this.viewAccount
   }
 
   /**
@@ -18,9 +36,12 @@ class RxAccountApi {
    */
   public async loadAccounts(budgetId: string) {
     const accounts = await accountApi.loadAccounts(budgetId)
-
-    accounts.forEach((account) => this.accountMap.set(account.id, new Account(account)))
-    console.log('from inside', this)
+    const accountIds: string[] = []
+    accounts.forEach((account) => {
+      accountIds.push(account.id)
+      this.accountMap.set(account.id, new Account(account))
+    })
+    this.accountIdList.next(accountIds)
   }
 
   /**
@@ -51,13 +72,26 @@ class RxAccountApi {
    *
    *
    * @param {string} accountId
-   * @returns {Observable<IAccount>}
    * @memberof RxAccountApi
    */
-  public getAccount$(accountId: string): Observable<IAccount> {
+  public setViewAccount(accountId: string): void {
+    const accountRef = this.accountMap.get(accountId)
+    if (accountRef) {
+      this.viewAccount = accountRef
+    }
+  }
+
+  /**
+   *
+   *
+   * @param {string} accountId
+   * @returns {Account}
+   * @memberof RxAccountApi
+   */
+  public getAccount(accountId: string): Account {
     const account = this.accountMap.get(accountId)
     if (account) {
-      return account.details$
+      return account
     }
     throw Error(`There is not account defined by id - ${accountId}`)
   }
