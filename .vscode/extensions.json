@@ -1,16 +1,15 @@
 {
-  "recommendations": [
-    "aaron-bond.better-comments",
-    "angular.ng-template",
-    "eamodio.gitlens",
-    "esbenp.prettier-vscode",
-    "ghmcadams.lintlens",
-    "gruntfuggly.todo-tree",
-    "HookyQR.beautify",
-    "knisterpeter.vscode-commitizen",
-    "ms-vscode.vscode-typescript-tslint-plugin",
-    "nrwl.angular-console",
-    "pflannery.vscode-versionlens",
-    "streetsidesoftware.code-spell-checker"
-  ]
+    "recommendations": [
+        "aaron-bond.better-comments",
+        "angular.ng-template",
+        "eamodio.gitlens",
+        "esbenp.prettier-vscode",
+        "ghmcadams.lintlens",
+        "gruntfuggly.todo-tree",
+        "HookyQR.beautify",
+        "ms-vscode.vscode-typescript-tslint-plugin",
+        "nrwl.angular-console",
+        "pflannery.vscode-versionlens",
+        "streetsidesoftware.code-spell-checker"
+    ]
 }
