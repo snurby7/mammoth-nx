@@ -16,10 +16,6 @@ class RxAccountApi {
     id: '',
   }
 
-  public get accountDetailList$(): Observable<IAccount>[] {
-    return Array.from(this.accountMap.values()).map((account) => account.details$)
-  }
-
   public get accountIdList$(): Observable<string[]> {
     return this.accountIdList.asObservable()
   }

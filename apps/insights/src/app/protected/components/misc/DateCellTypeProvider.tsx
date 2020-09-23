@@ -1,10 +1,10 @@
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
-import { ITransactionDetail } from '@mammoth/api-interfaces'
 import { TextField } from '@material-ui/core'
 import { LocalizationProvider, MobileDatePicker } from '@material-ui/pickers'
 import MomentAdapter from '@material-ui/pickers/adapter/moment'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
+import { ITransactionGridRow } from '../../../interface'
 import { formatter, parser } from '../../../utils'
 
 const DateCellFormatter = ({ value }) => {
@@ -39,7 +39,7 @@ const DateCellEditor = ({ value: cellValue, onValueChange }) => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-let detailKey: keyof ITransactionDetail
+let detailKey: keyof ITransactionGridRow
 
 export const DateCellTypeProvider = () => {
   return (

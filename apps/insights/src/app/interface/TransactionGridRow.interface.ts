@@ -2,9 +2,9 @@ export interface ITransactionGridRow {
   id?: string
   budgetId: string
   date: string
-  account: string
-  category: string
-  payee: string
+  accountId: string
+  categoryId: string
+  payeeId: string
   inflow?: number
   outflow?: number
   memo?: string

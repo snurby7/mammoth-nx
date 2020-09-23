@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ITransactionDetail } from '@mammoth/api-interfaces'
-import React, { useCallback, useEffect } from 'react'
+import React, { useEffect } from 'react'
+import { map } from 'rxjs/operators'
 import { IColumnExtension, IDataColumn, TransactionDataTable } from '../components'
-import { ITransactionInstance } from '../models'
 import { rxAccountApi } from '../models/account'
 import { rxTransactionApi } from '../models/transaction'
 export const AccountPage = () => {
-  // const accountStore = useAccountStore()
-  // const transactionStore = useTransactionStore()
   const viewAccount = rxAccountApi.viewAccountRef
 
   useEffect(() => {
@@ -34,20 +32,16 @@ export const AccountPage = () => {
     { columnName: 'category', width: '200px' },
   ]
 
-  const dataFilter = useCallback(
-    (record: ITransactionInstance) => {
-      return record.accountId.id === viewAccount.detailRef.id
-    },
-    [viewAccount.detailRef.id]
-  )
-
   return (
     <article>
       <TransactionDataTable
-        transactions$={rxTransactionApi.transactions$}
+        transactions$={rxTransactionApi.transactions$.pipe(
+          map((transactions: ITransactionDetail[]) =>
+            transactions.filter((transaction) => transaction.accountId === viewAccount.detailRef.id)
+          )
+        )}
         columns={dataColumns}
         columnExtensions={columnExtensions}
-        filter={dataFilter}
       />
     </article>
   )

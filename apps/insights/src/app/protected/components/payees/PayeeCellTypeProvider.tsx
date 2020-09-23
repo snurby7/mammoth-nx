@@ -1,10 +1,14 @@
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
-import { IFormattedNode, ITransactionDetail } from '@mammoth/api-interfaces'
+import { IFormattedNode, IPayee } from '@mammoth/api-interfaces'
 import { TextField } from '@material-ui/core'
 import { Autocomplete, createFilterOptions } from '@material-ui/lab'
 import React, { useCallback, useState } from 'react'
+import { map } from 'rxjs/operators'
+import { useObservable } from '../../../hooks'
+import { ITransactionGridRow } from '../../../interface'
 import { useBudgetStore, usePayeeStore } from '../../hooks'
 import { IPayeeSnap } from '../../models'
+import { rxPayeeApi } from '../../models/payee'
 
 const filter = createFilterOptions<IPayeeSnap>()
 
@@ -13,23 +17,29 @@ const PayeeCellFormatter = ({ value: node }: { value: IFormattedNode }) => {
 }
 
 const PayeeCellEditor = ({ value, onValueChange }) => {
-  const node: IFormattedNode = value ?? { id: '', value: '' } // when it's add mode this is undefined
+  const payeeId: string | undefined = value // when it's add mode this is undefined
+
   const payeeStore = usePayeeStore()
-  const payeeList: IPayeeSnap[] = Array.from(payeeStore.payees.values())
+  const { result: payeeList } = useObservable(
+    rxPayeeApi.payeeIdList$.pipe(
+      map((payeeIds) => payeeIds.map((payeeId) => rxPayeeApi.getPayee(payeeId).detailRef))
+    ),
+    []
+  )
   const { selectedBudget } = useBudgetStore()
-  const [selectedPayee, setSelectedPayee] = useState<IPayeeSnap | null>(
-    payeeList.find((payee) => payee.id === node.id) ?? null
+  const [selectedPayee, setSelectedPayee] = useState<IPayee | null>(
+    payeeId ? rxPayeeApi.getPayee(payeeId).detailRef : null
   )
 
   const onChange = useCallback(
-    (payee: IPayeeSnap | null) => {
+    (payee: IPayee | null) => {
       onValueChange(payee?.id)
       setSelectedPayee(payee)
     },
     [onValueChange]
   )
 
-  const onAutoCompleteSelection = (payee: IPayeeSnap | string) => {
+  const onAutoCompleteSelection = (payee: IPayee | string) => {
     if (typeof payee === 'string' || payee.id === '') {
       // create the payee and set the selectedPayee to the server payee
       let payeeName = typeof payee === 'string' ? payee : payee.name
@@ -37,13 +47,13 @@ const PayeeCellEditor = ({ value, onValueChange }) => {
         payeeName.charAt(payeeName.length - 1) === '"' ? payeeName.slice(0, -1) : payeeName
       // * Two cases come in here one that looks like 'Create "Payee A"' and one that looks like 'Payee A'
 
-      payeeStore
+      rxPayeeApi
         .createPayee({
           name: payeeName.replace('Create "', ''),
           budgetId: selectedBudget!.id,
         })
         .then((payee) => {
-          onChange(payee)
+          onChange(payee.detailRef)
         })
     } else {
       onChange(payee)
@@ -84,12 +94,12 @@ const PayeeCellEditor = ({ value, onValueChange }) => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-let detailKey: keyof ITransactionDetail
+let detailKey: keyof ITransactionGridRow
 
 export const PayeeCellTypeProvider = () => {
   return (
     <DataTypeProvider
-      for={[(detailKey = 'payee')]}
+      for={[(detailKey = 'payeeId')]}
       formatterComponent={PayeeCellFormatter}
       editorComponent={PayeeCellEditor}
     />

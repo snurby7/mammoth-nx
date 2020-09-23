@@ -1,35 +1,44 @@
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
-import { IFormattedNode, ITransactionDetail } from '@mammoth/api-interfaces'
+import { ICategory, IFormattedNode } from '@mammoth/api-interfaces'
 import { TextField } from '@material-ui/core'
 import { Autocomplete, createFilterOptions } from '@material-ui/lab'
 import React, { useCallback, useState } from 'react'
-import { useBudgetStore, useCategoryStore } from '../../hooks'
-import { ICategorySnap } from '../../models'
+import { map } from 'rxjs/operators'
+import { useObservable } from '../../../hooks'
+import { ITransactionGridRow } from '../../../interface'
+import { useBudgetStore } from '../../hooks'
+import { rxCategoryApi } from '../../models/category'
 
-const filter = createFilterOptions<ICategorySnap>()
+const filter = createFilterOptions<ICategory>()
 
 const CategoryCellFormatter = ({ value: node }: { value: IFormattedNode }) => {
   return <span>{node.value}</span>
 }
 
 const CategoryCellEditor = ({ value, onValueChange }) => {
-  const node: IFormattedNode = value ?? { id: '', value: '' } // when it's add mode this is undefined
-  const categoryStore = useCategoryStore()
-  const categoryList: ICategorySnap[] = Array.from(categoryStore.categories.values())
+  const categoryId: string | undefined = value // when it's add mode this is undefined
+  const { result: categoryList } = useObservable(
+    rxCategoryApi.categoryIdList$.pipe(
+      map((categoryIdList) =>
+        categoryIdList.map((categoryId) => rxCategoryApi.getCategory(categoryId).detailRef)
+      )
+    ),
+    []
+  )
   const { selectedBudget } = useBudgetStore()
-  const [selectedCategory, setSelectedCategory] = useState<ICategorySnap | null>(
-    categoryList.find((category) => category.id === node.id) ?? null
+  const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
+    categoryId ? rxCategoryApi.getCategory(categoryId).detailRef : null
   )
 
   const onChange = useCallback(
-    (category: ICategorySnap | null) => {
+    (category: ICategory | null) => {
       onValueChange(category?.id)
       setSelectedCategory(category)
     },
     [onValueChange]
   )
 
-  const onAutoCompleteSelection = (category: ICategorySnap | string) => {
+  const onAutoCompleteSelection = (category: ICategory | string) => {
     if (typeof category === 'string' || category.id === '') {
       // create the category and set the selectedCategory to the server category
       let categoryName = typeof category === 'string' ? category : category.name
@@ -38,13 +47,13 @@ const CategoryCellEditor = ({ value, onValueChange }) => {
           ? categoryName.slice(0, -1)
           : categoryName
       // * Two cases come in here one that looks like 'Create "Category A"' and one that looks like 'Category A'
-      categoryStore
+      rxCategoryApi
         .createCategory({
           name: categoryName.replace('Create "', ''),
           budgetId: selectedBudget!.id,
         })
         .then((category) => {
-          onChange(category)
+          onChange(category.detailRef)
         })
     } else {
       onChange(category)
@@ -56,7 +65,7 @@ const CategoryCellEditor = ({ value, onValueChange }) => {
       id="category-cell"
       value={selectedCategory}
       options={categoryList}
-      getOptionLabel={(option: ICategorySnap) => option.name}
+      getOptionLabel={(option: ICategory) => option.name}
       onChange={(_, newValue) => {
         if (typeof newValue === 'string') {
           onAutoCompleteSelection(newValue)
@@ -85,12 +94,12 @@ const CategoryCellEditor = ({ value, onValueChange }) => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-let detailKey: keyof ITransactionDetail
+let detailKey: keyof ITransactionGridRow
 
 export const CategoryCellTypeProvider = () => {
   return (
     <DataTypeProvider
-      for={[(detailKey = 'category')]}
+      for={[(detailKey = 'categoryId')]}
       formatterComponent={CategoryCellFormatter}
       editorComponent={CategoryCellEditor}
     />

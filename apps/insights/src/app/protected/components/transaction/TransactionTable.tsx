@@ -16,12 +16,15 @@ import {
 import { ITransactionDetail } from '@mammoth/api-interfaces'
 import Paper from '@material-ui/core/Paper'
 import { observer } from 'mobx-react'
-import { SnapshotIn } from 'mobx-state-tree'
 import React, { useState } from 'react'
 import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+import { useObservable } from '../../../hooks'
 import { ITransactionGridRow } from '../../../interface'
-import { useBudgetStore, useTransactionStore } from '../../hooks'
-import { ITransactionInstance, Transaction } from '../../models'
+import { useBudgetStore } from '../../hooks'
+import { ITransactionInstance } from '../../models'
+import { rxTransactionApi } from '../../models/transaction'
+import { Transaction } from '../../models/transaction/Transaction'
 import { AccountCellTypeProvider } from '../account'
 import { CategoryCellTypeProvider } from '../category'
 import { CurrencyCellTypeProvider, DateCellTypeProvider } from '../misc'
@@ -60,7 +63,6 @@ export interface IDataColumn<T> {
   name: keyof T
   title: string
   isRequired: boolean
-  formatter?: (value: SnapshotIn<typeof Transaction>) => string
 }
 
 export interface IColumnExtension<TData> {
@@ -71,17 +73,23 @@ export interface IColumnExtension<TData> {
 export interface IDataTable<TData> {
   columns: IDataColumn<TData>[]
   columnExtensions?: IColumnExtension<TData>[]
-  transactions$: Observable<ITransactionDetail[]>
+  transactions$: Observable<Transaction[]>
   filter?: (item: ITransactionInstance) => boolean
   hideControls?: boolean
 }
 
 export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
-  ({ transactions, columns, columnExtensions, filter, hideControls }) => {
+  ({ transactions$, columns, columnExtensions, filter, hideControls }) => {
     const [errors, setErrors] = useState<Record<string, any>>({})
-    const transactionStore = useTransactionStore()
     const budgetStore = useBudgetStore()
     const selectedBudget = budgetStore.selectedBudget
+
+    const { result: rows } = useObservable(
+      transactions$.pipe(
+        map((transactions) => transactions.map((transaction) => transaction.toGridView()))
+      ),
+      []
+    )
 
     const [sorting, setSorting] = useState<Sorting[]>([{ columnName: 'date', direction: 'desc' }])
 
@@ -95,26 +103,16 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
       }
       return accumulator
     }, [] as string[])
-    const rows: ITransactionDetail[] = []
-    Array.from(transactions.values()).forEach((transaction) => {
-      const formattedValue = transaction.formattedValue
-      // TODO: Give this a good hard stare, this seems like it could be easier
-      if (!filter) {
-        rows.push(formattedValue)
-      } else if (filter(transaction)) {
-        rows.push(formattedValue)
-      }
-    })
 
     const commitChanges = ({ added, changed, deleted }: ChangeSet) => {
       if (added) {
-        transactionStore.createTransactions(selectedBudget.id, added as ITransactionGridRow[])
+        rxTransactionApi.createTransaction(selectedBudget.id, added as ITransactionGridRow[])
       }
       if (changed) {
-        transactionStore.updateTransactions(changed as Record<string, ITransactionDetail>)
+        rxTransactionApi.updateTransactions(changed as Record<string, ITransactionDetail>)
       }
       if (deleted) {
-        transactionStore.deleteTransactions(deleted as string[])
+        rxTransactionApi.deleteTransactions(deleted as string[])
       }
     }
 

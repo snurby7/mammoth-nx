@@ -1,7 +1,7 @@
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
-import { ITransactionDetail } from '@mammoth/api-interfaces'
 import { Input } from '@material-ui/core'
 import React, { ChangeEvent, useState } from 'react'
+import { ITransactionGridRow } from '../../../interface'
 import { formatter } from '../../../utils'
 
 const CurrencyCellFormatter = ({ value }) => {
@@ -20,7 +20,7 @@ const CurrencyCellEditor = ({ value: cellValue, onValueChange }) => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-let detailKey: keyof ITransactionDetail
+let detailKey: keyof ITransactionGridRow
 
 export const CurrencyCellTypeProvider = () => {
   return (
