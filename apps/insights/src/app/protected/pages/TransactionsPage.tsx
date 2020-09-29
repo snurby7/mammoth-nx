@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ITransactionDetail } from '@mammoth/api-interfaces'
-import React, { useCallback, useEffect } from 'react'
+import React, { useEffect } from 'react'
+import { map } from 'rxjs/operators'
 import { IColumnExtension, IDataColumn, TransactionDataTable } from '../components'
 import { useBudgetStore, useTransactionStore } from '../hooks'
-import { ITransactionInstance } from '../models'
+import { rxTransactionApi } from '../models/transaction'
 export const TransactionsPage = () => {
   const { selectedBudget } = useBudgetStore()
   const selectedBudgetId = selectedBudget!.id
-  const { transactions, searchTransactionsByQuery } = useTransactionStore()
+  const { searchTransactionsByQuery } = useTransactionStore()
 
   useEffect(() => {
-    searchTransactionsByQuery(selectedBudgetId)
+    rxTransactionApi.searchTransactionsByQuery(selectedBudgetId)
   }, [searchTransactionsByQuery, selectedBudgetId])
 
   const dataColumns: IDataColumn<ITransactionDetail>[] = [
@@ -30,20 +31,18 @@ export const TransactionsPage = () => {
     { columnName: 'category', width: '200px' },
   ]
 
-  const dataFilter = useCallback(
-    (record: ITransactionInstance) => {
-      return record.budgetId === selectedBudgetId
-    },
-    [selectedBudgetId]
-  )
-
   return (
     <article>
       <TransactionDataTable
-        transactions={transactions}
+        transactions$={rxTransactionApi.transactions$.pipe(
+          map((transactions) =>
+            transactions.filter(
+              (transaction) => transaction.detailRef.budgetId === selectedBudgetId
+            )
+          )
+        )}
         columns={dataColumns}
         columnExtensions={columnExtensions}
-        filter={dataFilter}
       />
     </article>
   )

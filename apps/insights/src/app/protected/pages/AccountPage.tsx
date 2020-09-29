@@ -36,8 +36,10 @@ export const AccountPage = () => {
     <article>
       <TransactionDataTable
         transactions$={rxTransactionApi.transactions$.pipe(
-          map((transactions: ITransactionDetail[]) =>
-            transactions.filter((transaction) => transaction.accountId === viewAccount.detailRef.id)
+          map((transactions) =>
+            transactions.filter(
+              (transaction) => transaction.detailRef.accountId === viewAccount.detailRef.id
+            )
           )
         )}
         columns={dataColumns}

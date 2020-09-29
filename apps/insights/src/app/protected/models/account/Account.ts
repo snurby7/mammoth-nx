@@ -12,6 +12,10 @@ export class Account {
     return this.detailsSubject.asObservable()
   }
 
+  public get formattedNode(): IFormattedNode {
+    return { id: this.details.id, value: this.details.name }
+  }
+
   public get detailRef(): IAccount {
     return this.detailsSubject.value
   }
