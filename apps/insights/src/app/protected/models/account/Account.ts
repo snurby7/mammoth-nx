@@ -32,7 +32,7 @@ export class Account {
       this.details.budgetId,
       this.details.id
     )
-
+    console.log('transactions', transactions)
     rxTransactionApi.setTransactions(transactions)
   }
 

@@ -11,6 +11,7 @@ interface IRxApiOptions<TResponse, TError> {
    * onError gets called whenever the observable emits an event.
    */
   onError?: (result: TError) => void
+  onCleanUp?: () => void
 
   /**
    * onComplete is called when the Subscription is completed.
@@ -36,9 +37,9 @@ export const useObservable = <TResponse = any, TError = any>(
   rxApiOptions?: IRxApiOptions<TResponse, TError>
 ): IRxApiResponse<TResponse> => {
   const [isLoading, setIsLoading] = useState(true)
-  const { onComplete, onError, onNext } = rxApiOptions || {}
   const [value, setValue] = useState<TResponse>(initialValue)
   useEffect(() => {
+    const { onComplete, onError, onNext, onCleanUp } = rxApiOptions || {}
     const subscription = observable.subscribe({
       next: (result) => {
         setValue(result)
@@ -55,9 +56,12 @@ export const useObservable = <TResponse = any, TError = any>(
     })
 
     return () => {
+      onCleanUp?.()
       subscription.unsubscribe()
     }
-  }, [observable, onComplete, onError, onNext])
+    // ! Disabling this as it seems to be getting a new observable each time which is causing a spiral of subscriptions/unsubscribe
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return {
     result: value,

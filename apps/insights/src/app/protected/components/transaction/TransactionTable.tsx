@@ -15,16 +15,13 @@ import {
 } from '@devexpress/dx-react-grid-material-ui'
 import { ITransactionDetail } from '@mammoth/api-interfaces'
 import Paper from '@material-ui/core/Paper'
-import { observer } from 'mobx-react'
 import React, { useState } from 'react'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { useObservable } from '../../../hooks'
 import { ITransactionGridRow } from '../../../interface'
 import { useBudgetStore } from '../../hooks'
-import { ITransactionInstance } from '../../models'
-import { rxTransactionApi } from '../../models/transaction'
-import { Transaction } from '../../models/transaction/Transaction'
+import { rxTransactionApi, Transaction } from '../../models/transaction'
 import { AccountCellTypeProvider } from '../account'
 import { CategoryCellTypeProvider } from '../category'
 import { CurrencyCellTypeProvider, DateCellTypeProvider } from '../misc'
@@ -74,99 +71,98 @@ export interface IDataTable<TData> {
   columns: IDataColumn<TData>[]
   columnExtensions?: IColumnExtension<TData>[]
   transactions$: Observable<Transaction[]>
-  filter?: (item: ITransactionInstance) => boolean
   hideControls?: boolean
 }
 
-export const TransactionDataTable: React.FC<IDataTable<any>> = observer(
-  ({ transactions$, columns, columnExtensions, filter, hideControls }) => {
-    const [errors, setErrors] = useState<Record<string, any>>({})
-    const budgetStore = useBudgetStore()
-    const selectedBudget = budgetStore.selectedBudget
+export const TransactionDataTable: React.FC<IDataTable<any>> = ({
+  transactions$,
+  columns,
+  columnExtensions,
+  hideControls,
+}) => {
+  const [errors, setErrors] = useState<Record<string, any>>({})
+  const budgetStore = useBudgetStore()
+  const selectedBudget = budgetStore.selectedBudget
 
-    const { result: rows } = useObservable(
-      transactions$.pipe(
-        map((transactions) => transactions.map((transaction) => transaction.toGridView()))
-      ),
-      []
-    )
+  const { result: rows } = useObservable(
+    transactions$.pipe(
+      map((transactions) => transactions.map((transaction) => transaction.toGridView()))
+    ),
+    []
+  )
+  console.log('TransactionTable Rows => ', rows)
 
-    const [sorting, setSorting] = useState<Sorting[]>([{ columnName: 'date', direction: 'desc' }])
+  const [sorting, setSorting] = useState<Sorting[]>([{ columnName: 'date', direction: 'desc' }])
 
-    if (!selectedBudget) {
-      return <div>There is no selected budget! Sorry!</div>
+  if (!selectedBudget) {
+    return <div>There is no selected budget! Sorry!</div>
+  }
+
+  const requiredColumnKeys: string[] = columns.reduce((accumulator, item) => {
+    if (item.isRequired) {
+      accumulator.push(item.name as string)
     }
+    return accumulator
+  }, [] as string[])
 
-    const requiredColumnKeys: string[] = columns.reduce((accumulator, item) => {
-      if (item.isRequired) {
-        accumulator.push(item.name as string)
-      }
-      return accumulator
-    }, [] as string[])
-
-    const commitChanges = ({ added, changed, deleted }: ChangeSet) => {
-      if (added) {
-        rxTransactionApi.createTransaction(selectedBudget.id, added as ITransactionGridRow[])
-      }
-      if (changed) {
-        rxTransactionApi.updateTransactions(changed as Record<string, ITransactionDetail>)
-      }
-      if (deleted) {
-        rxTransactionApi.deleteTransactions(deleted as string[])
-      }
+  const commitChanges = ({ added, changed, deleted }: ChangeSet) => {
+    if (added) {
+      rxTransactionApi.createTransaction(selectedBudget.id, added as ITransactionGridRow[])
     }
-
-    const validate = (rows: ITransactionDetail[], columns: IDataColumn<any>[]) => {
-      return Object.entries(rows).reduce(
-        (acc, [rowId, row]) => ({
-          ...acc,
-          [rowId]: columns.some((column) => column.isRequired && row[column.name] === ''),
-        }),
-        {}
-      )
+    if (changed) {
+      rxTransactionApi.updateTransactions(changed as Record<string, ITransactionDetail>)
     }
+    if (deleted) {
+      rxTransactionApi.deleteTransactions(deleted as string[])
+    }
+  }
 
-    const onEdited = (edited) => setErrors(validate(edited, columns))
-
-    return (
-      <Paper>
-        <Grid rows={rows} columns={columns as Column[]} getRowId={getRowId}>
-          <SortingState sorting={sorting} onSortingChange={setSorting} />
-          <IntegratedSorting />
-          {/* Custom Cells these could probably be abstracted to {children} later */}
-          <AccountCellTypeProvider />
-          <PayeeCellTypeProvider />
-          <CategoryCellTypeProvider />
-          <DateCellTypeProvider />
-          <CurrencyCellTypeProvider />
-          {/* End custom cells */}
-          <EditingState onRowChangesChange={onEdited} onCommitChanges={commitChanges} />
-          <Table
-            columnExtensions={
-              columnExtensions?.map(({ columnName, width }) => ({
-                columnName: columnName as string, // a little type manipulation.
-                width,
-              })) ?? []
-            }
-          />
-          <TableHeaderRow showSortingControls />
-          <TableEditRow />
-          {!hideControls && (
-            <TableEditColumn
-              showAddCommand
-              showEditCommand
-              showDeleteCommand
-              cellComponent={(props) => (
-                <EditCell
-                  {...props}
-                  errors={errors}
-                  requiredTransactionFields={requiredColumnKeys}
-                />
-              )}
-            />
-          )}
-        </Grid>
-      </Paper>
+  const validate = (rows: ITransactionDetail[], columns: IDataColumn<any>[]) => {
+    return Object.entries(rows).reduce(
+      (acc, [rowId, row]) => ({
+        ...acc,
+        [rowId]: columns.some((column) => column.isRequired && row[column.name] === ''),
+      }),
+      {}
     )
   }
-)
+
+  const onEdited = (edited) => setErrors(validate(edited, columns))
+
+  return (
+    <Paper>
+      <Grid rows={rows} columns={columns as Column[]} getRowId={getRowId}>
+        <SortingState sorting={sorting} onSortingChange={setSorting} />
+        <IntegratedSorting />
+        {/* Custom Cells these could probably be abstracted to {children} later */}
+        <AccountCellTypeProvider />
+        <PayeeCellTypeProvider />
+        <CategoryCellTypeProvider />
+        <DateCellTypeProvider />
+        <CurrencyCellTypeProvider />
+        {/* End custom cells */}
+        <EditingState onRowChangesChange={onEdited} onCommitChanges={commitChanges} />
+        <Table
+          columnExtensions={
+            columnExtensions?.map(({ columnName, width }) => ({
+              columnName: columnName as string, // a little type manipulation.
+              width,
+            })) ?? []
+          }
+        />
+        <TableHeaderRow showSortingControls />
+        <TableEditRow />
+        {!hideControls && (
+          <TableEditColumn
+            showAddCommand
+            showEditCommand
+            showDeleteCommand
+            cellComponent={(props) => (
+              <EditCell {...props} errors={errors} requiredTransactionFields={requiredColumnKeys} />
+            )}
+          />
+        )}
+      </Grid>
+    </Paper>
+  )
+}
