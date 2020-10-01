@@ -7,6 +7,7 @@ class RxAccountApi {
   private accountIdList = new BehaviorSubject<string[]>([])
   private accountMap: Map<string, Account> = new Map()
   private viewAccount: Account
+  private readonly accountStorageKey = 'insights-account'
 
   public readonly defaultAccount: IAccount = {
     name: '',
@@ -22,6 +23,13 @@ class RxAccountApi {
 
   public get viewAccountRef(): Account {
     return this.viewAccount
+  }
+
+  constructor() {
+    const storedAccount: string | null = sessionStorage.getItem(this.accountStorageKey)
+    if (storedAccount) {
+      this.viewAccount = new Account(JSON.parse(storedAccount))
+    }
   }
 
   /**
@@ -73,6 +81,7 @@ class RxAccountApi {
   public setViewAccount(accountId: string): void {
     const accountRef = this.accountMap.get(accountId)
     if (accountRef) {
+      sessionStorage.setItem(this.accountStorageKey, JSON.stringify(accountRef.detailRef))
       this.viewAccount = accountRef
     }
   }

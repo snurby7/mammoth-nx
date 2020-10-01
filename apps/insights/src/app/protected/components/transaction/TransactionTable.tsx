@@ -90,7 +90,7 @@ export const TransactionDataTable: React.FC<IDataTable<any>> = ({
     ),
     []
   )
-  console.log('TransactionTable Rows => ', rows)
+  console.log(rows)
 
   const [sorting, setSorting] = useState<Sorting[]>([{ columnName: 'date', direction: 'desc' }])
 

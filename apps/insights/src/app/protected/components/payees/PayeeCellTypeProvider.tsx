@@ -13,10 +13,12 @@ import { rxPayeeApi } from '../../models/payee'
 const filter = createFilterOptions<IPayeeSnap>()
 
 const PayeeCellFormatter = ({ value: node }: { value: IFormattedNode }) => {
+  console.log(node)
   return <span>{node.value}</span>
 }
 
 const PayeeCellEditor = ({ value, onValueChange }) => {
+  console.log(value)
   const payeeId: string | undefined = value // when it's add mode this is undefined
 
   const payeeStore = usePayeeStore()

@@ -4,6 +4,8 @@ import React, { useEffect } from 'react'
 import { useAccountStore, useCategoryStore, usePayeeStore } from '../hooks'
 import { Budget } from '../models'
 import { rxAccountApi } from '../models/account'
+import { rxCategoryApi } from '../models/category'
+import { rxPayeeApi } from '../models/payee'
 
 interface IDataProviderProps {
   selectedBudget?: Instance<typeof Budget>
@@ -16,9 +18,8 @@ export const DataProvider: React.FC<IDataProviderProps> = observer(
 
     useEffect(() => {
       if (selectedBudget) {
-        categoryStore.loadCategories()
-        payeeStore.loadPayees()
-        accountStore.loadAccounts() // TODO: DELETE
+        rxCategoryApi.loadCategories(selectedBudget.id)
+        rxPayeeApi.loadPayees(selectedBudget.id)
         rxAccountApi.loadAccounts(selectedBudget.id)
       }
     }, [accountStore, categoryStore, payeeStore, selectedBudget])

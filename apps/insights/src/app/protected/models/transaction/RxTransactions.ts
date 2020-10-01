@@ -13,7 +13,6 @@ class RxTransactionApi {
   }
 
   public setTransactions(transactionDetails: ITransactionDetail[]): void {
-    console.log('transaction set')
     this.transactions.next(
       transactionDetails.map((transactionDetail) => new Transaction(transactionDetail))
     )

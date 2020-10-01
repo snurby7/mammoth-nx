@@ -1,5 +1,4 @@
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
-import { IFormattedNode } from '@mammoth/api-interfaces'
 import { Input, MenuItem, Select } from '@material-ui/core'
 import React, { useState } from 'react'
 import { map } from 'rxjs/operators'
@@ -7,8 +6,10 @@ import { useObservable } from '../../../hooks'
 import { ITransactionGridRow } from '../../../interface'
 import { rxAccountApi } from '../../models/account'
 
-const AccountCellFormatter = ({ value: node }: { value: IFormattedNode }) => {
-  return <span>{node.value}</span>
+const AccountCellFormatter = ({ value }) => {
+  console.log('Account => ', value)
+  // TODO This never gets called for some reason.
+  return <span> Waffles</span>
 }
 const AccountCellEditor = ({ value, onValueChange }) => {
   const accountId: string | undefined = value // when it's add mode this is undefined

@@ -5,7 +5,7 @@ import { ITransactionGridRow } from '../../../interface'
 import { formatter } from '../../../utils'
 
 const CurrencyCellFormatter = ({ value }) => {
-  return <span>{value !== 0 ? formatter.currency(value) : ''}</span>
+  return <span>{value !== undefined && value !== 0 ? formatter.currency(value) : ''}</span>
 }
 const CurrencyCellEditor = ({ value: cellValue, onValueChange }) => {
   const [value, setValue] = useState<string | null>(cellValue)

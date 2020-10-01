@@ -34,9 +34,9 @@ export class Transaction {
       budgetId: this.detailRef.budgetId,
       categoryId: this.detailRef.categoryId,
       date: dateFormatter.toDateString(this.detailRef.date),
-      inflow: this.detailRef.inflow,
+      inflow: this.detailRef.inflow ?? 0,
       memo: this.detailRef.memo,
-      outflow: this.detailRef.outflow,
+      outflow: this.detailRef.outflow ?? 0,
       payeeId: this.detailRef.payeeId,
     }
   }
