@@ -30,6 +30,7 @@ class RxCategoryApi {
       categoryIds.push(category.id)
       this.categoryMap.set(category.id, new Category(category))
     })
+    console.log(categoryIds)
     this.categoryIds.next(categoryIds)
   }
 

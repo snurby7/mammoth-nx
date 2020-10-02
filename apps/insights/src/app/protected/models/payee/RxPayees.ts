@@ -26,6 +26,7 @@ class RxPayeeApi {
   public async loadPayees(budgetId: string) {
     const payees = await payeeApi.loadPayees(budgetId)
     const payeeIds: string[] = []
+    console.log('loaded payees', payees)
     payees.forEach((payee) => {
       payeeIds.push(payee.id)
       this.payeeMap.set(payee.id, new Payee(payee))

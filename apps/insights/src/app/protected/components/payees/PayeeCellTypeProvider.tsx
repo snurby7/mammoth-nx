@@ -1,9 +1,9 @@
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
-import { IFormattedNode, IPayee } from '@mammoth/api-interfaces'
+import { IPayee } from '@mammoth/api-interfaces'
 import { TextField } from '@material-ui/core'
 import { Autocomplete, createFilterOptions } from '@material-ui/lab'
 import React, { useCallback, useState } from 'react'
-import { map } from 'rxjs/operators'
+import { map, skipWhile } from 'rxjs/operators'
 import { useObservable } from '../../../hooks'
 import { ITransactionGridRow } from '../../../interface'
 import { useBudgetStore, usePayeeStore } from '../../hooks'
@@ -12,9 +12,18 @@ import { rxPayeeApi } from '../../models/payee'
 
 const filter = createFilterOptions<IPayeeSnap>()
 
-const PayeeCellFormatter = ({ value: node }: { value: IFormattedNode }) => {
-  console.log(node)
-  return <span>{node.value}</span>
+type CellGridView = { value: string }
+
+const PayeeCellFormatter = ({ value }: CellGridView) => {
+  console.log(value)
+  const { result: payeeName } = useObservable(
+    rxPayeeApi.payeeIdList$.pipe(
+      skipWhile((payeeIds) => !payeeIds.some((payeeId) => payeeId === value)),
+      map(() => rxPayeeApi.getPayee(value).displayValue)
+    ),
+    ''
+  )
+  return <span>{payeeName}</span>
 }
 
 const PayeeCellEditor = ({ value, onValueChange }) => {

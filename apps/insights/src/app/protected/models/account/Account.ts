@@ -20,6 +20,10 @@ export class Account {
     return this.detailsSubject.value
   }
 
+  public get displayValue(): string {
+    return this.details.name
+  }
+
   public toFormattedNode(): IFormattedNode {
     return {
       id: this.details.id,

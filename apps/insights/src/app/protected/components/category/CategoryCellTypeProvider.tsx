@@ -1,9 +1,9 @@
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
-import { ICategory, IFormattedNode } from '@mammoth/api-interfaces'
+import { ICategory } from '@mammoth/api-interfaces'
 import { TextField } from '@material-ui/core'
 import { Autocomplete, createFilterOptions } from '@material-ui/lab'
 import React, { useCallback, useState } from 'react'
-import { map } from 'rxjs/operators'
+import { map, skipWhile } from 'rxjs/operators'
 import { useObservable } from '../../../hooks'
 import { ITransactionGridRow } from '../../../interface'
 import { useBudgetStore } from '../../hooks'
@@ -11,8 +11,16 @@ import { rxCategoryApi } from '../../models/category'
 
 const filter = createFilterOptions<ICategory>()
 
-const CategoryCellFormatter = ({ value: node }: { value: IFormattedNode }) => {
-  return <span>{node.value}</span>
+type CellGridView = { value: string }
+const CategoryCellFormatter = ({ value }: CellGridView) => {
+  const { result: categoryName } = useObservable(
+    rxCategoryApi.categoryIdList$.pipe(
+      skipWhile((categoryIdList) => !categoryIdList.some((categoryId) => categoryId === value)),
+      map(() => rxCategoryApi.getCategory(value).displayValue)
+    ),
+    ''
+  )
+  return <span>{categoryName}</span>
 }
 
 const CategoryCellEditor = ({ value, onValueChange }) => {

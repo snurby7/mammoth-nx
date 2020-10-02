@@ -8,5 +8,10 @@ export class Category {
   public get formattedNode(): IFormattedNode {
     return { id: this.details.id, value: this.details.name }
   }
+
+  public get displayValue(): string {
+    return this.details.name
+  }
+
   constructor(private details: ICategory) {}
 }

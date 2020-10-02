@@ -1,17 +1,25 @@
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import { Input, MenuItem, Select } from '@material-ui/core'
 import React, { useState } from 'react'
-import { map } from 'rxjs/operators'
+import { map, skipWhile } from 'rxjs/operators'
 import { useObservable } from '../../../hooks'
 import { ITransactionGridRow } from '../../../interface'
 import { rxAccountApi } from '../../models/account'
 
-const AccountCellFormatter = ({ value }) => {
-  console.log('Account => ', value)
-  // TODO This never gets called for some reason.
-  return <span> Waffles</span>
+type CellGridView = { value: string }
+const AccountCellFormatter = ({ value }: CellGridView) => {
+  const { result: accountName } = useObservable(
+    rxAccountApi.accountIdList$.pipe(
+      skipWhile((accountIdList) => !accountIdList.some((accountId) => accountId === value)),
+      map(() => rxAccountApi.getAccount(value).displayValue)
+    ),
+    ''
+  )
+  return <span>{accountName}</span>
 }
+
 const AccountCellEditor = ({ value, onValueChange }) => {
+  console.log('AccountCellEditor')
   const accountId: string | undefined = value // when it's add mode this is undefined
   const [selectedAccountId, setSelectedAccountId] = useState(accountId)
   const { result: accounts } = useObservable(
@@ -51,6 +59,7 @@ const AccountCellEditor = ({ value, onValueChange }) => {
 let detailKey: keyof ITransactionGridRow
 
 export const AccountCellTypeProvider = () => {
+  console.log('AccountCellType')
   return (
     <DataTypeProvider
       for={[(detailKey = 'accountId')]}

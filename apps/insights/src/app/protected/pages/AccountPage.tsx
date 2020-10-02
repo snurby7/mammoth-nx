@@ -17,9 +17,9 @@ export const AccountPage = () => {
 
   const dataColumns: IDataColumn<ITransactionDetail>[] = [
     { name: 'date', title: 'Date', isRequired: true },
-    { name: 'payee', title: 'Payee', isRequired: true },
-    { name: 'account', title: 'Account', isRequired: true },
-    { name: 'category', title: 'Category', isRequired: true },
+    { name: 'payeeId', title: 'Payee', isRequired: true },
+    { name: 'accountId', title: 'Account', isRequired: true },
+    { name: 'categoryId', title: 'Category', isRequired: true },
     { name: 'memo', title: 'Memo', isRequired: false },
     // the server is smart enough to know how to handle the case where either
     // inflow or outflow must be present and will reject if neither is there.
