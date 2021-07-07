@@ -38,6 +38,7 @@ export class TransactionController {
     @Param('budgetId') budgetId: string,
     @Body() request: TransactionCreateDto
   ): Observable<ITransaction> {
+    // TODO: Transaction - need to verify this contract return as I think it's returning the budget model
     if (budgetId !== request.budgetId) {
       throw new BadRequestException()
     }

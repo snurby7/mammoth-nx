@@ -1,25 +1,25 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ITransactionDetail } from '@mammoth/api-interfaces'
-import React, { useCallback, useEffect } from 'react'
+import React, { useEffect } from 'react'
+import { map } from 'rxjs/operators'
 import { IColumnExtension, IDataColumn, TransactionDataTable } from '../components'
-import { useAccountStore, useTransactionStore } from '../hooks'
-import { ITransactionInstance } from '../models'
+import { rxAccountApi } from '../models/account'
+import { rxTransactionApi } from '../models/transaction'
 export const AccountPage = () => {
-  const accountStore = useAccountStore()
-  const transactionStore = useTransactionStore()
+  const viewAccount = rxAccountApi.viewAccountRef
 
   useEffect(() => {
-    if (accountStore.selectedAccount) {
+    if (viewAccount) {
       // must be defined in order to get this to work and optional chaining makes that slightly less clear
-      accountStore.selectedAccount.loadTransactions()
+      viewAccount.getTransactionsByAccount()
     }
-  }, [accountStore.selectedAccount])
+  }, [viewAccount])
 
   const dataColumns: IDataColumn<ITransactionDetail>[] = [
     { name: 'date', title: 'Date', isRequired: true },
-    { name: 'payee', title: 'Payee', isRequired: true },
-    { name: 'account', title: 'Account', isRequired: true },
-    { name: 'category', title: 'Category', isRequired: true },
+    { name: 'payeeId', title: 'Payee', isRequired: true },
+    { name: 'accountId', title: 'Account', isRequired: true },
+    { name: 'categoryId', title: 'Category', isRequired: true },
     { name: 'memo', title: 'Memo', isRequired: false },
     // the server is smart enough to know how to handle the case where either
     // inflow or outflow must be present and will reject if neither is there.
@@ -32,20 +32,18 @@ export const AccountPage = () => {
     { columnName: 'category', width: '200px' },
   ]
 
-  const dataFilter = useCallback(
-    (record: ITransactionInstance) => {
-      return record.accountId.id === accountStore.selectedAccount.id
-    },
-    [accountStore.selectedAccount]
-  )
-
   return (
     <article>
       <TransactionDataTable
-        transactions={transactionStore.transactions}
+        transactions$={rxTransactionApi.transactions$.pipe(
+          map((transactions) =>
+            transactions.filter(
+              (transaction) => transaction.detailRef.accountId === viewAccount.detailRef.id
+            )
+          )
+        )}
         columns={dataColumns}
         columnExtensions={columnExtensions}
-        filter={dataFilter}
       />
     </article>
   )

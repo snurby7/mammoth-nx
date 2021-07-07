@@ -1,54 +1,59 @@
 import { List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core'
 import { AccountBalanceOutlined } from '@material-ui/icons'
-import { observer } from 'mobx-react'
 import React, { ReactNode } from 'react'
-import { useRouter } from '../../../hooks'
+import { useObservable, useRouter } from '../../../hooks'
 import { RoutePaths } from '../../../routes'
 import { formatter, replaceKeyPlaceholders } from '../../../utils'
-import { useAccountStore, useBudgetStore } from '../../hooks'
-import { IAccountInstance } from '../../models'
+import { useBudgetStore } from '../../hooks'
+import { rxAccountApi } from '../../models/account'
 
-export const AccountMenuItem = observer(
-  ({ account }: { account: IAccountInstance }): JSX.Element => {
-    const accountStore = useAccountStore()
-    const budgetStore = useBudgetStore()
-    const router = useRouter()
-    const onAccountClick = () => {
-      accountStore.setAccount(account)
-      router.push(
-        replaceKeyPlaceholders(RoutePaths.AccountPage, {
-          budgetId: budgetStore.selectedBudget?.id,
-          accountId: account.id,
-        })
-      )
-    }
-    // TODO: Format the balance based on if it's negative or not.
-    return (
-      <ListItem alignItems="center" button onClick={onAccountClick}>
-        <ListItemIcon>
-          <AccountBalanceOutlined />
-        </ListItemIcon>
-        <ListItemText primary={account.name} />
-        <ListItemText secondary={formatter.currency(account.balance)} />
-      </ListItem>
+export const AccountMenuItem = ({ accountId }: { accountId: string }) => {
+  const { result: account } = useObservable(
+    rxAccountApi.getAccount(accountId).details$,
+    rxAccountApi.defaultAccount
+  )
+
+  // const accountStore = useAccountStore()
+  const budgetStore = useBudgetStore()
+  const router = useRouter()
+
+  if (!account) {
+    return null
+  }
+
+  const onAccountClick = () => {
+    rxAccountApi.setViewAccount(account.id)
+    router.push(
+      replaceKeyPlaceholders(RoutePaths.AccountPage, {
+        budgetId: budgetStore.selectedBudget?.id,
+        accountId: account.id,
+      })
     )
   }
-)
+  // TODO: Format the balance based on if it's negative or not.
+  return (
+    <ListItem alignItems="center" button onClick={onAccountClick}>
+      <ListItemIcon>
+        <AccountBalanceOutlined />
+      </ListItemIcon>
+      <ListItemText primary={account.name} />
+      <ListItemText secondary={formatter.currency(account.balance)} />
+    </ListItem>
+  )
+}
 
 interface IAccountMenuList {
-  accounts: Map<string, IAccountInstance>
   children?: ReactNode
 }
 
-export const AccountMenuList = observer(
-  ({ accounts, children }: IAccountMenuList): JSX.Element => {
-    return (
-      <List dense={true}>
-        {Array.from(accounts.values()).map((account) => (
-          <AccountMenuItem key={account.id} account={account} />
-        ))}
-        {children}
-      </List>
-    )
-  }
-)
+export const AccountMenuList = ({ children }: IAccountMenuList): JSX.Element => {
+  const { result: accountIds } = useObservable(rxAccountApi.accountIdList$, [])
+  return (
+    <List dense={true}>
+      {accountIds.map((accountId) => (
+        <AccountMenuItem key={accountId} accountId={accountId} />
+      ))}
+      {children}
+    </List>
+  )
+}

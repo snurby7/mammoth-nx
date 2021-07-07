@@ -27,7 +27,7 @@ export const Transaction = types
     get formattedValue(): ITransactionDetail {
       return {
         id: self.id,
-        date: self.date.toDate(),
+        date: {} as any,
         accountId: self.accountId.id,
         account: self.accountId.formattedNode,
         category: self.categoryId.formattedNode,

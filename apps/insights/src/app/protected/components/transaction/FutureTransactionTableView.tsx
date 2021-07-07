@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ITransactionDetail } from '@mammoth/api-interfaces'
 import React from 'react'
-import { useTransactionStore } from '../../hooks'
-import { ITransactionInstance } from '../../models'
+import { map } from 'rxjs/operators'
+import { dateFormatter } from '../../../utils'
+import { rxTransactionApi } from '../../models/transaction'
 import { IColumnExtension, IDataColumn, TransactionDataTable } from './TransactionTable'
 
 const today = new Date()
 
 export const FutureTransactionTableView = () => {
-  const { transactions } = useTransactionStore()
-
   const dataColumns: IDataColumn<ITransactionDetail>[] = [
     { name: 'date', title: 'Date', isRequired: true },
     { name: 'payee', title: 'Payee', isRequired: true },
@@ -26,18 +25,19 @@ export const FutureTransactionTableView = () => {
     { columnName: 'category', width: '200px' },
   ]
 
-  const dataFilter = (transaction: ITransactionInstance) => {
-    return transaction.transactionDate > today
-  }
-
   return (
     <article>
       <TransactionDataTable
-        transactions={transactions}
+        transactions$={rxTransactionApi.transactions$.pipe(
+          map((transactions) =>
+            transactions.filter(
+              (transaction) => dateFormatter.toDate(transaction.detailRef.date) > today
+            )
+          )
+        )}
         columns={dataColumns}
         columnExtensions={columnExtensions}
         hideControls={true}
-        filter={dataFilter}
       />
     </article>
   )
